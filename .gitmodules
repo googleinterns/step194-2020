@@ -4,3 +4,6 @@
 [submodule "noahkrohngold-projects"]
 	path = noahkrohngold-projects
 	url = https://github.com/krowngold/my-portfolio.git
+[submodule "carolinehana-StepProjects"]
+	path = carolinehana-StepProjects
+	url = https://github.com/CarolineHana/carolinehana-StepProjects.git

@@ -1,17 +1,15 @@
+//opens chat and queue on the side and adjusts content size on screen 
+function openSidebar() {
+    const buttonText = document.getElementById('sidebarBtn');
 
-// opens chat and queue on the side and adjusts content size on screen 
-function openChat() {
-  var buttonText = document.getElementById("openbtn");
-
-
-if(buttonText.innerHTML === '<span class="glyphicon glyphicon-menu-left"></span>'){
-	 buttonText.innerHTML = '<span class="glyphicon glyphicon-menu-right"></span>';
-  document.getElementById("mySidebar").style.width = "25%";
-  document.getElementById("main").style.marginRight = "25%";
-}
-else{
-  buttonText.innerHTML = '<span class="glyphicon glyphicon-menu-left"></span>';
-  document.getElementById("mySidebar").style.width = "0";
-  document.getElementById("main").style.marginRight= "0";
-}
+    if (buttonText.innerHTML === '<span class="glyphicon glyphicon-menu-left"></span>') {
+        buttonText.innerHTML = '<span class="glyphicon glyphicon-menu-right"></span>';
+        document.getElementById('mySidebar').style.width = '25%';
+        document.getElementById('main').style.marginRight = '25%';
+    }
+    else{
+        buttonText.innerHTML = '<span class="glyphicon glyphicon-menu-left"></span>';
+        document.getElementById('mySidebar').style.width = '0';
+        document.getElementById('main').style.marginRight= '0';
+    }
 }

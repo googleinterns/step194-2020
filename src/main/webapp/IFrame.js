@@ -13,12 +13,12 @@
 // limitations under the License.
 
 let player = null;
-function onYouTubeIframeAPIReady() {  // eslint-disable-line no-unused-vars
+function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
       'onStateChange': onPlayerStateChange,
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
-    }
+    },
   });
 }
 

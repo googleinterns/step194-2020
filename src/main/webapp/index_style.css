@@ -1,6 +1,6 @@
 body, html {
   height: 100%;
-  background:var(--co-text, rgba(0,0,0, .66));
+  background:var(--co-text, #111);
   margin: 0;
 }
 
@@ -8,6 +8,7 @@ body, html {
     height: 60px;
     width: 100%;
     text-align: center; 
+    float:center;
 }
 
 .YTlogo{
@@ -40,24 +41,27 @@ letter-spacing:normal
 
 #main {
   transition: margin-right .5s;
+  height: 100%;
 }
 
-iframe {
-display:block;
-margin-left: auto;
-margin-right:auto;
-width:80%;
-height:800px;
-position:relative;
-margin-top:2%;
-}
+.videoplayer {
+  margin:auto;
+  margin-top: 1%;
+  position: relative;
+  height: 85%;
+  width: 90%;
+} 
 
+.videoplayer iframe{
+  height: 100%;
+  width: 100%
+} 
 
 .sidebar {
   height: 100%;
   width: 0;
   position: fixed;
-  z-index: 1;
+  z-index:2;
   top: 0;
   right:0px;
   background-color:#E0E0E0;
@@ -67,7 +71,9 @@ margin-top:2%;
 
 #sidebarBtn {
   top: 0;
+  z-index:2;
   font-size: 20px;
+  font-style: bold;
   cursor: pointer;
   background-color: #111;
   color: white;
@@ -89,4 +95,8 @@ margin-top:2%;
     color: #818181;
      display: block;
     transition: 0.3s;
+}
+
+.tab-pane{
+    padding: 15px;
 }

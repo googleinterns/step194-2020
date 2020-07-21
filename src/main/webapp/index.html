@@ -13,16 +13,17 @@
       
       <!-- content that resizes when side bar opens -->
       <div id = "main">
+          <button id="sidebarBtn" onclick="openSidebar()"> <span class="glyphicon glyphicon-menu-left"></span></button> 
            <div class= "header" >
                 <img
                  src="https://firebasestorage.googleapis.com/v0/b/codesign-prod.google.com.a.appspot.com/o/user_assets%2FlyxSOzzXdt1gu3M1bgLd%2FfGwBG6ucZZcvCT6IQ54Y%2Foriginal.svg?alt=media&token=2e67a119-d7c8-4cbb-91de-04f256f74609"
                 class = "YTlogo" />
                 <span class = "title">Lounge</span>
             </div> 
-        <button id="sidebarBtn" onclick="openSidebar()"> <span class="glyphicon glyphicon-menu-left"></span></button> 
           <!-- video placeholder --> 
-          <div id = "videoplayer">
-            <iframe id="ytPlayer" src="https://www.youtube.com/embed/y0U4sD3_lX4"></iframe>
+        <!-- maintains video at 16:9 aspect ratio for all screen sizes -->
+          <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
+            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4" allowfullscreen></iframe>
           </div>
      </div>
 

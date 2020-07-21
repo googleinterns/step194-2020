@@ -12,59 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var player;
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('ytplayer', {
+const player;
+function onYouTubeIframeAPIReady() {  // eslint-disable-line no-unused-vars
+  player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
-      'onStateChange': onPlayerStateChange, 
-      'onPlaybackRateChange': onPlayerPlaybackRateChange
+      'onStateChange': onPlayerStateChange,
+      'onPlaybackRateChange': onPlayerPlaybackRateChange,
     }
   });
 }
 
 function onPlayerStateChange() {
-  getTime(); 
-  switch(player.getPlayerState()) {
+  getTime();
+  switch (player.getPlayerState()) {
     case 1:
-      console.log("now playing"); 
-      break; 
+      console.log('now playing');
+      break;
     case 0:
-      console.log("just ended"); 
-      break; 
+      console.log('just ended');
+      break;
     case 2:
-      console.log("now paused"); 
-      break; 
+      console.log('now paused');
+      break;
     case 5:
-      console.log("now cued"); 
-      break; 
+      console.log('now cued');
+      break;
     case 3:
-      console.log("now buffering"); 
+      console.log('now buffering');
   }
 }
 
 // Get the time of the current video
 function getTime() {
-  console.log(player.getCurrentTime()); 
+  console.log(player.getCurrentTime());
 }
 
-var newTime = 60; 
-
-function setTime(newTime) {
-  player.seekTo(newTime, true); 
+const newTime = 60; // eslint-disable-line no-unused-vars
+function setTime(newTime) { // eslint-disable-line no-unused-vars
+  player.seekTo(newTime, true);
 }
 
 function onPlayerPlaybackRateChange() {
-  console.log("new speed: " + player.getPlaybackRate()); 
+  console.log('new speed: ' + player.getPlaybackRate());
 }
 
-function halfSpeed() {
+function halfSpeed() { // eslint-disable-line no-unused-vars
   player.setPlaybackRate(0.5);
 }
 
-function doubleSpeed() {
-  player.setPlaybackRate(2); 
+function doubleSpeed() { // eslint-disable-line no-unused-vars
+  player.setPlaybackRate(2);
 }
 
-function normalSpeed() {
-  player.setPlaybackRate(1); 
+function normalSpeed() { // eslint-disable-line no-unused-vars
+  player.setPlaybackRate(1);
 }

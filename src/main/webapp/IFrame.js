@@ -150,7 +150,7 @@ function updateVideo(text) {
   if (player.getPlaybackRate() != videoInfo.videoSpeed) {
     player.setPlaybackRate(videoInfo.videoSpeed);
   }
-  videoUpdating = false; 
+  videoUpdating = false;
 }
 
 function beginFetchingLoop() {

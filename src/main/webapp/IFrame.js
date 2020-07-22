@@ -105,7 +105,7 @@ function fetchData() {
   const request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      videoUpdating = true; 
+      videoUpdating = true;
       updateVideo(this.responseText);
     }
   };

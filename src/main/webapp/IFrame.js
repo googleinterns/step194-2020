@@ -27,7 +27,7 @@ function sendInfo(playing) {
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      console.log("Request sent");
+      console.log('Request sent');
     }
   };
   xhttp.open('POST', '/Playback-Test', true);

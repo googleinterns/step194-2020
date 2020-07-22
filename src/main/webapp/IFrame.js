@@ -34,8 +34,8 @@ function sendInfo(playing) {
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   const time = player.getCurrentTime();
   const speed = player.getPlaybackRate();
-  xhttp.send('timestamp=' + time + '&videoSpeed=' + speed + '&isPlaying='
-    + playing);
+  xhttp.send('timestamp=' + time + '&videoSpeed=' + speed + '&isPlaying='+ 
+    playing);
 }
 
 /*

@@ -7,15 +7,17 @@ function verifyURLStructure(url) {
     console.log("false"); //signal bad url to user
   }
   else if (document.getElementById("videoplayer") != null) { //already in a room
-    console.log("good structure!"); //good link structure, now get video from server
+    console.log("good structure!");
     getVideoData(document.getElementById("linkArea").value.substring(32));
   }
   else { //starting a room
+    console.log("good structure!");
     getVideoData(document.getElementById("linkArea").value.substring(32));
   }
 }
 
-async function getVideoData(id) { //might want to cut up url into just video id
+//Retrieve video and create a new room via servlet GET request
+async function getVideoData(id) {
   if (id == "") {
     return;
   }
@@ -32,6 +34,7 @@ async function getVideoData(id) { //might want to cut up url into just video id
   });
 }
 
+//Within a room, so just add video to room's queue via room ID
 async function getVideoData(id, room) {
   if (id == "" || room == "") {
     return;

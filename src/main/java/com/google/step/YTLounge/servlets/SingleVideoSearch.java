@@ -10,16 +10,28 @@ import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.googleapis.services.CommonGoogleClientRequestInitializer;
+import com.google.api.client.googleapis.services.json.CommonGoogleJsonClientRequestInitializer;
+import com.google.api.services.youtube.YouTubeRequestInitializer;
+import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreService.*;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+// import com.google.appengine.api.datastore.Entity.*;
 import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query.*;
+// import com.google.appengine.api.datastore.Query.*;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Key;
+// import com.google.appengine.api.datastore.Key.*;
+import com.google.appengine.api.datastore.KeyFactory;
+// import com.google.appengine.api.datastore.KeyFactory.*;
+import com.google.cloud.datastore.Datastore;
+import com.google.cloud.datastore.DatastoreOptions;
 
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.VideoListResponse;
@@ -32,8 +44,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.lang.Integer;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
-import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/vSearch")
 public class SingleVideoSearch extends HttpServlet {
 
-  private static final String CLIENT_SECRETS= "client_secret.json";
+  private static final String CLIENT_SECRETS= "~/step194-2020/src/main/java/com/google/step/YTLoung/servlets/client_secret.json";
   private static final Collection<String> SCOPES =
       Arrays.asList("https://www.googleapis.com/auth/youtube.readonly");
 
@@ -56,11 +69,12 @@ public class SingleVideoSearch extends HttpServlet {
     * @return an authorized Credential object.
     * @throws IOException
     */
-  public static Credential authorize(final NetHttpTransport httpTransport) throws IOException {
+  public Credential authorize(final NetHttpTransport httpTransport) throws IOException {
       // Load client secrets.
       // ServletContext context = getContext();
       // String fullPath = context.getRealPath("/java/com/google/step/YTLounge/servlets/client_secret.json");
-      InputStream in = SingleVideoSearch.class.getResourceAsStream("/WEB-INF/client_secret.json");
+    //   InputStream in = SingleVideoSearch.class.getResourceAsStream(CLIENT_SECRETS);
+      InputStream in = getServletContext().getResourceAsStream("/WEB-INF/client_secret.json");
       System.err.println(in);
       GoogleClientSecrets clientSecrets =
         GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
@@ -79,14 +93,22 @@ public class SingleVideoSearch extends HttpServlet {
     * @return an authorized API client service
     * @throws GeneralSecurityException, IOException
     */
-  public static YouTube getService() throws GeneralSecurityException, IOException {
+  public YouTube getService() throws GeneralSecurityException, IOException {
+      final YouTubeRequestInitializer KEY_INITIALIZER =
+      new YouTubeRequestInitializer("AIzaSyBIwlgpsYZLoI7cr347HyBoAETX9FvzXps");
       final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-      Credential credential = authorize(httpTransport);
-      return new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
+    //   Credential credential = authorize(httpTransport);
+      return new YouTube.Builder(httpTransport, JSON_FACTORY, null)
           .setApplicationName("YouTube Lounge")
+          .setYouTubeRequestInitializer(KEY_INITIALIZER)
           .build();
   }
 
+  /**
+    * Retrieve query parameters, extract the video if video exists, and 
+    * create new Lounge if necessary based on query request.
+    * Prints video response when complete.
+    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
@@ -94,7 +116,7 @@ public class SingleVideoSearch extends HttpServlet {
     Gson gson = new Gson();
     response.setContentType("application/json");
     String videoID = getParameter(request, "id", "");
-    // String roomid = getParameter(request, "roomid", "");
+    String roomid = getParameter(request, "roomid", generateRoomID());
 
     YouTube youtubeService = null;
     try {
@@ -108,13 +130,16 @@ public class SingleVideoSearch extends HttpServlet {
     YouTube.Videos.List videoRequest = youtubeService.videos()
       .list("snippet,contentDetails");
     VideoListResponse videoResponse = videoRequest.setId(videoID).execute();
+    System.out.println("Response: " + videoResponse +"\n\n");
     JsonObject jsonObject = new JsonParser().parse(gson.toJson(videoResponse)).getAsJsonObject();
     JsonObject error = jsonObject.getAsJsonObject("error");
-    if (error == null) { //if video doesn't exist
+    if (error != null) { //if video doesn't exist
       return;
     }
 
-    extractVideo(jsonObject.getAsJsonArray("items"));
+    System.out.println("\n\n\n" + gson.toJson(videoResponse) + "\n\n\n");
+
+    extractVideo(jsonObject.getAsJsonArray("items"), videoID);
 
     response.getWriter().println(gson.toJson(videoResponse));
   }
@@ -125,43 +150,45 @@ public class SingleVideoSearch extends HttpServlet {
     * necessary properties for the room.
     * @return a string representing a room's identifier
     */
-  // private String generateRoomID() {
-  //   DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-  //   Key roomKey = datastore.newKeyFactory()
-  //     .setKind("room");
-  //   Entity roomEntity = Entity.newBuilder(roomKey)
-  //     .set("members", new HashSet<Key<Member>>())
-  //     .set("nowPlaying", "")
-  //     .set("queue", new List<Key<Video>>())
-  //     .set("duration", 0)
-  //     .set("elapsedTime", 0)
-  //     .set("log", new List<Key<Chat>>())
-  //     .build();
-  //   datastore.put(roomEntity);
-  //   return datastore.get(roomKey).id();
-  // }
+  private String generateRoomID() {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    // Key roomKey = KeyFactory().createKey("room");
+    // Entity roomEntity = Entity.newBuilder(roomKey)
+    Entity roomEntity = new Entity("room");
+      roomEntity.setProperty("members", new HashSet<Key>());
+      roomEntity.setProperty("nowPlaying", "");
+      roomEntity.setProperty("queue", new ArrayList<Key>());
+      roomEntity.setProperty("duration", 0);
+      roomEntity.setProperty("elapsedTime", 0);
+      roomEntity.setProperty("log", new ArrayList<Key>());
+    //   roomEntity.build();
+    datastore.put(roomEntity);
+    return Long.toString(roomEntity.getKey().getId());
+  }
 
   /**
     * Iterates through the given items and locates specific values to 
     * create a new Video and upload the video to DataStore
     */
-  private void extractVideo(JsonArray items) {
+  private void extractVideo(JsonArray items, String videoID) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity videoEntity = new Entity("Video");
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
-      String title = snippet.get("title").getAsString();
+      System.out.println("snippet: " + snippet);
+      String title = snippet.get("title").toString();
+      System.out.println("\nTitle: " + title);
       String thumbnailURL = snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get(
-        "url").getAsString();
-      // String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
-      String duration = snippet.getAsJsonObject("contentDetails").get("duration").getAsString();
-      String channelName = snippet.get("channelTitle").getAsString();
-      String releaseDate = snippet.get("publishedAt").getAsString();
+        "url").toString();
+      String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
+      String duration = items.get(i).getAsJsonObject().getAsJsonObject("contentDetails").get("duration").toString(); //null pointer exception!!!
+      String channelName = snippet.get("channelTitle").toString();
+      String releaseDate = snippet.get("publishedAt").toString();
       
       videoEntity.setProperty("title", title);
       videoEntity.setProperty("thumbnailURL", thumbnailURL);
-      // videoEntity.setProperty("videoURL", formattedVideoURL);
-      // videoEntity.setProperty("videoID", videoID);
+      videoEntity.setProperty("videoURL", formattedVideoURL);
+      videoEntity.setProperty("videoID", videoID);
       videoEntity.setProperty("duration", parseDuration(duration));
       videoEntity.setProperty("channelName", channelName);
       videoEntity.setProperty("releaseDate", releaseDate);

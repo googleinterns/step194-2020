@@ -14,7 +14,7 @@
 
 let player = null; // IFrame variable
 let fetchingInterval = null; // Interval to retrieve information
-let videoUpdating = null; 
+let videoUpdating = null;
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {

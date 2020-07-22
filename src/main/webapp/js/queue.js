@@ -1,4 +1,4 @@
-/*exported verifyURLStructure*/
+/* exported verifyURLStructure */
 /*
   Makes sure the stub of the user's URL is valid and will warn user
   if their link wasn't formatted correctly for the server to parse.
@@ -32,6 +32,7 @@ async function getVideoData(id) {
       });
 }
 
+/* exported getVideoDataWithRoom */
 // Within a room, so just add video to room's queue via room ID
 async function getVideoDataWithRoom(id, room) {
   if (id == '' || room == '') {
@@ -40,7 +41,7 @@ async function getVideoDataWithRoom(id, room) {
   fetch('/vSearch?id=' + id + '&room=' + room)
       .then((response) => response.json())
       .then((video) => {
-        if (video.error != null) { // video was found, now load it into the website
+        if (video.error != null) { // video was found, now load
           // put thumbnail, title, duration, and channel name onto page
           console.log(video);
         } else { // video wasn't found, signal error to user

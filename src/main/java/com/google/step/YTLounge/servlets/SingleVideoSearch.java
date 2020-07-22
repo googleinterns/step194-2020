@@ -5,6 +5,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -16,10 +17,10 @@ import com.google.cloud.datastore.DatastoreOptions;
 import com.google.api.services.youtube.model.VideoListResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.ArrayList;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/vSearch")
 public class SingleVideoSearch extends HttpServlet {
 
-  private static final String CLIENT_SECRETS= 
+  private static final String CLIENT_SECRETS = 
       "~/step194-2020/src/main/java/com/google/step/YTLoung/servlets/client_secret.json";
   private static final Collection<String> SCOPES =
       Arrays.asList("https://www.googleapis.com/auth/youtube.readonly");

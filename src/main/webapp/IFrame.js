@@ -24,31 +24,33 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 }
 
 function sendInfo(playing) {
-  let xhttp = new XMLHttpRequest();
+  const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
+      console.log("Request sent");
     }
   };
-  xhttp.open("POST", "/Playback-Test", true);
-  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.open('POST', '/Playback-Test', true);
+  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   const time = player.getCurrentTime();
   const speed = player.getPlaybackRate();
-  xhttp.send('timestamp=' + time + '&videoSpeed=' + speed + '&isPlaying=' + playing);
+  xhttp.send('timestamp=' + time + '&videoSpeed=' + speed + '&isPlaying='
+    + playing);
 }
 
 /*
-  Note: Currently, I think my biggest problem is I send 
-  more requests than I need to because I don't know exactly 
-  how the user is interacting with the player. 
-  To differentiate between a user pausing and 
+  Note: Currently, I think my biggest problem is I send
+  more requests than I need to because I don't know exactly
+  how the user is interacting with the player.
+  To differentiate between a user pausing and
   moving the video forward/backward, I waited to see if
-  the pause state change was due to the user 
-  stopping the video, or the IFrame's method 
+  the pause state change was due to the user
+  stopping the video, or the IFrame's method
   of skipping around (1. pause 2. move the playhead
   3. buffer 4. play at the new position). This idea works
   in some cases and failed in others (depending on how
   long buffering takes I think), so future commits will
-  hopefully have better methods. 
+  hopefully have better methods.
 */
 function onPlayerStateChange() {
   let timeout;
@@ -64,15 +66,15 @@ function onPlayerStateChange() {
       clearTimeout(timeout);
       break;
     case -1: // just before the video starts
-        beginFetchingLoop();
-        break;
+      beginFetchingLoop();
+      break;
     case 0: // Ended
       endFetchingLoop();
   }
 }
 
 // Get the time of the current video
-function getTime() {
+function getTime() { // eslint-disable-line no-unused-vars
   console.log(player.getCurrentTime());
 }
 
@@ -97,13 +99,13 @@ function normalSpeed() { // eslint-disable-line no-unused-vars
 }
 
 function fetchData() {
-  let request = new XMLHttpRequest();
+  const request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       updateVideo(this.responseText);
     }
   };
-  request.open("GET", "/Playback-Test", true);
+  request.open('GET', '/Playback-Test', true);
   request.send();
 }
 
@@ -118,7 +120,7 @@ function differentStates(serverVidIsPlaying) {
     if (serverVidIsPlaying) { // master playing
       return true;
     }
-  return false;
+    return false;
   }
   if (!serverVidIsPlaying) {
     return true;
@@ -128,12 +130,12 @@ function differentStates(serverVidIsPlaying) {
 
 function updateVideo(text) {
   console.log(text);
-  let videoInfo = JSON.parse(text);
+  const videoInfo = JSON.parse(text);
   if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp, true); 
+    player.seekTo(videoInfo.timestamp, true);
   }
   if (differentStates(videoInfo.isPlaying)) {
-    switch(videoInfo.isPlaying) {
+    switch (videoInfo.isPlaying) {
       case true:
         player.playVideo();
         break;

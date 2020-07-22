@@ -15,8 +15,6 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -98,6 +96,8 @@ public class SingleVideoSearch extends HttpServlet {
     return Long.toString(roomEntity.getKey().getId());
   }
 
+
+
   /**
    * Iterates through the given items and locates specific values to create a new Video and upload
    * the video to DataStore
@@ -107,17 +107,17 @@ public class SingleVideoSearch extends HttpServlet {
     Entity videoEntity = new Entity("Video");
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
-      String title = snippet.get("title").toString();
-      String thumbnailURL = 
+      String thumbnailURL =
           snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get("url").toString();
-      String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
-      String duration = 
+      String title = snippet.get("title").toString();
+      String duration =
           items
               .get(i)
               .getAsJsonObject()
               .getAsJsonObject("contentDetails")
               .get("duration")
               .toString();
+      String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
       String channelName = snippet.get("channelTitle").toString();
       String releaseDate = snippet.get("publishedAt").toString();
       videoEntity.setProperty("title", title);

@@ -96,8 +96,6 @@ public class SingleVideoSearch extends HttpServlet {
     return Long.toString(roomEntity.getKey().getId());
   }
 
-
-
   /**
    * Iterates through the given items and locates specific values to create a new Video and upload
    * the video to DataStore

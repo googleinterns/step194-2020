@@ -14,6 +14,7 @@
 
 let player = null; // IFrame variable
 let fetchingInterval = null; // Interval to retrieve information
+let videoUpdating = null; 
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
@@ -54,22 +55,24 @@ function sendInfo(playing) {
 */
 function onPlayerStateChange() {
   let timeout;
-  switch (player.getPlayerState()) {
-    case 1: // Playing
-      sendInfo(true);
-      clearTimeout(timeout);
-      break;
-    case 2: // paused
-      timeout = setTimeout(sendInfo(false), 1000);
-      break;
-    case 3: // Buffering
-      clearTimeout(timeout);
-      break;
-    case -1: // just before the video starts
-      beginFetchingLoop();
-      break;
-    case 0: // Ended
-      endFetchingLoop();
+  if (!videoUpdating) {
+    switch (player.getPlayerState()) {
+      case 1: // Playing
+        sendInfo(true);
+        clearTimeout(timeout);
+        break;
+      case 2: // paused
+        timeout = setTimeout(sendInfo(false), 1000);
+        break;
+      case 3: // Buffering
+        clearTimeout(timeout);
+        break;
+      case -1: // just before the video starts
+        beginFetchingLoop();
+        break;
+      case 0: // Ended
+        endFetchingLoop();
+    }
   }
 }
 
@@ -83,7 +86,7 @@ function setTime() { // eslint-disable-line no-unused-vars
 }
 
 function onPlayerPlaybackRateChange() {
-  sendInfo(player.getPlayerState() === 1);
+  if (!videoUpdating) sendInfo(player.getPlayerState() === 1);
 }
 
 function halfSpeed() { // eslint-disable-line no-unused-vars
@@ -102,6 +105,7 @@ function fetchData() {
   const request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
+      videoUpdating = true; 
       updateVideo(this.responseText);
     }
   };
@@ -146,6 +150,7 @@ function updateVideo(text) {
   if (player.getPlaybackRate() != videoInfo.videoSpeed) {
     player.setPlaybackRate(videoInfo.videoSpeed);
   }
+  videoUpdating = false; 
 }
 
 function beginFetchingLoop() {

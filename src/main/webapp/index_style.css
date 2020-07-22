@@ -1,0 +1,102 @@
+body, html {
+  height: 100%;
+  background:var(--co-text, #111);
+  margin: 0;
+}
+
+.header {
+    height: 60px;
+    width: 100%;
+    text-align: center; 
+    float:center;
+}
+
+.YTlogo{
+display: inline-block;
+width:202px;
+height:50px;
+object-position:50% 42%;
+position:relative;
+opacity:1;
+margin:auto;
+object-fit:cover;
+top:11px;
+}
+
+.title{
+overflow:visible visible;
+display: inline-block;
+position:relative;
+opacity:1;
+margin:auto;
+font:700 44px/58px Roboto;
+vertical-align:top;
+padding:6px 6px 6px 6px;
+align-self:start;
+top:6px;
+justify-self:start;
+color:var(--co-text-light, #FFFFFF);
+letter-spacing:normal
+}
+
+#main {
+  transition: margin-right .5s;
+  height: 100%;
+}
+
+.videoplayer {
+  margin:auto;
+  margin-top: 1%;
+  position: relative;
+  height: 85%;
+  width: 90%;
+} 
+
+.videoplayer iframe{
+  height: 100%;
+  width: 100%
+} 
+
+.sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index:2;
+  top: 0;
+  right:0px;
+  background-color:#E0E0E0;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+#sidebarBtn {
+  top: 0;
+  z-index:2;
+  font-size: 20px;
+  font-style: bold;
+  cursor: pointer;
+  background-color: #111;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  margin:0px;
+  float: right;
+}
+
+#sidebarBtn:hover {
+  background-color: #444;
+}
+
+#tabs li { 
+    font:500 20px/30px Roboto;
+    padding: 8px 0px 8px 0px;
+    text-decoration: none;
+     font-size: 15px;
+    color: #818181;
+     display: block;
+    transition: 0.3s;
+}
+
+.tab-pane{
+    padding: 15px;
+}

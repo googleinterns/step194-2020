@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>YouTube Lounge</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="index_style.css"></link>
+    <script src="index_script.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body >
+      
+      <!-- content that resizes when side bar opens -->
+      <div id = "main">
+          <button id="sidebarBtn" onclick="openSidebar()"> <span class="glyphicon glyphicon-menu-left"></span></button> 
+           <div class= "header" >
+                <img
+                 src="https://firebasestorage.googleapis.com/v0/b/codesign-prod.google.com.a.appspot.com/o/user_assets%2FlyxSOzzXdt1gu3M1bgLd%2FfGwBG6ucZZcvCT6IQ54Y%2Foriginal.svg?alt=media&token=2e67a119-d7c8-4cbb-91de-04f256f74609"
+                class = "YTlogo" />
+                <span class = "title">Lounge</span>
+            </div> 
+          <!-- video placeholder --> 
+        <!-- maintains video at 16:9 aspect ratio for all screen sizes -->
+          <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
+            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4" allowfullscreen></iframe>
+          </div>
+     </div>
+
+     <div id="mySidebar" class="sidebar">
+        <ul class="nav nav-tabs" id= "tabs">
+        <li class="active"><a data-toggle="tab" href="#chat">  <span class="glyphicon glyphicon-comment"></span> Chat</a></li>
+        <li><a data-toggle="tab" href="#queue"> <span class="glyphicon glyphicon-th-list"></span> Queue</a></li>
+        <li><a data-toggle="tab" href="#guests"> <span class="glyphicon glyphicon-user"></span> Guests</a></li>
+        </ul>
+  
+        <!-- each tab contains placeholder text -->
+        <div class="tab-content">
+          <div id="chat" class="tab-pane in active">
+            <h3>Chat</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, 
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+          </div>
+          <div id="queue" class="tab-pane">
+            <h3>Queue</h3>
+            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                 laboris nisi ut aliquip ex ea commodo consequat.</p>
+          </div>
+          <div id="guests" class="tab-pane">
+            <h3>Guests</h3>
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem 
+                accusantium doloremque laudantium, totam rem aperiam.</p>
+          </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+

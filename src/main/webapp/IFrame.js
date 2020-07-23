@@ -39,32 +39,22 @@ function sendInfo(playing) {
     playing);
 }
 
-/*
-  Note: Currently, I think my biggest problem is I send
-  more requests than I need to because I don't know exactly
-  how the user is interacting with the player.
-  To differentiate between a user pausing and
-  moving the video forward/backward, I waited to see if
-  the pause state change was due to the user
-  stopping the video, or the IFrame's method
-  of skipping around (1. pause 2. move the playhead
-  3. buffer 4. play at the new position). This idea works
-  in some cases and failed in others (depending on how
-  long buffering takes I think), so future commits will
-  hopefully have better methods.
-*/
+let timeout;
 function onPlayerStateChange() {
-  let timeout;
+  console.log(player.getPlayerState());
   if (!videoUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
+        console.log("play: " + player.getCurrentTime());
         clearTimeout(timeout);
         sendInfo(true);
         break;
       case 2: // paused
-        timeout = setTimeout(sendInfo(false), 1500);
+        console.log("pause: " + player.getCurrentTime());
+        timeout = setTimeout(sendInfo, 100, false);
         break;
       case 3: // Buffering
+        console.log("buffer: " + player.getCurrentTime());
         clearTimeout(timeout);
         break;
       case -1: // Just before video starts
@@ -136,7 +126,7 @@ function updateVideo(text) {
   const videoInfo = JSON.parse(text);
   videoUpdating = true;
   if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp - 1, true);
+    player.seekTo(videoInfo.timestamp - 0.75, true);
   }
   if (differentStates(videoInfo.isPlaying)) {
     switch (videoInfo.isPlaying) {
@@ -156,7 +146,7 @@ function updateVideo(text) {
 
 function beginFetchingLoop() {
   clearInterval(fetchingInterval);
-  fetchingInterval = setInterval(fetchData, 1000);
+  fetchingInterval = setInterval(fetchData, 1500);
 }
 
 function endFetchingLoop() {

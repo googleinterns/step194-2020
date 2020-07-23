@@ -45,16 +45,13 @@ function onPlayerStateChange() {
   if (!videoUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
-        console.log("play: " + player.getCurrentTime());
         clearTimeout(timeout);
         sendInfo(true);
         break;
       case 2: // paused
-        console.log("pause: " + player.getCurrentTime());
         timeout = setTimeout(sendInfo, 100, false);
         break;
       case 3: // Buffering
-        console.log("buffer: " + player.getCurrentTime());
         clearTimeout(timeout);
         break;
       case -1: // Just before video starts

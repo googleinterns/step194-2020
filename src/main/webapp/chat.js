@@ -2,7 +2,8 @@
 window.onload = function() {
   const input = document.getElementById('new-message');
   document.getElementById('send').onclick = function() {
-      input.forEach(addChatMessage())};
+    input.forEach(addChatMessage())
+    };
 
   input.addEventListener('keyup', function(event) {
   // "Enter" key on the keyboard
@@ -16,7 +17,7 @@ window.onload = function() {
     const message = document.getElementById('new-message');
     const chatList = document.getElementById('chat-history');
 
-    if (message !== ''){
+    if (message !== '') {
       formattedComment = createChatElement(message);
       chatList.appendChild(formattedComment);
       document.getElementById('new-message').value = '';
@@ -31,7 +32,7 @@ function createChatElement(message) {
   avatarElement.className = 'avatar';
 
   const textElement = document.createElement('span');
-  textElement.innerText = message.value + "\n";
+  textElement.innerText = message.value + '\n';
 
   const UserInfoElement = document.createElement('span');
   UserInfoElement.innerHTML = '  <b>Sundar Pichai</b>  ';

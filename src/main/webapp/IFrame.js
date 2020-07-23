@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let player = null; // IFrame variable
 let fetchingInterval = null; // Interval to retrieve information
 let videoUpdating = null;
+let player;
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
@@ -58,18 +58,18 @@ function onPlayerStateChange() {
   if (!videoUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
-        sendInfo(true);
         clearTimeout(timeout);
+        sendInfo(true);
         break;
       case 2: // paused
-        timeout = setTimeout(sendInfo(false), 1000);
+        timeout = setTimeout(sendInfo(false), 1500);
         break;
       case 3: // Buffering
         clearTimeout(timeout);
         break;
-      case -1: // just before the video starts
-        beginFetchingLoop();
-        break;
+      case -1: // Just before video starts
+        beginFetchingLoop(); 
+        break; 
       case 0: // Ended
         endFetchingLoop();
     }
@@ -105,7 +105,6 @@ function fetchData() {
   const request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      videoUpdating = true;
       updateVideo(this.responseText);
     }
   };
@@ -115,7 +114,7 @@ function fetchData() {
 
 // return true if player time is within 5 seconds of master time
 function timesInRange(serverVidTime) {
-  return Math.abs(player.getCurrentTime() - serverVidTime) < 5;
+  return Math.abs(player.getCurrentTime() - serverVidTime) < 3;
 }
 
 // return true if player state is different than master state
@@ -135,8 +134,9 @@ function differentStates(serverVidIsPlaying) {
 function updateVideo(text) {
   console.log(text);
   const videoInfo = JSON.parse(text);
+  videoUpdating = true;
   if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp, true);
+    player.seekTo(videoInfo.timestamp - 1, true);
   }
   if (differentStates(videoInfo.isPlaying)) {
     switch (videoInfo.isPlaying) {
@@ -145,6 +145,7 @@ function updateVideo(text) {
         break;
       case false:
         player.pauseVideo();
+        player.seekTo(videoInfo.timestamp, true);
     }
   }
   if (player.getPlaybackRate() != videoInfo.videoSpeed) {
@@ -154,7 +155,8 @@ function updateVideo(text) {
 }
 
 function beginFetchingLoop() {
-  fetchingInterval = setInterval(fetchData, 3000);
+  clearInterval(fetchingInterval);
+  fetchingInterval = setInterval(fetchData, 1000);
 }
 
 function endFetchingLoop() {

@@ -100,3 +100,26 @@ letter-spacing:normal
 .tab-pane{
     padding: 15px;
 }
+
+.queueVideo {
+    display: flex;
+    flex-direction: row;
+    padding: 0.15%;
+}
+
+.videoThumbnail {
+    height: 80px;
+    width: auto;
+    padding: 0.1%;
+}
+
+.videoSubmit {
+    display: flex;
+    flex-direction: row;
+    padding: 0.25%;
+}
+
+#linkError {
+    display: none;
+    color: red;
+}

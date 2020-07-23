@@ -1,13 +1,16 @@
+
+#chat-display{
+    overflow: auto;
+    height: 900px;
+    position: relative;
+
+}
 #chat-history {  
     margin-bottom: 5px; 
     border-bottom: 1px solid silver;  
-    display: flex;
-    justify-content: left;
-    align-items: flex-end;
     position: relative;
-    height: 90%;
-    font: 8px;
-    } 
+    font: 8px;   
+} 
 
 ul {
     padding: 0;
@@ -21,7 +24,7 @@ ul {
 }
 
 textarea { 
-    display:block;
+    display:inline-block;
 width:100%;
 left:0px;
 position:absolute;

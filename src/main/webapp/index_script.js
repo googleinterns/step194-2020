@@ -24,7 +24,7 @@ function removeVideo(element) { // eslint-disable-line no-unused-vars
 function addToQueue(url) { // eslint-disable-line no-unused-vars
   document.getElementById('linkError').style.display = 'none';
   if (url == 'https://www.youtube.com/watch?v=JhckVlgYZJE') {
-    document.getElementById('videoContainer').innerHTML += 
+    document.getElementById('videoContainer').innerHTML +=
         '<div id="video4" class="queueVideo">' +
           '<img ' +
             'class="videoThumbnail"' +

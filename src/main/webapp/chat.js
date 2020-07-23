@@ -1,13 +1,12 @@
+// local storage of comments
 window.onload = function(){
-     
-document.getElementById("send").onclick = function() {addChatMessage()};
-
 var input = document.getElementById("new-message");
+document.getElementById("send").onclick = function() {input.forEach(addChatMessage())};
 
 input.addEventListener("keyup", function(event) {
-  // Number 13 is the "Enter" key on the keyboard
+  // "Enter" key on the keyboard
   if (event.keyCode === 13) {
-        addChatMessage();
+        input.forEach(addChatMessage());
   }
 });
 var formattedComment = "";
@@ -15,16 +14,16 @@ var formattedComment = "";
 function addChatMessage() {
     var message = document.getElementById("new-message");
      const chatList = document.getElementById('chat-history');
-    chatList.innerHTML = '';
+
     if(message !== ""){
-        formattedComment += createChatElement(message);
-        localStorage.setItem("messageStorageKey", formattedComment); 
-        chatList.innerHTML = localStorage.getItem("messageStorageKey");
+        formattedComment = createChatElement(message);
+        chatList.appendChild(formattedComment);
         document.getElementById("new-message").value = "";
         }
     }
  }
 
+//placeholder items for avatar and display name
  function createChatElement(message) {
     const avatarElement = document.createElement('img');
     avatarElement.src= "https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png";
@@ -40,5 +39,5 @@ function addChatMessage() {
     chatListElement.appendChild(avatarElement);
     chatListElement.appendChild(UserInfoElement);
     chatListElement.appendChild(textElement);
-    return chatListElement; 
+    return chatListElement;
 }

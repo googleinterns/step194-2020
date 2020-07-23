@@ -68,8 +68,8 @@ function onPlayerStateChange() {
         clearTimeout(timeout);
         break;
       case -1: // Just before video starts
-        beginFetchingLoop(); 
-        break; 
+        beginFetchingLoop();
+        break;
       case 0: // Ended
         endFetchingLoop();
     }

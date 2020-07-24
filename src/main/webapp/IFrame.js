@@ -128,9 +128,9 @@ function updateVideo(text) {
     player.setPlaybackRate(videoInfo.videoSpeed);
   }
   if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp - 
+    player.seekTo(videoInfo.timestamp -
       ((FETCH_PERIOD / NUM_MEMBERS) * player.getPlaybackRate()), true);
-    player.playVideo(); 
+    player.playVideo();
   } else { // Only updates play state on play/pause, not seek
     if (differentStates(videoInfo.isPlaying)) {
       switch (videoInfo.isPlaying) {

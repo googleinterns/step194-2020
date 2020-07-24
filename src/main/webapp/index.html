@@ -5,7 +5,9 @@
     <title>YouTube Lounge</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="index_style.css"></link>
-    
+    <link rel="stylesheet" href="chat_style.css"></link>
+    <script src="index_script.js"></script>
+    <script src="chat.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="IFrame.js"></script>
@@ -39,9 +41,15 @@
         <!-- each tab contains placeholder text -->
         <div class="tab-content">
           <div id="chat" class="tab-pane in active">
-            <h3>Chat</h3>
-            <p>[PLACEHOLDER TEXT]</p>
-          </div>
+             <div id="chat-display">
+                 <ul id ="chat-history"></ul> 
+            </div>
+            <div class= "new-chat">
+                 <button id="emoji"> <span class="glyphicon glyphicon-sunglasses"></span> </button>
+                 <textarea id="new-message" type="text" placeholder="Type a chat message ..." spellcheck></textarea>
+                 <button id= "send" method="GET" action="chatmessages"> <span class= "glyphicon glyphicon-send"></span></button>
+             </div>
+        </div>
           <div id="queue" class="tab-pane">
             <div id="videoContainer">
                 <h3>Queue</h3>

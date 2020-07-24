@@ -99,6 +99,7 @@ letter-spacing:normal
 
 .tab-pane{
     padding: 15px;
+    height: 100%;
 }
 
 .queueVideo {

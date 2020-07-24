@@ -17,14 +17,9 @@ package com.google.step.YTLounge.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.KeyRange;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.gson.Gson;
 import java.io.IOException;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -93,9 +88,9 @@ public class PlaybackCalls extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity entity = null;
     try {
-    entity = datastore.get(videoKey);
+      entity = datastore.get(videoKey);
     } catch (Exception e) {
-        e.printStackTrace();
+      e.printStackTrace();
     }
     double timestamp = (double) entity.getProperty("Timestamp");
     boolean isPlaying = (boolean) entity.getProperty("isPlaying");
@@ -104,7 +99,7 @@ public class PlaybackCalls extends HttpServlet {
     vid.setVideoSpeed(videoSpeed); 
     vid.setIsPlaying(isPlaying); 
     if (isPlaying) { // Only change the timestamp if the video is playing
-      timestamp+= (FETCH_PERIOD/NUM_VIEWERS) * videoSpeed; 
+      timestamp += (FETCH_PERIOD / NUM_VIEWERS) * videoSpeed; 
       entity.setProperty("Timestamp", timestamp);
       datastore.put(entity);
     }  
@@ -115,8 +110,7 @@ public class PlaybackCalls extends HttpServlet {
 
   private boolean getIsPlaying(HttpServletRequest request) {
     String isPlayingString = request.getParameter("isPlaying"); 
-    if (isPlayingString.equals("true")) return true; 
-    return false; 
+    return (isPlayingString.equals("true")); 
   }
 
   private double getTimestamp(HttpServletRequest request) {

@@ -30,7 +30,7 @@ function sendInfo(playing) {
       console.log('Request sent');
     }
   };
-  xhttp.open('POST', '/Playback-Test', true);
+  xhttp.open('POST', '/PlaybackInfo', true);
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   const time = player.getCurrentTime();
   const speed = player.getPlaybackRate();
@@ -94,11 +94,11 @@ function fetchData() {
       updateVideo(this.responseText);
     }
   };
-  request.open('GET', '/Playback-Test', true);
+  request.open('GET', '/PlaybackInfo', true);
   request.send();
 }
 
-const SYNC_WINDOW = 3; // max time diff between client and server
+const SYNC_WINDOW = 5; // max time diff between client and server
 // return true if player time is within 5 seconds of master time
 function timesInRange(serverVidTime) {
   return Math.abs(player.getCurrentTime() - serverVidTime) < SYNC_WINDOW;
@@ -124,28 +124,30 @@ function updateVideo(text) {
   console.log(text);
   const videoInfo = JSON.parse(text);
   videoUpdating = true;
-  if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp - (FETCH_PERIOD / NUM_MEMBERS), true);
-  }
-  if (differentStates(videoInfo.isPlaying)) {
-    switch (videoInfo.isPlaying) {
-      case true:
-        player.playVideo();
-        break;
-      case false:
-        player.pauseVideo();
-        player.seekTo(videoInfo.timestamp, true);
-    }
-  }
   if (player.getPlaybackRate() != videoInfo.videoSpeed) {
     player.setPlaybackRate(videoInfo.videoSpeed);
+  }
+  if (!timesInRange(videoInfo.timestamp)) {
+    player.seekTo(videoInfo.timestamp - 
+      ((FETCH_PERIOD / NUM_MEMBERS) * player.getPlaybackRate()), true);
+    player.playVideo(); 
+  } else { // Only updates play state on play/pause, not seek
+    if (differentStates(videoInfo.isPlaying)) {
+      switch (videoInfo.isPlaying) {
+        case true:
+          player.playVideo();
+          break;
+        case false:
+          player.pauseVideo();
+          player.seekTo(videoInfo.timestamp, true);
+      }
+    }
   }
   videoUpdating = false;
 }
 
 let fetchingInterval; // Interval to retrieve information
 function beginFetchingLoop() {
-  clearInterval(fetchingInterval);
   fetchingInterval = setInterval(fetchData, FETCH_PERIOD*1000);
 }
 

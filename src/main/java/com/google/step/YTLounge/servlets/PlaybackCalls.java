@@ -34,10 +34,14 @@ public class PlaybackCalls extends HttpServlet {
 
   /** A YouTube video's data and relevant information */
   private static class PlaybackInfo {
-    private double timestamp; private boolean isPlaying; private double videoSpeed; 
+    private double timestamp;
+    private boolean isPlaying;
+    private double videoSpeed;
 
     public PlaybackInfo() {
-      timestamp = 0; isPlaying = false; videoSpeed = 1; 
+      timestamp = 0;
+      isPlaying = false;
+      videoSpeed = 1;
     }
 
     public void setTimestamp(double timestamp) {
@@ -57,7 +61,7 @@ public class PlaybackCalls extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity newVideo = null; 
+    Entity newVideo = null;
     if (videoKey != null) { // A video has been started and stored
       try {
         newVideo = datastore.get(videoKey);
@@ -98,7 +102,7 @@ public class PlaybackCalls extends HttpServlet {
       timestamp += (FETCH_PERIOD / NUM_VIEWERS) * videoSpeed;
       entity.setProperty("Timestamp", timestamp);
       datastore.put(entity);
-    } 
+    }
     vid.setTimestamp(timestamp);
     response.setContentType("application/json;");
     response.getWriter().println(convertToJsonUsingGson(vid));

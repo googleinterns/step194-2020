@@ -4,12 +4,12 @@
   if their link wasn't formatted correctly for the server to parse.
 */
 function verifyURLStructure(url) {
-  var validator = new RegExp(''
-    + /(^(?:https?:\/\/)?(?:www\.)?)/.source
-    + /((?:youtu\.be\/|youtube\.com\/))/.source
-    + /((?:embed\/|v\/|watch\?v=|watch\?.+&v=))/.source
-    + /((\w|-){11})(?:\S+)?$/.source
-  ); //regex for youtube link validation
+  let validator = new RegExp('' +
+    /(^(?:https?:\/\/)?(?:www\.)?)/.source +
+    /((?:youtu\.be\/|youtube\.com\/))/.source +
+    /((?:embed\/|v\/|watch\?v=|watch\?.+&v=))/.source +
+    /((\w|-){11})(?:\S+)?$/.source,
+  ); // regex for youtube link validation
   if (!url.match(validator)) {
     console.log('false'); // signal bad url to user
   } else if (document.getElementById('videoplayer') != null) {

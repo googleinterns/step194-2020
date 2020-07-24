@@ -13,7 +13,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -37,8 +36,7 @@ public class SingleVideoSearch extends HttpServlet {
    */
   public YouTube getService() throws GeneralSecurityException, IOException {
     String key = readSecrets();
-    final YouTubeRequestInitializer keyInitializer =
-        new YouTubeRequestInitializer(key);
+    final YouTubeRequestInitializer keyInitializer = new YouTubeRequestInitializer(key);
     final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     return new YouTube.Builder(httpTransport, jsonFactory, null)
         .setApplicationName("YouTube Lounge")
@@ -153,7 +151,8 @@ public class SingleVideoSearch extends HttpServlet {
     }
     minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
     seconds += (minutes * 60);
-    shortenedTime = shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
+    shortenedTime = 
+        shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
     seconds += Integer.parseInt(shortenedTime);
 
     return seconds;
@@ -173,19 +172,19 @@ public class SingleVideoSearch extends HttpServlet {
     return value;
   }
 
-private String readSecrets() {
-  try {
-    File secretFile = new File("dataSecret.txt");
-    Scanner myReader = new Scanner(secretFile);
-    if (myReader.hasNextLine()) {
-      String data = myReader.nextLine();
-      return data;
+  private String readSecrets() {
+    try {
+      File secretFile = new File("dataSecret.txt");
+      Scanner myReader = new Scanner(secretFile);
+      if (myReader.hasNextLine()) {
+        String data = myReader.nextLine();
+        return data;
+      }
+      myReader.close();
+    } catch (Exception e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
     }
-    myReader.close();
-  } catch (Exception e) {
-    System.out.println("An error occurred.");
-    e.printStackTrace();
-  }
-  return "";
+    return "";
   }
 }

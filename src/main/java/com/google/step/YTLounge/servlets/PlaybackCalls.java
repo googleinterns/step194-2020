@@ -34,25 +34,21 @@ public class PlaybackCalls extends HttpServlet {
 
   /** A YouTube video's data and relevant information */
   private static class PlaybackInfo {
-    private double timestamp; 
-    private boolean isPlaying; 
-    private double videoSpeed; 
+    private double timestamp; private boolean isPlaying; private double videoSpeed; 
 
     public PlaybackInfo() {
-      timestamp = 0; 
-      isPlaying = false; 
-      videoSpeed = 1; 
+      timestamp = 0; isPlaying = false; videoSpeed = 1; 
     }
 
-    public void setTimestamp (double timestamp) {
+    public void setTimestamp(double timestamp) {
       this.timestamp = timestamp;
     }
 
-    public void setIsPlaying (boolean isPlaying) {
+    public void setIsPlaying(boolean isPlaying) {
       this.isPlaying = isPlaying;
     }
 
-    public void setVideoSpeed (double videoSpeed) {
+    public void setVideoSpeed(double videoSpeed) {
       this.videoSpeed = videoSpeed;
     }
   }
@@ -76,7 +72,7 @@ public class PlaybackCalls extends HttpServlet {
       newVideo.setProperty("Timestamp", 0.0);
       newVideo.setProperty("isPlaying", true);
       newVideo.setProperty("videoSpeed", 1.0);
-      videoKey = newVideo.getKey(); 
+      videoKey = newVideo.getKey();
     }
     datastore.put(newVideo);
     response.sendRedirect("/index.html");
@@ -96,31 +92,28 @@ public class PlaybackCalls extends HttpServlet {
     boolean isPlaying = (boolean) entity.getProperty("isPlaying");
     double videoSpeed = (double) entity.getProperty("videoSpeed");
     PlaybackInfo vid = new PlaybackInfo();
-    vid.setVideoSpeed(videoSpeed); 
-    vid.setIsPlaying(isPlaying); 
+    vid.setVideoSpeed(videoSpeed);
+    vid.setIsPlaying(isPlaying);
     if (isPlaying) { // Only change the timestamp if the video is playing
-      timestamp += (FETCH_PERIOD / NUM_VIEWERS) * videoSpeed; 
+      timestamp += (FETCH_PERIOD / NUM_VIEWERS) * videoSpeed;
       entity.setProperty("Timestamp", timestamp);
       datastore.put(entity);
-    }  
-    vid.setTimestamp(timestamp); 
+    } 
+    vid.setTimestamp(timestamp);
     response.setContentType("application/json;");
     response.getWriter().println(convertToJsonUsingGson(vid));
   }
 
   private boolean getIsPlaying(HttpServletRequest request) {
-    String isPlayingString = request.getParameter("isPlaying"); 
-    return (isPlayingString.equals("true")); 
+    return (request.getParameter("isPlaying").equals("true"));
   }
 
   private double getTimestamp(HttpServletRequest request) {
-    String timestampString = request.getParameter("timestamp"); 
-    return Double.parseDouble(timestampString);
+    return Double.parseDouble(request.getParameter("timestamp"));
   }
 
   private double getVideoSpeed(HttpServletRequest request) {
-    String videoSpeedString = request.getParameter("videoSpeed"); 
-    return Double.parseDouble(videoSpeedString); 
+    return Double.parseDouble(request.getParameter("videoSpeed"));
   }
 
   private String convertToJsonUsingGson(PlaybackInfo input) {

@@ -98,7 +98,7 @@ function fetchData() {
   request.send();
 }
 
-const SYNC_WINDOW = 3 // max time diff between client and server
+const SYNC_WINDOW = 3; // max time diff between client and server
 // return true if player time is within 5 seconds of master time
 function timesInRange(serverVidTime) {
   return Math.abs(player.getCurrentTime() - serverVidTime) < SYNC_WINDOW;

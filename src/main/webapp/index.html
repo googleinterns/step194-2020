@@ -5,10 +5,14 @@
     <title>YouTube Lounge</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="index_style.css"></link>
+    <link rel="stylesheet" href="chat_style.css"></link>
     <script src="index_script.js"></script>
     <script src="js/queue.js"></script>
+    <script src="chat.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="IFrame.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script> 
   </head>
   <body >
       
@@ -24,7 +28,7 @@
           <!-- video placeholder --> 
         <!-- maintains video at 16:9 aspect ratio for all screen sizes -->
           <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
-            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4" allowfullscreen></iframe>
+            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4?autoplay=1&mute=1&enablejsapi=1" allow="autoplay" allowfullscreen></iframe>
           </div>
      </div>
 
@@ -38,22 +42,85 @@
         <!-- each tab contains placeholder text -->
         <div class="tab-content">
           <div id="chat" class="tab-pane in active">
-            <h3>Chat</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, 
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          </div>
+             <div id="chat-display">
+                 <ul id ="chat-history"></ul> 
+            </div>
+            <div class= "new-chat">
+                 <button id="emoji"> <span class="glyphicon glyphicon-sunglasses"></span> </button>
+                 <textarea id="new-message" type="text" placeholder="Type a chat message ..." spellcheck></textarea>
+                 <button id= "send" method="GET" action="chatmessages"> <span class= "glyphicon glyphicon-send"></span></button>
+             </div>
+        </div>
           <div id="queue" class="tab-pane">
-            <h3>Queue</h3>
-            <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                 laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <div id="videoContainer">
+                <h3>Queue</h3>
+                <div id="video1" class="queueVideo">
+                    <img 
+                        class="videoThumbnail" 
+                        src="images/shaq.png"
+                    />
+                    <div id="video1Info" class="videoInfo">
+                        <p class="videoTitle">Shaq Tries to Not Make a Face While Eating Spicy Wings | Hot Ones</p>
+                        <button class="removeVideoBtn" id="removeVideoBtn1" onclick="removeVideo(document.getElementById('video1'))">
+                            <img src="images/remove-from-queue.svg"/>
+                        </button>
+                        <p>31:09</p>
+                    </div>
+                </div>
+                <div id="video2" class="queueVideo">
+                    <img 
+                        class="videoThumbnail"
+                        src="images/bwb.png"
+                    />
+                    <div id="video2Info" class="videoInfo">
+                        <p class="videoTitle">Binging with Babish: Ratatouille (Confit Byaldi) from Ratatouille</p>
+                        <button class="removeVideoBtn" id="removeVideoBtn2" onclick="removeVideo(document.getElementById('video2'))">
+                            <img src="images/remove-from-queue.svg"/>
+                        </button>
+                        <p>4:04</p>
+                    </div>
+                </div>
+                <div id="video3" class="queueVideo">
+                    <img 
+                        class="videoThumbnail"
+                        src="images/japancars.png"
+                    />
+                    <div id="video3Info" class="videoInfo">
+                        <p class="videoTitle">Japan's Surprising Obsession with American Cars</p>
+                        <button class="removeVideoBtn" id="removeVideoBtn3" onclick="removeVideo(document.getElementById('video3'))">
+                            <img src="images/remove-from-queue.svg"/>
+                        </button>
+                        <p>9:56</p>
+                    </div>
+                </div>
+            </div>
+            <div class="videoSubmit">
+                <textarea id="linkArea"></textarea>
+                <button class="submitBtn" id="queueBtn" onclick="addToQueue(document.getElementById('linkArea').value)">Add to queue</button>    
+            </div>
+            <p id="linkError">Bad link!</p>
           </div>
           <div id="guests" class="tab-pane">
             <h3>Guests</h3>
-            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem 
-                accusantium doloremque laudantium, totam rem aperiam.</p>
+            <div class="guest">
+                <img id="caroline" class="userPic" src="images/caroline.jpg"/>
+                <h4 class="username">carolinehana@google.com</h4>
+            </div>
+            <div class="guest">
+                <img id="clayton" class="userPic" src="images/clayton.png"/>
+                <h4 class="username">clayferg@google.com</h4>
+            </div>
+            <div class="guest">
+                <img id="noah" class="userPic" src="images/noah.jpg"/>
+                <h4 class="username">nkrohngold@google.com</h4>
+            </div>
+            <div class="guest">
+                <img id="sundar" class="userPic" src="images/sundar.jpg"/>
+                <h4 class="username">sundar@google.com</h4>
+            </div>
           </div>
         </div>
     </div>
-
+    <script src="index_script.js"></script>
 </body>
 </html>

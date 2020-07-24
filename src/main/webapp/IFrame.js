@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let fetchingInterval = null; // Interval to retrieve information
-let videoUpdating = null;
-let player;
+let videoUpdating; // boolean for when server request is updating video 
+let player; 
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
@@ -99,9 +98,10 @@ function fetchData() {
   request.send();
 }
 
+const SYNC_WINDOW = 3 // max time diff between client and server 
 // return true if player time is within 5 seconds of master time
 function timesInRange(serverVidTime) {
-  return Math.abs(player.getCurrentTime() - serverVidTime) < 3;
+  return Math.abs(player.getCurrentTime() - serverVidTime) < SYNC_WINDOW;
 }
 
 // return true if player state is different than master state
@@ -118,12 +118,14 @@ function differentStates(serverVidIsPlaying) {
   return false;
 }
 
+const FETCH_PERIOD = 1.5; // time between information retreival in seconds
+const NUM_MEMBERS = 2; // number of room participants 
 function updateVideo(text) {
   console.log(text);
   const videoInfo = JSON.parse(text);
   videoUpdating = true;
   if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp - 0.75, true);
+    player.seekTo(videoInfo.timestamp - (FETCH_PERIOD / NUM_MEMBERS), true);
   }
   if (differentStates(videoInfo.isPlaying)) {
     switch (videoInfo.isPlaying) {
@@ -141,9 +143,10 @@ function updateVideo(text) {
   videoUpdating = false;
 }
 
+let fetchingInterval; // Interval to retrieve information
 function beginFetchingLoop() {
   clearInterval(fetchingInterval);
-  fetchingInterval = setInterval(fetchData, 1500);
+  fetchingInterval = setInterval(fetchData, FETCH_PERIOD*1000);
 }
 
 function endFetchingLoop() {

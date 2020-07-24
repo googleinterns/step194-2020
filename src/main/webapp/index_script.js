@@ -18,7 +18,7 @@ function openSidebar() { // eslint-disable-line no-unused-vars
 
 function removeVideo(element) { // eslint-disable-line no-unused-vars
   console.log(element);
-  element.style.display = 'none';
+  element.remove();
 }
 
 function addToQueue(url) { // eslint-disable-line no-unused-vars

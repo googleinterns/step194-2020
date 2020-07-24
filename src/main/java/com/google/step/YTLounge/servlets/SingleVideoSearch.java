@@ -89,7 +89,7 @@ public class SingleVideoSearch extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity roomEntity = new Entity("room");
     roomEntity.setProperty("members", new HashSet<Key>());
-    roomEntity.setProperty("nowPlaying", "");
+    roomEntity.setProperty("nowPlaying", null);
     roomEntity.setProperty("queue", new ArrayList<Key>());
     roomEntity.setProperty("duration", 0);
     roomEntity.setProperty("elapsedTime", 0);
@@ -102,7 +102,7 @@ public class SingleVideoSearch extends HttpServlet {
    * Iterates through the given items and locates specific values to create a new Video and upload
    * the video to DataStore
    */
-  private void extractVideo(JsonArray items, String videoID) {
+  private Entity extractVideo(JsonArray items, String videoID) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity videoEntity = new Entity("Video");
     for (int i = 0; i < items.size(); i++) {
@@ -118,6 +118,7 @@ public class SingleVideoSearch extends HttpServlet {
               .get("duration")
               .toString();
       duration = duration.substring(1, duration.length() - 1);
+      long numberDuration = parseDuration(duration);
       String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
       String channelName = snippet.get("channelTitle").toString();
       String releaseDate = snippet.get("publishedAt").toString();
@@ -125,12 +126,33 @@ public class SingleVideoSearch extends HttpServlet {
       videoEntity.setProperty("thumbnailURL", thumbnailURL);
       videoEntity.setProperty("videoURL", formattedVideoURL);
       videoEntity.setProperty("videoID", videoID);
-      videoEntity.setProperty("duration", parseDuration(duration));
+      videoEntity.setProperty("duration", numberDuration);
       videoEntity.setProperty("channelName", channelName);
       videoEntity.setProperty("releaseDate", releaseDate);
       videoEntity.setProperty("requestTime", System.currentTimeMillis());
       datastore.put(videoEntity); // place video in queue for that room
+
+
+      Query roomQuery = new Query("room");
+      PreparedQuery roomResults = datastore.prepare(roomQuery);
+      for (Entity room : roomResults.asIterable()) {
+          System.out.println(room);
+          if (room.getProperty("nowPlaying") == null) {
+              room.setProperty("nowPlaying", videoEntity.getKey());
+              room.setProperty("duration", numberDuration);
+          }
+          else {
+              ArrayList<Key> roomQ = (ArrayList<Key>) room.getProperty("queue");
+              if (roomQ == null) {
+                  roomQ = new ArrayList<Key>();
+              }
+              roomQ.add(videoEntity.getKey());
+              room.setProperty("queue", roomQ);
+          }
+          datastore.put(room);
+      }
     }
+    return videoEntity;
   }
 
   /**

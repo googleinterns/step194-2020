@@ -16,7 +16,7 @@ function verifyURLStructure(url) {
     console.log('good structure!');
     getVideoData(document.getElementById('linkArea').value.substring(32));
   } else { // starting a room
-    console.log('good structure!');
+    console.log('good, starting a room!');
     getVideoData(document.getElementById('linkArea').value.substring(32));
   }
 }
@@ -24,6 +24,7 @@ function verifyURLStructure(url) {
 // Retrieve video and create a new room via servlet GET request
 async function getVideoData(id) {
   if (id == '') {
+    console.log("NO ID");
     return;
   }
   fetch('/vSearch?id=' + id)
@@ -32,6 +33,18 @@ async function getVideoData(id) {
         if (video.error != null) { // video was found, now load
           // put thumbnail, title, duration, and channel name onto page
           console.log(video);
+          let videoCount = document.getElementById('videoContainer').childElementCount - 1;
+          document.getElementById('videoContainer').innerHTML +=
+            '<div id="video' + (videoCount + 1) + '" class="queueVideo">' +
+            '<img class="videoThumbnail" src=' + video.items[0].snippet.thumbnails.medium.url + '/>' +
+            '<div id="video' + (videoCount + 1) + 'Info" class="videoInfo">' +
+            '<p class="videoTitle">' + video.items[0].snippet.title + '</p>' +
+            '<button class="removeVideoBtn" id="removeVideoBtn' + (videoCount + 1) + 
+            '" onclick="removeVideo(document.getElementById(\'video' + (videoCount + 1) + '\'))">' +
+            '<img src="images/remove-from-queue.svg"/>' +
+            '</button>' +
+            '<p>' + video.items[0].contentDetails.duration + '</p>' +
+            '</div></div>';
         } else { // video wasn't found, signal error to user
           console.log(video.error);
         }

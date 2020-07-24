@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let videoUpdating; // boolean for when server request is updating video 
-let player; 
+let videoUpdating; // boolean for when server request is updating video
+let player;
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
@@ -98,7 +98,7 @@ function fetchData() {
   request.send();
 }
 
-const SYNC_WINDOW = 3 // max time diff between client and server 
+const SYNC_WINDOW = 3 // max time diff between client and server
 // return true if player time is within 5 seconds of master time
 function timesInRange(serverVidTime) {
   return Math.abs(player.getCurrentTime() - serverVidTime) < SYNC_WINDOW;
@@ -119,7 +119,7 @@ function differentStates(serverVidIsPlaying) {
 }
 
 const FETCH_PERIOD = 1.5; // time between information retreival in seconds
-const NUM_MEMBERS = 2; // number of room participants 
+const NUM_MEMBERS = 2; // number of room participants
 function updateVideo(text) {
   console.log(text);
   const videoInfo = JSON.parse(text);

@@ -12,10 +12,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Scanner;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 /** Returns a YouTube video based on a user's inputted YouTube URL */
 @WebServlet("/vSearch")
 public class SingleVideoSearch extends HttpServlet {
-  private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+  private static final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
   /**
    * Build and return an authorized API client service.
@@ -33,12 +36,13 @@ public class SingleVideoSearch extends HttpServlet {
    * @throws GeneralSecurityException, IOException
    */
   public YouTube getService() throws GeneralSecurityException, IOException {
-    final YouTubeRequestInitializer KEY_INITIALIZER =
-        new YouTubeRequestInitializer("AIzaSyBIwlgpsYZLoI7cr347HyBoAETX9FvzXps");
+    String key = readSecrets();
+    final YouTubeRequestInitializer keyInitializer =
+        new YouTubeRequestInitializer(key);
     final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    return new YouTube.Builder(httpTransport, JSON_FACTORY, null)
+    return new YouTube.Builder(httpTransport, jsonFactory, null)
         .setApplicationName("YouTube Lounge")
-        .setYouTubeRequestInitializer(KEY_INITIALIZER)
+        .setYouTubeRequestInitializer(keyInitializer)
         .build();
   }
 
@@ -115,6 +119,7 @@ public class SingleVideoSearch extends HttpServlet {
               .getAsJsonObject("contentDetails")
               .get("duration")
               .toString();
+      duration = duration.substring(1, duration.length() - 1);
       String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
       String channelName = snippet.get("channelTitle").toString();
       String releaseDate = snippet.get("publishedAt").toString();
@@ -148,7 +153,7 @@ public class SingleVideoSearch extends HttpServlet {
     }
     minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
     seconds += (minutes * 60);
-    shortenedTime = shortenedTime.substring(shortenedTime.indexOf("M") + 1);
+    shortenedTime = shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
     seconds += Integer.parseInt(shortenedTime);
 
     return seconds;
@@ -166,5 +171,21 @@ public class SingleVideoSearch extends HttpServlet {
       return defaultValue;
     }
     return value;
+  }
+
+private String readSecrets() {
+  try {
+    File secretFile = new File("dataSecret.txt");
+    Scanner myReader = new Scanner(secretFile);
+    if (myReader.hasNextLine()) {
+      String data = myReader.nextLine();
+      return data;
+    }
+    myReader.close();
+  } catch (Exception e) {
+    System.out.println("An error occurred.");
+    e.printStackTrace();
+  }
+  return "";
   }
 }

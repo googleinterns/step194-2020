@@ -4,7 +4,7 @@
   if their link wasn't formatted correctly for the server to parse.
 */
 function verifyURLStructure(url) {
-  let validator = new RegExp('' +
+  const validator = new RegExp('' +
     /(^(?:https?:\/\/)?(?:www\.)?)/.source +
     /((?:youtu\.be\/|youtube\.com\/))/.source +
     /((?:embed\/|v\/|watch\?v=|watch\?.+&v=))/.source +

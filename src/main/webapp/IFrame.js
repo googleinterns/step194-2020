@@ -42,7 +42,7 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
     },
   });
   updateFirestoreInterval = setInterval(sendInfo, SYNC_WINDOW * 1000,
-      'update Firestore'); 
+      'update Firestore');
   getRealtimeUpdates();
 }
 
@@ -168,7 +168,7 @@ function getRealtimeUpdates() {
       videoUpdating = false;
     }
   });
-};
+}
 
 // return true if player time is within 5 seconds of Firestore time
 function timesInRange(firestoreVidTime) {

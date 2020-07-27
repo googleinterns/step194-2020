@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let videoUpdating; // is video currently updating to match Firestore information? 
+let videoUpdating; // is video currently updating to match Firestore info?
 let updateFirestoreInterval; // Looping call to update firestore playback info
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 
-var firebaseConfig = {
-  apiKey: API_KEY,
+const firebaseConfig = {
+  apiKey: API_KEY, // eslint-disable-line no-undef
   authDomain: 'lounge-95f01.firebaseapp.com',
   databaseURL: 'https://lounge-95f01.firebaseio.com',
   projectId: 'youtube-lounge',
@@ -26,8 +26,8 @@ var firebaseConfig = {
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
   measurementId: 'G-JSDHBSMHS3',
 };
-firebase.initializeApp(firebaseConfig);
-var firestore = firebase.firestore();
+firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
 // Hard coded for now, but eventually will update to point
 // to current video in queue
@@ -42,7 +42,7 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
     },
   });
   updateFirestoreInterval = setInterval(sendInfo, SYNC_WINDOW * 1000,
-    'update Firestore'); 
+      'update Firestore'); 
   getRealtimeUpdates();
 }
 
@@ -52,10 +52,10 @@ function sendInfo(goal) { // send info to Firestore
     timestamp: player.getCurrentTime(),
     videoSpeed: player.getPlaybackRate(),
   }).then(function() {
-      console.log(goal + ' request sent');
-    }).catch(function (error) {
-      console.log(goal + ' caused an error: ', error);
-    });
+    console.log(goal + ' request sent');
+  }).catch(function(error) {
+    console.log(goal + ' caused an error: ', error);
+  });
 }
 
 let catchUp = false; // Does this vid need to catch up to Firestore?
@@ -102,14 +102,14 @@ function onPlayerStateChange() {
         break;
       case 3: // Buffering
         clearTimeout(pauseTimeout);
-        clearInterval(updateFirestoreInterval); 
+        clearInterval(updateFirestoreInterval);
         updateFirestoreOff = true; // buffering videos don't input to Firestore
         bufferTimeout = setTimeout(function() {
           catchUp = true;
         }, SYNC_WINDOW*1000);
         break;
       case 0: // Ended
-        clear(updateFirestoreInterval); 
+        clearInterval(updateFirestoreInterval);
     }
   }
 }
@@ -120,8 +120,8 @@ function bufferingChecks() {
     catchUp = false;
   }
   if (updateFirestoreOff) {
-    updateFirestoreInterval = setInterval(sendInfo, SYNC_WINDOW * 1000, 
-      'update Firestore');
+    updateFirestoreInterval = setInterval(sendInfo, SYNC_WINDOW * 1000,
+        'update Firestore');
     updateFirestoreOff = false;
   }
 }
@@ -129,8 +129,8 @@ function bufferingChecks() {
 function catchUserUp() {
   docRef.get().then(function(doc) {
     if (doc && doc.exists) {
-      vidData = doc.data();
-      player.seekTo(vidData.timestamp)
+      const vidData = doc.data();
+      player.seekTo(vidData.timestamp);
       player.setPlaybackRate(vidData.videoSpeed);
       if (vidData.isPlaying) player.playVideo();
       else player.pauseVideo();
@@ -142,8 +142,8 @@ function onPlayerPlaybackRateChange() {
   if (!videoUpdating) sendInfo('Change Speed');
 }
 
-getRealtimeUpdates = function() {
-  docRef.onSnapshot(function (doc) {
+function getRealtimeUpdates() {
+  docRef.onSnapshot(function(doc) {
     if (doc && doc.exists) {
       const vidData = doc.data();
       videoUpdating = true;
@@ -168,7 +168,7 @@ getRealtimeUpdates = function() {
       videoUpdating = false;
     }
   });
-}
+};
 
 // return true if player time is within 5 seconds of Firestore time
 function timesInRange(firestoreVidTime) {
@@ -190,5 +190,5 @@ function differentStates(firestoreVidIsPlaying) {
 }
 
 function isVideoPlaying() {
-  return (player.getPlayerState() == 1); 
+  return (player.getPlayerState() == 1);
 }

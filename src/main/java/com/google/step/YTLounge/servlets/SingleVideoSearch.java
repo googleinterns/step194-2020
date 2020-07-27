@@ -1,5 +1,9 @@
 package com.google.step.YTLounge.servlets;
 
+import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -8,6 +12,15 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.appengine.api.datastore.*;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -17,6 +30,9 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -42,6 +58,23 @@ public class SingleVideoSearch extends HttpServlet {
         .setApplicationName("YouTube Lounge")
         .setYouTubeRequestInitializer(keyInitializer)
         .build();
+  }
+
+  private Firestore authorize() throws Exception {
+    Firestore db = null;
+    try {
+      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+      FirestoreOptions firestoreOptions =
+          FirestoreOptions.getDefaultInstance().toBuilder()
+              .setProjectId("youtube-lounge")
+              .setCredentials(GoogleCredentials.getApplicationDefault())
+              .build();
+      db = firestoreOptions.getService();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+      return db;
+    }
   }
 
   /**
@@ -75,8 +108,12 @@ public class SingleVideoSearch extends HttpServlet {
       return;
     }
 
-    extractVideo(jsonObject.getAsJsonArray("items"), videoID);
-    response.getWriter().println(gson.toJson(videoResponse));
+    try {
+        extractVideo(jsonObject.getAsJsonArray("items"), videoID);
+        response.getWriter().println(gson.toJson(videoResponse));
+    } catch (Exception e) {
+        response.getWriter().println(gson.toJson("error: exception"));
+    }
   }
 
   /**
@@ -102,9 +139,33 @@ public class SingleVideoSearch extends HttpServlet {
    * Iterates through the given items and locates specific values to create a new Video and upload
    * the video to DataStore
    */
-  private Entity extractVideo(JsonArray items, String videoID) {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity videoEntity = new Entity("Video");
+  private void extractVideo(JsonArray items, String videoID) throws Exception {
+    Firestore db = null;
+    try {
+        db = authorize();
+    } catch (Exception e) {
+        System.out.println("bad firestore authorization");
+    }
+    ApiFuture<QuerySnapshot> queueFuture =
+        db
+            .collection("rooms")
+            .document("room1")
+            .collection("information")
+            .document("queue")
+            .collection("videos")
+            .get(); // get all videos in the room's queue
+    List<QueryDocumentSnapshot> queueVideos = queueFuture.get().getDocuments();
+    DocumentReference docRef = 
+        db
+            .collection("rooms")
+            .document("room1")
+            .collection("information")
+            .document("queue")
+            .collection("videos")
+            .document("video" + queueVideos.size()); // create new video instance in queue
+    ApiFuture<DocumentSnapshot> future = docRef.get();
+    DocumentSnapshot document = future.get();
+    Map<String, Object> videoData = new HashMap<>();
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =
@@ -122,37 +183,22 @@ public class SingleVideoSearch extends HttpServlet {
       String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
       String channelName = snippet.get("channelTitle").toString();
       String releaseDate = snippet.get("publishedAt").toString();
-      videoEntity.setProperty("title", title);
-      videoEntity.setProperty("thumbnailURL", thumbnailURL);
-      videoEntity.setProperty("videoURL", formattedVideoURL);
-      videoEntity.setProperty("videoID", videoID);
-      videoEntity.setProperty("duration", numberDuration);
-      videoEntity.setProperty("channelName", channelName);
-      videoEntity.setProperty("releaseDate", releaseDate);
-      videoEntity.setProperty("requestTime", System.currentTimeMillis());
-      datastore.put(videoEntity); // place video in queue for that room
-
-
-      Query roomQuery = new Query("room");
-      PreparedQuery roomResults = datastore.prepare(roomQuery);
-      for (Entity room : roomResults.asIterable()) {
-          System.out.println(room);
-          if (room.getProperty("nowPlaying") == null) {
-              room.setProperty("nowPlaying", videoEntity.getKey());
-              room.setProperty("duration", numberDuration);
-          }
-          else {
-              ArrayList<Key> roomQ = (ArrayList<Key>) room.getProperty("queue");
-              if (roomQ == null) {
-                  roomQ = new ArrayList<Key>();
-              }
-              roomQ.add(videoEntity.getKey());
-              room.setProperty("queue", roomQ);
-          }
-          datastore.put(room);
+      try {
+        videoData.put("title", title);
+        videoData.put("thumbnailURL", thumbnailURL);
+        videoData.put("videoURL", formattedVideoURL);
+        videoData.put("videoID", videoID);
+        videoData.put("duration", numberDuration);
+        videoData.put("channelName", channelName);
+        videoData.put("releaseDate", releaseDate);
+        videoData.put("requestTime", System.currentTimeMillis());
+        ApiFuture<WriteResult> result = docRef.set(videoData);
+        System.out.println("Update time : " + result.get().getUpdateTime());
+      } catch (Exception e) {
+          System.out.println("Error: can't put video into firestore");
       }
     }
-    return videoEntity;
+    db.close();
   }
 
   /**

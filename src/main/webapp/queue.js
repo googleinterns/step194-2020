@@ -14,6 +14,7 @@ function verifyURLStructure(url) {
     console.log('false'); // signal bad url to user
   } else if (document.getElementById('videoplayer') != null) {
     console.log('good structure!');
+    console.log("vid count " + (document.getElementById('videoContainer').childElementCount - 1));
     getVideoData(document.getElementById('linkArea').value.substring(32));
   } else { // starting a room
     console.log('good, starting a room!');
@@ -27,13 +28,15 @@ async function getVideoData(id) {
     console.log("NO ID");
     return;
   }
+  console.log("FETCHING");
   fetch('/vSearch?id=' + id)
       .then((response) => response.json())
       .then((video) => {
         if (video.error != null) { // video was found, now load
           // put thumbnail, title, duration, and channel name onto page
-          console.log(video);
+          console.log("ADDING TO HTML");
           let videoCount = document.getElementById('videoContainer').childElementCount - 1;
+          console.log("vid count" + videoCount);
           document.getElementById('videoContainer').innerHTML +=
             '<div id="video' + (videoCount + 1) + '" class="queueVideo">' +
             '<img class="videoThumbnail" src=' + video.items[0].snippet.thumbnails.medium.url + '/>' +
@@ -46,7 +49,7 @@ async function getVideoData(id) {
             '<p>' + video.items[0].contentDetails.duration + '</p>' +
             '</div></div>';
         } else { // video wasn't found, signal error to user
-          console.log(video.error);
+          console.log("NO VIDEO FOUND");
         }
       });
 }

@@ -1,14 +1,14 @@
-var firebaseConfig = {
-    // apiKey: removed ,
-    authDomain: "lounge-95f01.firebaseapp.com",
-    databaseURL: "https://lounge-95f01.firebaseio.com",
-    projectId: "youtube-lounge",
-    storageBucket: "youtube-lounge.appspot.com",
-    messagingSenderId: "681171972170",
-    appId: "1:681171972170:web:4c6526b8eb788af9d876b3",
-    measurementId: "G-JSDHBSMHS3"
-  };
-  firebase.initializeApp(firebaseConfig);
+const firebaseConfig = {
+  apiKey: "AIzaSyDEJrTVmLz59L5-SkO8E7TC2_mZtfHjzj8",
+  authDomain: 'lounge-95f01.firebaseapp.com',
+  databaseURL: 'https://lounge-95f01.firebaseio.com',
+  projectId: 'youtube-lounge',
+  storageBucket: 'youtube-lounge.appspot.com',
+  messagingSenderId: '681171972170',
+  appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
+  measurementId: 'G-JSDHBSMHS3'
+};
+firebase.initializeApp(firebaseConfig);
 
 function signIn() {
   var provider = new firebase.auth.GoogleAuthProvider();
@@ -31,6 +31,10 @@ function getUserName() {
   return firebase.auth().currentUser.displayName;
 }
 
+function getTimestamp() {
+  return firebase.firestore.FieldValue.serverTimestamp();
+}
+
 function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
@@ -42,11 +46,27 @@ function saveMessage(messageText) {
     name: getUserName(),
     text: messageText,
     profilePicUrl: getProfilePicUrl(),
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    timestamp: getTimestamp(),
   }).then(function(){
       console.log("saved message");
   }).catch(function(error) {
     console.error('Error writing new message to database', error);
+  });
+}
+
+// Loads chat messages history and listens for upcoming ones.
+function loadMessages() {
+  const query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc').limit(12);
+    query.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        deleteMessage(change.doc.id);
+      } else {
+        const message = change.doc.data();
+        displayMessage(change.doc.id, message.timestamp, message.name,
+                      message.text, message.profilePicUrl);
+      }
+    });
   });
 }
 
@@ -64,8 +84,8 @@ function onMessageFormSubmit(e) {
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) {
-    var profilePicUrl = getProfilePicUrl();
-    var userName = getUserName();
+    const profilePicUrl = getProfilePicUrl();
+    const userName = getUserName();
 
     userPicElement.style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
@@ -85,13 +105,14 @@ function authStateObserver(user) {
   }
 }
 
+
 function checkSignedInWithMessage() {
   if (isUserSignedIn()) {
     return true;
   }
 
   // Display a message to the user using a Toast.
-  var data = {
+  const data = {
     message: 'You must sign-in first',
     timeout: 2000
   };
@@ -99,6 +120,90 @@ function checkSignedInWithMessage() {
   return false;
 }
 
+function resetMaterialTextfield(element) {
+  element.value = '';
+  element.parentNode.MaterialTextfield.boundUpdateClassesHandler();
+}
+
+// Template for messages.
+const MESSAGE_TEMPLATE =
+    '<div class="message-container">' +
+      '<div class="spacing"><div class="pic"></div></div>' +
+      '<div class="message"></div>' +
+       '<div class="name" style="font-variant: small-caps;"></div>'+
+    '</div>';
+
+function addSizeToGoogleProfilePic(url) {
+  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
+    return url + '?sz=150';
+  }
+  return url;
+}
+
+function deleteMessage(id) {
+  var div = document.getElementById(id);
+  if (div) {
+    div.parentNode.removeChild(div);
+  }
+}
+
+function createAndInsertMessage(id, timestamp) {
+  const container = document.createElement('div');
+  container.innerHTML = MESSAGE_TEMPLATE;
+  const div = container.firstChild;
+  div.setAttribute('id', id);
+
+  timestamp = timestamp ? timestamp.toMillis() : Date.now();
+  div.setAttribute('timestamp', timestamp);
+
+  // figure out where to insert new message
+  const existingMessages = messageListElement.children;
+  if (existingMessages.length === 0) {
+    messageListElement.appendChild(div);
+  } else {
+    let messageListNode = existingMessages[0];
+
+    while (messageListNode) {
+      const messageListNodeTime = messageListNode.getAttribute('timestamp');
+
+      if (!messageListNodeTime) {
+        throw new Error(
+          `Child ${messageListNode.id} has no 'timestamp' attribute`
+        );
+      }
+      if (messageListNodeTime > timestamp) {
+        break;
+      }
+      messageListNode = messageListNode.nextSibling;
+    }
+    messageListElement.insertBefore(div, messageListNode);
+  }
+  return div;
+}
+
+function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+  const div = document.getElementById(id) || createAndInsertMessage(id, timestamp);
+
+  if (picUrl) {
+    div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+  }
+    const date = new Date(timestamp * 1000);
+    const hours = date.getHours();
+    const minutes = "0" + date.getMinutes();
+    const seconds = "0" + date.getSeconds();
+    let formattedTime = hours + ':' + minutes.substr(-2)+ ':' + seconds.substr(-2);
+
+  div.querySelector('.name').textContent =  name + '  ' + formattedTime;
+  const messageElement = div.querySelector('.message');
+
+  if (text) {
+    messageElement.textContent = text;
+    messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
+  }
+  setTimeout(function() {div.classList.add('visible')}, 1);
+  messageListElement.scrollTop = messageListElement.scrollHeight;
+  messageInputElement.focus();
+}
 
 // Enables or disables the submit button 
 function toggleButton() {
@@ -110,15 +215,15 @@ function toggleButton() {
 }
 
 
-var messageListElement = document.getElementById('messages');
-var messageFormElement = document.getElementById('message-form');
-var messageInputElement = document.getElementById('message');
-var submitButtonElement = document.getElementById('submit');
-var userPicElement = document.getElementById('user-pic');
-var userNameElement = document.getElementById('user-name');
-var signInButtonElement = document.getElementById('sign-in');
-var signOutButtonElement = document.getElementById('sign-out');
-var signInSnackbarElement = document.getElementById('must-signin-snackbar');
+const messageListElement = document.getElementById('messages');
+const messageFormElement = document.getElementById('message-form');
+const messageInputElement = document.getElementById('message');
+const submitButtonElement = document.getElementById('submit');
+const userPicElement = document.getElementById('user-pic');
+const userNameElement = document.getElementById('user-name');
+const signInButtonElement = document.getElementById('sign-in');
+const signOutButtonElement = document.getElementById('sign-out');
+const signInSnackbarElement = document.getElementById('must-signin-snackbar');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', signOut);
@@ -129,4 +234,4 @@ messageInputElement.addEventListener('change', toggleButton);
 
 initFirebaseAuth();
 
-loadMessages();
+loadMessages(); 

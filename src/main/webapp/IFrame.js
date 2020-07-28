@@ -43,8 +43,8 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   // I'm still working on writing this as a promise, but it doesn't
   // work unless these next two parts are delayed
   setTimeout(function() {
-      sendInfo("start");
-      getRealtimeUpdates();
+    sendInfo('start');
+    getRealtimeUpdates();
   }, 1000);
 }
 
@@ -104,11 +104,11 @@ function onPlayerStateChange() {
       case 2: // paused
         if (!catchUp) { // don't send paused info if user must catch up
           pauseTimeout = setTimeout(sendInfo, 100, 'pause');
-          let lastTime = player.getCurrentTime(); 
+          let lastTime = player.getCurrentTime();
           pauseInterval = setInterval(function() {
             if (player.getCurrentTime() != lastTime) {
               lastTime = player.getCurrentTime();
-              sendInfo("Update on Pause Seek");
+              sendInfo('Update on Pause Seek');
             }
           }, 1000);
         }

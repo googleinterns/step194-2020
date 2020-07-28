@@ -13,7 +13,6 @@
 // limitations under the License.
 
 let videoUpdating; // is video currently updating to match Firestore info?
-let updateFirestoreInterval; // Looping call to update firestore playback info
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 
 const firebaseConfig = {
@@ -41,9 +40,12 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
     },
   });
-  updateFirestoreInterval = setInterval(sendInfo, SYNC_WINDOW * 1000,
-      'update Firestore');
-  getRealtimeUpdates();
+  // I'm still working on writing this as a promise, but it doesn't
+  // work unless these next two parts are delayed
+  setTimeout(function() {
+      sendInfo("start");
+      getRealtimeUpdates();
+  }, 1000);
 }
 
 function sendInfo(goal) { // send info to Firestore
@@ -59,7 +61,6 @@ function sendInfo(goal) { // send info to Firestore
 }
 
 let catchUp = false; // Does this vid need to catch up to Firestore?
-let updateFirestoreOff = false; // Is this vid buffering?
 
 /*
   The purpose of the pause timeout is to differentiate between
@@ -83,33 +84,46 @@ let updateFirestoreOff = false; // Is this vid buffering?
   SYNC_WINDOW) and then they'd fall out of the timeframe and this code would
   not catch it. In the future, I may add a summing total of buffering to solve
   this issue, but I think it's a rare enough occurence to fix later.
+
+  Pause interval just makes sure seek information is sent
+  while the video isn't playing.
 */
 let pauseTimeout;
 let bufferTimeout;
+let pauseInterval;
 function onPlayerStateChange() {
   if (!videoUpdating) { // don't send info to Firestore while updating
     switch (player.getPlayerState()) {
       case 1: // Playing
         clearTimeout(pauseTimeout);
         clearTimeout(bufferTimeout);
+        clearInterval(pauseInterval);
         bufferingChecks();
         sendInfo('play');
         break;
       case 2: // paused
         if (!catchUp) { // don't send paused info if user must catch up
           pauseTimeout = setTimeout(sendInfo, 100, 'pause');
+          let lastTime = player.getCurrentTime(); 
+          pauseInterval = setInterval(function() {
+            if (player.getCurrentTime() != lastTime) {
+              lastTime = player.getCurrentTime();
+              sendInfo("Update on Pause Seek");
+            }
+          }, 1000);
         }
         break;
       case 3: // Buffering
         clearTimeout(pauseTimeout);
-        clearInterval(updateFirestoreInterval);
-        updateFirestoreOff = true; // buffering videos don't input to Firestore
         bufferTimeout = setTimeout(function() {
           catchUp = true;
         }, SYNC_WINDOW*1000);
         break;
+      case -1: // Just before next video starts
+        // Will change the video docRef refers to
+        break;
       case 0: // Ended
-        clearInterval(updateFirestoreInterval);
+        // will load the next video
     }
   }
 }
@@ -118,11 +132,6 @@ function bufferingChecks() {
   if (catchUp) {
     catchUserUp();
     catchUp = false;
-  }
-  if (updateFirestoreOff) {
-    updateFirestoreInterval = setInterval(sendInfo, SYNC_WINDOW * 1000,
-        'update Firestore');
-    updateFirestoreOff = false;
   }
 }
 

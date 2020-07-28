@@ -152,17 +152,15 @@ function getRealtimeUpdates() {
       }
       if (!timesInRange(vidData.timestamp)) {
         player.seekTo(vidData.timestamp, true);
-        player.playVideo();
-      } else { // Only updates play state on play/pause, not seek
-        if (differentStates(vidData.isPlaying)) {
-          switch (vidData.isPlaying) {
-            case true:
-              player.playVideo();
-              break;
-            case false:
-              player.pauseVideo();
-              player.seekTo(vidData.timestamp, true);
-          }
+      }
+      if (differentStates(vidData.isPlaying)) {
+        switch (vidData.isPlaying) {
+          case true:
+            player.playVideo();
+            break;
+          case false:
+            player.pauseVideo();
+            player.seekTo(vidData.timestamp, true);
         }
       }
       videoUpdating = false;

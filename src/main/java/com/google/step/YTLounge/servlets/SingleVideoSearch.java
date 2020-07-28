@@ -60,23 +60,6 @@ public class SingleVideoSearch extends HttpServlet {
         .build();
   }
 
-  private Firestore authorize() throws Exception {
-    Firestore db = null;
-    try {
-      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-      FirestoreOptions firestoreOptions =
-          FirestoreOptions.getDefaultInstance().toBuilder()
-              .setProjectId("youtube-lounge")
-              .setCredentials(GoogleCredentials.getApplicationDefault())
-              .build();
-      db = firestoreOptions.getService();
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-      return db;
-    }
-  }
-
   /**
    * Retrieve query parameters, extract the video if video exists, and create new Lounge if
    * necessary based on query request. Prints video response when complete.
@@ -89,13 +72,17 @@ public class SingleVideoSearch extends HttpServlet {
     Gson gson = new Gson();
     response.setContentType("application/json");
     String videoID = getParameter(request, "id", "");
-    String roomid = getParameter(request, "roomid", generateRoomID());
+    String roomID = getParameter(request, "roomid", "");
+    if (roomID.equals("")) {
+        roomID = generateRoomID();
+    }
 
     YouTube youtubeService = null;
     try {
       youtubeService = getService();
     } catch (GeneralSecurityException e) {
       response.getWriter().println("");
+      return;
     }
     if (youtubeService == null) {
       return;
@@ -109,7 +96,7 @@ public class SingleVideoSearch extends HttpServlet {
     }
 
     try {
-        extractVideo(jsonObject.getAsJsonArray("items"), videoID);
+        extractVideo(jsonObject.getAsJsonArray("items"), videoID, roomID);
         response.getWriter().println(gson.toJson(videoResponse));
     } catch (Exception e) {
         response.getWriter().println(gson.toJson("error: exception"));
@@ -123,33 +110,48 @@ public class SingleVideoSearch extends HttpServlet {
    * @return a string representing a room's identifier
    */
   private String generateRoomID() {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity roomEntity = new Entity("room");
-    roomEntity.setProperty("members", new HashSet<Key>());
-    roomEntity.setProperty("nowPlaying", null);
-    roomEntity.setProperty("queue", new ArrayList<Key>());
-    roomEntity.setProperty("duration", 0);
-    roomEntity.setProperty("elapsedTime", 0);
-    roomEntity.setProperty("log", new ArrayList<Key>());
-    datastore.put(roomEntity);
-    return Long.toString(roomEntity.getKey().getId());
+    Firestore db = null;
+    try {
+      db = authorize();
+    } catch (Exception e) {
+      System.out.println("bad firestore authorization");
+    }
+    Map<String, Object> roomData = new HashMap<>();
+    roomData.put("members", new HashMap<>());
+    roomData.put("nowPlaying", null);
+    roomData.put("queue", null);
+    roomData.put("duration", 0);
+    roomData.put("elapsedTime", 0);
+    roomData.put("log", null);
+    ApiFuture<DocumentReference> addedDocRef = db.collection("rooms").add(roomData);
+    String id = null;
+    try {
+      id = addedDocRef.get().getId();
+      System.out.println("Added document with ID: " + id);
+      db.close();
+      return id;
+    } catch (Exception e) {
+      System.out.println("UNABLE to get id");
+    }
+    
+    return "";
   }
 
   /**
    * Iterates through the given items and locates specific values to create a new Video and upload
    * the video to DataStore
    */
-  private void extractVideo(JsonArray items, String videoID) throws Exception {
+  private void extractVideo(JsonArray items, String videoID, String roomID) throws Exception {
     Firestore db = null;
     try {
-        db = authorize();
+      db = authorize();
     } catch (Exception e) {
-        System.out.println("bad firestore authorization");
+      System.out.println("bad firestore authorization");
     }
     ApiFuture<QuerySnapshot> queueFuture =
         db
             .collection("rooms")
-            .document("room1")
+            .document(roomID)
             .collection("information")
             .document("queue")
             .collection("videos")
@@ -158,7 +160,7 @@ public class SingleVideoSearch extends HttpServlet {
     DocumentReference docRef = 
         db
             .collection("rooms")
-            .document("room1")
+            .document(roomID)
             .collection("information")
             .document("queue")
             .collection("videos")
@@ -166,6 +168,17 @@ public class SingleVideoSearch extends HttpServlet {
     ApiFuture<DocumentSnapshot> future = docRef.get();
     DocumentSnapshot document = future.get();
     Map<String, Object> videoData = new HashMap<>();
+    findItems(items, videoData, docRef, videoID);// might change method name
+    db.close();
+  }
+
+  /**
+   * Iterates through the given items and adds the relevant information to 
+   * the given map, eventually adding the video to the database and notifying
+   * the console of when the item was successfully added
+   */
+  private void findItems(JsonArray items, Map<String, Object> videoData,
+      DocumentReference docRef, String videoID) {
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =
@@ -198,7 +211,6 @@ public class SingleVideoSearch extends HttpServlet {
           System.out.println("Error: can't put video into firestore");
       }
     }
-    db.close();
   }
 
   /**
@@ -240,6 +252,29 @@ public class SingleVideoSearch extends HttpServlet {
     return value;
   }
 
+  /**
+   * Creates a Firestore that's available for reading and writing data to the database.
+   */
+  private Firestore authorize() throws Exception {
+    Firestore db = null;
+    try {
+      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+      FirestoreOptions firestoreOptions =
+          FirestoreOptions.getDefaultInstance().toBuilder()
+              .setProjectId("youtube-lounge")
+              .setCredentials(GoogleCredentials.getApplicationDefault())
+              .build();
+      db = firestoreOptions.getService();
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+      return db;
+    }
+  }
+
+  /**
+   * Locate the necessary API key to access needed data
+   */
   private String readSecrets() {
     try {
       File secretFile = new File("dataSecret.txt");

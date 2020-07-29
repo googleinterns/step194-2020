@@ -18,9 +18,37 @@
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-auth.js"></script>
-
   </head>
-  <body >
+  <body>
+      <dialog class="mdl-dialog" id="dialog">
+        <h4 class="mdl-dialog__title" style="font-weight: bold;">Welcome to your Lounge!</h4>
+
+        <div class="mdl-dialog__content">
+         <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+        <i class="material-icons">account_circle</i>Sign-in with Google
+        </button>
+        <h5 style="font-variant: small-caps; color:white; line-height: 10px;"> OR </h5>
+        <h7 style = "font-weight:bold;"> Select a Display Image:<h7>
+            <div id="icon-holder-template"> 
+                <ul id="icon-holder">
+                    <a class="image-button"> 
+                    <img class ="img-class" src = "https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png">
+                    </a></li>
+                    <a class="image-button"> 
+                    <img class ="img-class" src = "https://www.pngkey.com/png/full/203-2037403_flat-faces-icons-circle-girl-flat-icon-png.png">
+                    </a></li>
+                </ul>
+            </div>  <br>
+        <h7 style = "font-weight:bold;"> Display Name:  <h7>
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input" type="text" id="userName" required>
+                <label class="mdl-textfield__label" for="userName">Add a Nickname</label>
+            </div>
+        </div>
+        <div class="mdl-dialog__actions">
+	    <button id = "anonymous-signin" type="sumbit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">Sign In</button>
+        </div>
+      </dialog>
       
       <!-- content that resizes when side bar opens -->
       <div id = "main">
@@ -30,10 +58,7 @@
                  <div hidden id="user-pic"></div>
                   <div hidden id="user-name"></div>
                   <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-                Sign-out
-                  </button>
-                  <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-                  <i class="material-icons">account_circle</i>Sign-in with Google
+                    Sign-out
                   </button>
                 </div>
                 <img
@@ -155,5 +180,3 @@
     <script src="firebase-chat.js"></script>
 </body>
 </html>
-
-

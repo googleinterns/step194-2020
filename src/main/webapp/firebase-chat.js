@@ -1,5 +1,5 @@
 const firebaseConfig = {
-  //apiKey: removed,
+  // apiKey: removed ,
   authDomain: 'lounge-95f01.firebaseapp.com',
   databaseURL: 'https://lounge-95f01.firebaseio.com',
   projectId: 'youtube-lounge',
@@ -8,27 +8,43 @@ const firebaseConfig = {
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
   measurementId: 'G-JSDHBSMHS3'
 };
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+
 
 function signIn() {
-  var provider = new firebase.auth.GoogleAuthProvider();
+  const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider);
+}
+
+function AnonymousSignIn() {
+  firebase.auth().signInAnonymously();
 }
 
 function signOut() {
   firebase.auth().signOut();
 }
 
+
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
 function getProfilePicUrl() {
-  return firebase.auth().currentUser.photoURL;
+  if(signInButtonElement.clicked==true) {
+    return firebase.auth().currentUser.photoURL;
+  } else {
+// placeholder profile picture for anonymous
+    return 'https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png';
+  }
 }
 
 function getUserName() {
-  return firebase.auth().currentUser.displayName;
+  if(signInButtonElement.clicked==true) {
+    return firebase.auth().currentUser.displayName;
+  } else {
+// placeholder username for anonymous
+    return 'John Smith';
+  }
 }
 
 function getTimestamp() {
@@ -47,8 +63,8 @@ function saveMessage(messageText) {
     text: messageText,
     profilePicUrl: getProfilePicUrl(),
     timestamp: getTimestamp(),
-  }).then(function(){
-      console.log("saved message");
+  }).then(function() {
+      console.log('saved message');
   }).catch(function(error) {
     console.error('Error writing new message to database', error);
   });
@@ -56,7 +72,7 @@ function saveMessage(messageText) {
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
-  const query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc').limit(12);
+  const query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc');
     query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {
@@ -94,14 +110,15 @@ function authStateObserver(user) {
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
 
-    signInButtonElement.setAttribute('hidden', 'true');
+    var dialog = document.getElementById('dialog');
+    dialog.close();
 
   } else {
     userNameElement.setAttribute('hidden', 'true');
     userPicElement.setAttribute('hidden', 'true');
     signOutButtonElement.setAttribute('hidden', 'true');
-
-    signInButtonElement.removeAttribute('hidden');
+    var dialog = document.getElementById('dialog');
+    dialog.showModal();
   }
 }
 
@@ -221,12 +238,33 @@ const submitButtonElement = document.getElementById('submit');
 const userPicElement = document.getElementById('user-pic');
 const userNameElement = document.getElementById('user-name');
 const signInButtonElement = document.getElementById('sign-in');
+const anonymousSignInElement = document.getElementById('anonymous-signin');
 const signOutButtonElement = document.getElementById('sign-out');
 const signInSnackbarElement = document.getElementById('must-signin-snackbar');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
-signOutButtonElement.addEventListener('click', signOut);
-signInButtonElement.addEventListener('click', signIn);
+signOutButtonElement.addEventListener('click', function() {
+  dialog.showModal();
+  if(signInButtonElement.clicked==true) {
+    signOut();
+  } else {
+    firebase.auth().signOut();
+  }
+});
+
+signInButtonElement.addEventListener('click',function() {
+      dialog.close();
+      signIn();
+    });
+
+anonymousSignInElement.addEventListener('click',function() {
+      AnonymousSignIn();
+      dialog.close();
+    });
+
+firebase.auth().onAuthStateChanged(firebaseUser => {
+    console.log(firebaseUser);
+});
 
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const firebaseConfig = {
   // apiKey: removed ,
   authDomain: 'lounge-95f01.firebaseapp.com',
@@ -9,7 +10,6 @@ const firebaseConfig = {
   measurementId: 'G-JSDHBSMHS3',
 };
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
-const firebase = firebase; // eslint-disable-line no-undef
 
 function signIn() {
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -72,7 +72,7 @@ function saveMessage(messageText) {
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
-  const query = 
+  const query =
   firebase.firestore().collection('messages').orderBy('timestamp', 'desc');
   query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
@@ -105,7 +105,7 @@ function authStateObserver(user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
 
-    userPicElement.style.backgroundImage = 
+    userPicElement.style.backgroundImage =
     'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
 
@@ -185,7 +185,7 @@ function createAndInsertMessage(id, timestamp) {
 
       if (!messageListNodeTime) {
         throw new Error(
-        `Child ${messageListNode.id} has no 'timestamp' attribute`,
+            `Child ${messageListNode.id} has no 'timestamp' attribute`,
         );
       }
       if (messageListNodeTime > timestamp) {
@@ -199,18 +199,18 @@ function createAndInsertMessage(id, timestamp) {
 }
 
 function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
-  const div = 
+  const div =
   document.getElementById(id) || createAndInsertMessage(id, timestamp);
 
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 
+    div.querySelector('.pic').style.backgroundImage =
     'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
   }
   const date = new Date(timestamp * 1000);
   const hours = date.getHours();
   const minutes = '0' + date.getMinutes();
   const seconds = '0' + date.getSeconds();
-  const formattedTime = 
+  const formattedTime =
   hours + ':' + minutes.substr(-2)+ ':' + seconds.substr(-2);
 
   div.querySelector('.name').textContent = name + '  ' + formattedTime;
@@ -221,7 +221,8 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
     messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
   }
   setTimeout(function() {
-      div.classList.add('visible')}, 1);
+    div.classList.add('visible');
+    }, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
@@ -267,7 +268,7 @@ anonymousSignInElement.addEventListener('click', function() {
   dialog.close();
 });
 
-firebase.auth().onAuthStateChanged(firebaseUser => {
+firebase.auth().onAuthStateChanged((firebaseUser) => {
   console.log(firebaseUser);
 });
 

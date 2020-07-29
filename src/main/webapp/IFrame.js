@@ -105,10 +105,10 @@ function onPlayerStateChange() {
         pauseTimeout = setTimeout(sendInfo, 100, 'pause');
         let lastTime = player.getCurrentTime();
         pauseInterval = setInterval(function() {
-        if (player.getCurrentTime() != lastTime) {
-          lastTime = player.getCurrentTime();
-          sendInfo('Update on Pause Seek');
-        }
+          if (player.getCurrentTime() != lastTime) {
+            lastTime = player.getCurrentTime();
+            sendInfo('Update on Pause Seek');
+          }
         }, 1000);
       }
       break;

@@ -6,17 +6,17 @@ const firebaseConfig = {
   storageBucket: 'youtube-lounge.appspot.com',
   messagingSenderId: '681171972170',
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
-  measurementId: 'G-JSDHBSMHS3'
+  measurementId: 'G-JSDHBSMHS3',
 };
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
-
+const firebase = firebase; // eslint-disable-line no-undef
 
 function signIn() {
   const provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider);
 }
 
-function AnonymousSignIn() {
+function anonymousSignIn() {
   firebase.auth().signInAnonymously();
 }
 
@@ -30,19 +30,19 @@ function initFirebaseAuth() {
 }
 
 function getProfilePicUrl() {
-  if(signInButtonElement.clicked==true) {
+  if (signInButtonElement.clicked==true) {
     return firebase.auth().currentUser.photoURL;
   } else {
-// placeholder profile picture for anonymous
+    // placeholder profile picture for anonymous
     return 'https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png';
   }
 }
 
 function getUserName() {
-  if(signInButtonElement.clicked==true) {
+  if (signInButtonElement.clicked==true) {
     return firebase.auth().currentUser.displayName;
   } else {
-// placeholder username for anonymous
+    // placeholder username for anonymous
     return 'John Smith';
   }
 }
@@ -64,7 +64,7 @@ function saveMessage(messageText) {
     profilePicUrl: getProfilePicUrl(),
     timestamp: getTimestamp(),
   }).then(function() {
-      console.log('saved message');
+    console.log('saved message');
   }).catch(function(error) {
     console.error('Error writing new message to database', error);
   });
@@ -72,21 +72,22 @@ function saveMessage(messageText) {
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
-  const query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc');
-    query.onSnapshot(function(snapshot) {
+  const query = 
+  firebase.firestore().collection('messages').orderBy('timestamp', 'desc');
+  query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {
         deleteMessage(change.doc.id);
       } else {
         const message = change.doc.data();
         displayMessage(change.doc.id, message.timestamp, message.name,
-                      message.text, message.profilePicUrl);
+            message.text, message.profilePicUrl);
       }
     });
   });
 }
 
-  // Check that the user entered a message and is signed in.
+// Check that the user entered a message and is signed in.
 function onMessageFormSubmit(e) {
   e.preventDefault();
   if (messageInputElement.value && checkSignedInWithMessage()) {
@@ -97,27 +98,26 @@ function onMessageFormSubmit(e) {
   }
 }
 
-// Triggers when the auth state change for instance when the user signs-in or signs-out.
+// Triggers when the auth state change for
+// instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
 
-    userPicElement.style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+    userPicElement.style.backgroundImage = 
+    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
 
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
 
-    var dialog = document.getElementById('dialog');
     dialog.close();
-
   } else {
     userNameElement.setAttribute('hidden', 'true');
     userPicElement.setAttribute('hidden', 'true');
     signOutButtonElement.setAttribute('hidden', 'true');
-    var dialog = document.getElementById('dialog');
     dialog.showModal();
   }
 }
@@ -131,7 +131,7 @@ function checkSignedInWithMessage() {
   // Display a message to the user using a Toast.
   const data = {
     message: 'You must sign-in first',
-    timeout: 2000
+    timeout: 2000,
   };
   signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
   return false;
@@ -158,7 +158,7 @@ function addSizeToGoogleProfilePic(url) {
 }
 
 function deleteMessage(id) {
-  var div = document.getElementById(id);
+  const div = document.getElementById(id);
   if (div) {
     div.parentNode.removeChild(div);
   }
@@ -185,7 +185,7 @@ function createAndInsertMessage(id, timestamp) {
 
       if (!messageListNodeTime) {
         throw new Error(
-          `Child ${messageListNode.id} has no 'timestamp' attribute`
+        `Child ${messageListNode.id} has no 'timestamp' attribute`,
         );
       }
       if (messageListNodeTime > timestamp) {
@@ -199,30 +199,34 @@ function createAndInsertMessage(id, timestamp) {
 }
 
 function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
-  const div = document.getElementById(id) || createAndInsertMessage(id, timestamp);
+  const div = 
+  document.getElementById(id) || createAndInsertMessage(id, timestamp);
 
   if (picUrl) {
-    div.querySelector('.pic').style.backgroundImage = 'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+    div.querySelector('.pic').style.backgroundImage = 
+    'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
   }
-    const date = new Date(timestamp * 1000);
-    const hours = date.getHours();
-    const minutes = "0" + date.getMinutes();
-    const seconds = "0" + date.getSeconds();
-    let formattedTime = hours + ':' + minutes.substr(-2)+ ':' + seconds.substr(-2);
+  const date = new Date(timestamp * 1000);
+  const hours = date.getHours();
+  const minutes = '0' + date.getMinutes();
+  const seconds = '0' + date.getSeconds();
+  const formattedTime = 
+  hours + ':' + minutes.substr(-2)+ ':' + seconds.substr(-2);
 
-  div.querySelector('.name').textContent =  name + '  ' + formattedTime;
+  div.querySelector('.name').textContent = name + '  ' + formattedTime;
   const messageElement = div.querySelector('.message');
 
   if (text) {
     messageElement.textContent = text;
     messageElement.innerHTML = messageElement.innerHTML.replace(/\n/g, '<br>');
   }
-  setTimeout(function() {div.classList.add('visible')}, 1);
+  setTimeout(function() {
+      div.classList.add('visible')}, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
 
-// Enables or disables the submit button 
+// Enables or disables the submit button
 function toggleButton() {
   if (messageInputElement.value) {
     submitButtonElement.removeAttribute('disabled');
@@ -241,29 +245,30 @@ const signInButtonElement = document.getElementById('sign-in');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
 const signOutButtonElement = document.getElementById('sign-out');
 const signInSnackbarElement = document.getElementById('must-signin-snackbar');
+const dialog = document.getElementById('dialog');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   dialog.showModal();
-  if(signInButtonElement.clicked==true) {
+  if (signInButtonElement.clicked==true) {
     signOut();
   } else {
     firebase.auth().signOut();
   }
 });
 
-signInButtonElement.addEventListener('click',function() {
-      dialog.close();
-      signIn();
-    });
+signInButtonElement.addEventListener('click', function() {
+  dialog.close();
+  signIn();
+});
 
-anonymousSignInElement.addEventListener('click',function() {
-      AnonymousSignIn();
-      dialog.close();
-    });
+anonymousSignInElement.addEventListener('click', function() {
+  anonymousSignIn();
+  dialog.close();
+});
 
 firebase.auth().onAuthStateChanged(firebaseUser => {
-    console.log(firebaseUser);
+  console.log(firebaseUser);
 });
 
 messageInputElement.addEventListener('keyup', toggleButton);
@@ -271,4 +276,4 @@ messageInputElement.addEventListener('change', toggleButton);
 
 initFirebaseAuth();
 
-loadMessages(); 
+loadMessages();

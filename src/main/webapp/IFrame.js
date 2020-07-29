@@ -92,39 +92,39 @@ let pauseTimeout;
 let bufferTimeout;
 let pauseInterval;
 function onPlayerStateChange() {
-    switch (player.getPlayerState()) {
-      case 1: // Playing
-        clearTimeout(pauseTimeout);
-        clearTimeout(bufferTimeout);
-        clearInterval(pauseInterval);
-        bufferingChecks();
-        if (!videoUpdating) sendInfo('play');
-        break;
-      case 2: // paused
-        if (!catchUp && !videoUpdating) {
-          pauseTimeout = setTimeout(sendInfo, 100, 'pause');
-          let lastTime = player.getCurrentTime();
-          pauseInterval = setInterval(function() {
-            if (player.getCurrentTime() != lastTime) {
-              lastTime = player.getCurrentTime();
-              sendInfo('Update on Pause Seek');
-            }
-          }, 1000);
+  switch (player.getPlayerState()) {
+    case 1: // Playing
+      clearTimeout(pauseTimeout);
+      clearTimeout(bufferTimeout);
+      clearInterval(pauseInterval);
+      bufferingChecks();
+      if (!videoUpdating) sendInfo('play');
+      break;
+    case 2: // paused
+      if (!catchUp && !videoUpdating) {
+        pauseTimeout = setTimeout(sendInfo, 100, 'pause');
+        let lastTime = player.getCurrentTime();
+        pauseInterval = setInterval(function() {
+        if (player.getCurrentTime() != lastTime) {
+          lastTime = player.getCurrentTime();
+          sendInfo('Update on Pause Seek');
         }
-        break;
-      case 3: // Buffering
-        clearTimeout(pauseTimeout);
-        clearInterval(pauseInterval);
-        bufferTimeout = setTimeout(function() {
-          catchUp = true;
-        }, SYNC_WINDOW*1000);
-        break;
-      case -1: // Just before next video starts
-        // Will change the video docRef refers to
-        break;
-      case 0: // Ended
-        // will load the next video
-    }
+        }, 1000);
+      }
+      break;
+    case 3: // Buffering
+      clearTimeout(pauseTimeout);
+      clearInterval(pauseInterval);
+      bufferTimeout = setTimeout(function() {
+        catchUp = true;
+      }, SYNC_WINDOW*1000);
+      break;
+    case -1: // Just before next video starts
+      // Will change the video docRef refers to
+      break;
+    case 0: // Ended
+      // will load the next video
+  }
 }
 
 function bufferingChecks() {

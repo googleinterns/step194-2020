@@ -92,17 +92,16 @@ let pauseTimeout;
 let bufferTimeout;
 let pauseInterval;
 function onPlayerStateChange() {
-  if (!videoUpdating) { // don't send info to Firestore while updating
     switch (player.getPlayerState()) {
       case 1: // Playing
         clearTimeout(pauseTimeout);
         clearTimeout(bufferTimeout);
         clearInterval(pauseInterval);
         bufferingChecks();
-        sendInfo('play');
+        if (!videoUpdating) sendInfo('play');
         break;
       case 2: // paused
-        if (!catchUp) { // don't send paused info if user must catch up
+        if (!catchUp && !videoUpdating) {
           pauseTimeout = setTimeout(sendInfo, 100, 'pause');
           let lastTime = player.getCurrentTime();
           pauseInterval = setInterval(function() {
@@ -115,6 +114,7 @@ function onPlayerStateChange() {
         break;
       case 3: // Buffering
         clearTimeout(pauseTimeout);
+        clearInterval(pauseInterval);
         bufferTimeout = setTimeout(function() {
           catchUp = true;
         }, SYNC_WINDOW*1000);
@@ -125,7 +125,6 @@ function onPlayerStateChange() {
       case 0: // Ended
         // will load the next video
     }
-  }
 }
 
 function bufferingChecks() {

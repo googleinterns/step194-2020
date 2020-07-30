@@ -9,13 +9,16 @@ const firebaseConfig = {
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
   measurementId: 'G-JSDHBSMHS3',
 };
-const app = firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+const app = 
+    firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
 
 // Track realtime changes to the database and update the visual queue on change
 // hardcoded for one room for now, can access different rooms through
 // window.location.search property
-db.collection('rooms').doc('47jGbulshBCjcc8YOt8a').collection('information') // eslint-disable-line no-undef
+db.collection('rooms') // eslint-disable-line no-undef
+    .doc('47jGbulshBCjcc8YOt8a')
+    .collection('information')
     .doc('queue').collection('videos')
     .onSnapshot(function(snapshot) {
       snapshot.docChanges().forEach(function(change) {

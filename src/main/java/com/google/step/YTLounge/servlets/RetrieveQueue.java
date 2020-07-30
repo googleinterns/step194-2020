@@ -52,7 +52,7 @@ public class RetrieveQueue extends HttpServlet {
               .document("queue")
               .collection("videos")
               .orderBy("requestTime", Direction.ASCENDING)
-              .get(); // sort all videos for this room by their requestTime     
+              .get(); // sort all videos for this room by their requestTime
       List<QueryDocumentSnapshot> queueVideos = null;
       List<Object> queueFormatted = new ArrayList<>();
       try {

@@ -13,7 +13,13 @@
 // limitations under the License.
 
 let videoUpdating; // is video currently updating to match Firestore info?
+let updateInterval; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
+const VIDEO_QUEUE = ['y0U4sD3_lX4','VYOjWnS4cMY', 'F1B9Fk_SgI0'];
+
+const FISRT_VIDEO_ID = VIDEO_QUEUE.shift();
+document.getElementById('ytplayer').src = 
+    'https://www.youtube.com/embed/' + FISRT_VIDEO_ID + '?enablejsapi=1';
 
 const firebaseConfig = {
   apiKey: API_KEY, // eslint-disable-line no-undef
@@ -36,20 +42,51 @@ let player; // var representing iframe ytplayer
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
+      'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange,
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
     },
   });
-  // I'm still working on writing this as a promise, but it doesn't
-  // work unless these next two parts are delayed
-  setTimeout(function() {
-    sendInfo('start');
-    getRealtimeUpdates();
-  }, 1000);
 }
 
-function sendInfo(goal) { // send info to Firestore
+function onPlayerReady(event) {
+    catchUserUp(true);
+    getRealtimeUpdates();
+}
+
+function catchUserUp(justStarting) {
+  console.log('does this get called twice? ' + justStarting);
+  docRef.get().then(function(doc) {
+    if (doc && doc.exists) {
+      const vidData = doc.data();
+      player.seekTo(vidData.timestamp);
+      player.setPlaybackRate(vidData.videoSpeed);
+      if (vidData.isPlaying) player.playVideo();
+      else player.pauseVideo();
+    } else {
+      sendInitialInfo('start');
+    }
+  }).then(function() {
+    updateInterval = setInterval(updateInfo, SYNC_WINDOW*1000, 'update');
+    if (justStarting) addOneViewer();
+  });
+}
+
+function sendInitialInfo(goal) { // send info to Firestore
   docRef.set({
+    isPlaying: isVideoPlaying(),
+    timestamp: player.getCurrentTime(),
+    videoSpeed: player.getPlaybackRate(),
+    numPeopleWatching: 0,
+  }).then(function() {
+    console.log(goal + ' request sent');
+  }).catch(function(error) {
+    console.log(goal + ' caused an error: ', error);
+  });
+}
+
+function updateInfo(goal) { // send info to Firestore
+  docRef.update({
     isPlaying: isVideoPlaying(),
     timestamp: player.getCurrentTime(),
     videoSpeed: player.getPlaybackRate(),
@@ -59,6 +96,7 @@ function sendInfo(goal) { // send info to Firestore
     console.log(goal + ' caused an error: ', error);
   });
 }
+
 
 let catchUp = false; // Does this vid need to catch up to Firestore?
 
@@ -91,6 +129,7 @@ let catchUp = false; // Does this vid need to catch up to Firestore?
 let pauseTimeout;
 let bufferTimeout;
 let pauseInterval;
+let firstVid = true;
 function onPlayerStateChange() {
   switch (player.getPlayerState()) {
     case 1: // Playing
@@ -98,16 +137,16 @@ function onPlayerStateChange() {
       clearTimeout(bufferTimeout);
       clearInterval(pauseInterval);
       bufferingChecks();
-      if (!videoUpdating) sendInfo('play');
+      if (!videoUpdating) updateInfo('play');
       break;
     case 2: // paused
       if (!catchUp && !videoUpdating) {
-        pauseTimeout = setTimeout(sendInfo, 100, 'pause');
+        pauseTimeout = setTimeout(updateInfo, 100, 'pause');
         let lastTime = player.getCurrentTime();
         pauseInterval = setInterval(function() {
           if (player.getCurrentTime() != lastTime) {
             lastTime = player.getCurrentTime();
-            sendInfo('Update on Pause Seek');
+            updateInfo('Update on Pause Seek');
           }
         }, 1000);
       }
@@ -117,37 +156,75 @@ function onPlayerStateChange() {
       clearInterval(pauseInterval);
       bufferTimeout = setTimeout(function() {
         catchUp = true;
+        clearInterval(updateInterval);
       }, SYNC_WINDOW*1000);
       break;
-    case -1: // Just before next video starts
-      // Will change the video docRef refers to
+    case 5:
+      console.log('cued');
+      waitForOthers();
+      removeOneViewer();
       break;
     case 0: // Ended
       // will load the next video
+      clearInterval(updateInterval);
+      // removeOneViewer();
+      player.cueVideoById({videoId: VIDEO_QUEUE.shift(),});
+      // removeOneViewer();
   }
+}
+
+let pleaseDoNotCallAgain = false;
+function waitForOthers() {
+  docRef.onSnapshot(function(doc) {
+    if (doc && doc.exists && !pleaseDoNotCallAgain) {
+      console.log(pleaseDoNotCallAgain);
+      const vidData = doc.data();
+      if (vidData.numPeopleWatching === 0) {
+        pleaseDoNotCallAgain = true;
+        resetPlaybackInfo();
+        player.playVideo();
+        catchUserUp(true);
+        console.log('did this happen twice?');
+        console.log(vidData.numPeopleWatching);
+      }
+    }
+  });
+  setTimeout(function() {pleaseDoNotCallAgain = false; console.log('yoyoyo')}, SYNC_WINDOW*1000);
+}
+
+function resetPlaybackInfo() {
+  docRef.update({
+    isPlaying: true,
+    timestamp: 0,
+    videoSpeed: player.getPlaybackRate(),
+  }).then(function() {
+    console.log('reset request sent');
+  }).catch(function(error) {
+    console.log('reset caused an error: ', error);
+  });
+}
+
+function removeOneViewer() {
+  docRef.update({
+    numPeopleWatching: firebase.firestore.FieldValue.increment(-1),
+  }).then(function() { console.log('removed one viewer'); });
+}
+
+function addOneViewer() {
+  docRef.update({
+    numPeopleWatching: firebase.firestore.FieldValue.increment(1),
+  }).then(function() { console.log('added one viewer'); });
 }
 
 function bufferingChecks() {
   if (catchUp) {
-    catchUserUp();
+    catchUserUp(false);
     catchUp = false;
   }
 }
 
-function catchUserUp() {
-  docRef.get().then(function(doc) {
-    if (doc && doc.exists) {
-      const vidData = doc.data();
-      player.seekTo(vidData.timestamp);
-      player.setPlaybackRate(vidData.videoSpeed);
-      if (vidData.isPlaying) player.playVideo();
-      else player.pauseVideo();
-    }
-  });
-}
-
 function onPlayerPlaybackRateChange() {
-  if (!videoUpdating) sendInfo('Change Speed');
+  if (!videoUpdating) updateInfo('Change Speed');
 }
 
 function getRealtimeUpdates() {

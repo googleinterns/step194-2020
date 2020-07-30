@@ -1,26 +1,20 @@
 package com.google.step.YTLounge.servlets;
 
-import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.appengine.api.datastore.*;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
-import com.google.common.collect.ImmutableMap;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,10 +22,7 @@ import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import javax.servlet.annotation.WebServlet;
@@ -74,7 +65,7 @@ public class SingleVideoSearch extends HttpServlet {
     String videoID = getParameter(request, "id", "");
     String roomID = getParameter(request, "roomid", "");
     if (roomID.equals("")) {
-        roomID = generateRoomID();
+      roomID = generateRoomID();
     }
 
     YouTube youtubeService = null;
@@ -96,10 +87,10 @@ public class SingleVideoSearch extends HttpServlet {
     }
 
     try {
-        extractVideo(jsonObject.getAsJsonArray("items"), videoID, roomID);
-        response.getWriter().println(gson.toJson(videoResponse));
+      extractVideo(jsonObject.getAsJsonArray("items"), videoID, roomID);
+      response.getWriter().println(gson.toJson(videoResponse));
     } catch (Exception e) {
-        response.getWriter().println(gson.toJson("error: exception"));
+      response.getWriter().println(gson.toJson("error: exception"));
     }
   }
 
@@ -133,7 +124,6 @@ public class SingleVideoSearch extends HttpServlet {
     } catch (Exception e) {
       System.out.println("UNABLE to get id");
     }
-    
     return "";
   }
 
@@ -150,8 +140,7 @@ public class SingleVideoSearch extends HttpServlet {
     }
     Map<String, Object> videoData = new HashMap<>();
     ApiFuture<DocumentReference> vidRef = 
-        db
-            .collection("rooms")
+        db.collection("rooms")
             .document(roomID)
             .collection("information")
             .document("queue")
@@ -161,13 +150,12 @@ public class SingleVideoSearch extends HttpServlet {
   }
 
   /**
-   * Iterates through the given items and adds the relevant information to 
-   * the given map, eventually adding the video to the database and notifying
-   * the console of when the item was successfully added
+   * Iterates through the given items and adds the relevant information to the given map, eventually
+   * adding the video to the database and notifying the console of when the item was successfully 
+   * added
    */
-  private Map<String, Object> getVideoInformation(JsonArray items, 
-    //   Map<String, Object> videoData, DocumentReference docRef, String videoID) {
-        Map<String, Object> videoData, String videoID) {
+  private Map<String, Object> getVideoInformation(JsonArray items, Map<String, Object> videoData,
+      String videoID) {
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =
@@ -241,9 +229,7 @@ public class SingleVideoSearch extends HttpServlet {
     return value;
   }
 
-  /**
-   * Creates a Firestore that's available for reading and writing data to the database.
-   */
+  /** Creates a Firestore that's available for reading and writing data to the database. */
   private Firestore authorize() throws Exception {
     Firestore db = null;
     try {
@@ -255,15 +241,13 @@ public class SingleVideoSearch extends HttpServlet {
               .build();
       db = firestoreOptions.getService();
     } catch (Exception e) {
-        e.printStackTrace();
+      e.printStackTrace();
     } finally {
       return db;
     }
   }
 
-  /**
-   * Locate the necessary API key to access needed data
-   */
+  /** Locate the necessary API key to access needed data */
   private String readSecrets() {
     try {
       File secretFile = new File("dataSecret.txt");

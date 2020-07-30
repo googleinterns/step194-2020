@@ -2,22 +2,13 @@ package com.google.step.YTLounge.servlets;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Query.Direction;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
@@ -37,14 +28,12 @@ public class RetrieveQueue extends HttpServlet {
     if (roomid.equals("")) {
       response.getWriter().println(gson.toJson("error: no room found"));
     }
-
     Firestore db = null;
     try {
       db = authorize();
     } catch (Exception e) {
       System.out.println("bad firestore authorization");
     }
-    
     DocumentReference roomRef = db.collection("rooms").document(roomid);
     ApiFuture<DocumentSnapshot> roomFuture = roomRef.get();
     DocumentSnapshot room = null;
@@ -55,8 +44,7 @@ public class RetrieveQueue extends HttpServlet {
     }
     if (room.exists()) {
       ApiFuture<QuerySnapshot> queueFuture = 
-          db
-              .collection("rooms")
+          db.collection("rooms")
               .document(roomid)
               .collection("information")
               .document("queue")
@@ -65,7 +53,7 @@ public class RetrieveQueue extends HttpServlet {
               .get(); // sort all videos for this room by their requestTime
               
       List<QueryDocumentSnapshot> queueVideos = null;
-      List<Object> queueFormatted = new ArrayList<>();;
+      List<Object> queueFormatted = new ArrayList<>();
       try {
         queueVideos = queueFuture.get().getDocuments();
         for (QueryDocumentSnapshot doc : queueVideos) {
@@ -100,8 +88,8 @@ public class RetrieveQueue extends HttpServlet {
   }
 
   /**
-   * Retrieves validation for Firestore access. 
-   * 
+   * Retrieves validation for Firestore access.
+   *
    * @return null if access denied
    * @return Validated Firestore object
    */

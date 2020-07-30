@@ -62,35 +62,9 @@ function sendInfo(goal) { // send info to Firestore
 
 let catchUp = false; // Does this vid need to catch up to Firestore?
 
-/*
-  The purpose of the pause timeout is to differentiate between
-  users pausing the video and moving ahead in the video. When
-  the IFrame seeks (user moves to a different part of video) the
-  following steps are taken:
-    1. pause the video
-    2. (sometimes) buffer while moving playhead
-    3. play the video at new playhead position
-  This means when a user goes to move the playhead, the pause
-  case is triggered, and I didn't want to send needless requests
-  to the Firestore, so I delayed the request until buffering/play hadn't
-  been called for 100 ms.
-
-  The purpose of the buffering timeout is to decide when a user's
-  video buffered for too long. If the video buffers for an amount of
-  time greater than the SYNC_WINDOW, then they can no longer make changes
-  to the Firestore until they've caught up to everyone else's video play.
-  It's possible a user's video could buffer then play in small increments
-  multiple times (i.e. video buffers for 1 second 5 times with a 5 second
-  SYNC_WINDOW) and then they'd fall out of the timeframe and this code would
-  not catch it. In the future, I may add a summing total of buffering to solve
-  this issue, but I think it's a rare enough occurence to fix later.
-
-  Pause interval just makes sure seek information is sent
-  while the video isn't playing.
-*/
-let pauseTimeout;
-let bufferTimeout;
-let pauseInterval;
+let pauseTimeout; // Differentiates pause from seek
+let bufferTimeout; // Finds when user's video has fallen behind
+let pauseInterval; // sends new information about paused videos
 function onPlayerStateChange() {
   switch (player.getPlayerState()) {
     case 1: // Playing

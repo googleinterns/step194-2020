@@ -9,7 +9,7 @@ const firebaseConfig = {
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
   measurementId: 'G-JSDHBSMHS3',
 };
-const app = 
+const app =
     firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
 

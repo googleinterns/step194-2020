@@ -31,7 +31,6 @@ public class RetrieveQueue extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    //make error json
     Gson gson = new Gson();
     response.setContentType("application/json");
     String roomid = getParameter(request, "roomid", "");
@@ -52,12 +51,9 @@ public class RetrieveQueue extends HttpServlet {
     try {
       room = roomFuture.get();
     } catch (Exception e) {
-      response.getWriter().println(gson.toJson("error: DocumentSnapshot error"));
+      response.getWriter().println(gson.toJson("error: DocSnap error"));
     }
     if (room.exists()) {
-      //do something to retrieve videos
-      //access collection of videos and sort by time added
-      //turn collection to json and write it to the response
       ApiFuture<QuerySnapshot> queueFuture = 
           db
               .collection("rooms")
@@ -66,7 +62,7 @@ public class RetrieveQueue extends HttpServlet {
               .document("queue")
               .collection("videos")
               .orderBy("requestTime", Direction.ASCENDING)
-              .get();
+              .get(); // sort all videos for this room by their requestTime
               
       List<QueryDocumentSnapshot> queueVideos = null;
       List<Object> queueFormatted = new ArrayList<>();;
@@ -76,7 +72,7 @@ public class RetrieveQueue extends HttpServlet {
           queueFormatted.add(doc.getData());
         }
       } catch (Exception e) {
-        response.getWriter().println(gson.toJson("error: DocumentSnapshot error"));
+        response.getWriter().println(gson.toJson("error: DocSnap error"));
       }
       response.getWriter().println(gson.toJson(queueFormatted));
     } else {
@@ -103,6 +99,12 @@ public class RetrieveQueue extends HttpServlet {
     return value;
   }
 
+  /**
+   * Retrieves validation for Firestore access. 
+   * 
+   * @return null if access denied
+   * @return Validated Firestore object
+   */
   private Firestore authorize() throws Exception {
     Firestore db = null;
     try {

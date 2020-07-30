@@ -1,0 +1,33 @@
+.queueVideo {
+    display: flex;
+    flex-direction: row;
+    padding: 0.25%;
+}
+
+.videoThumbnail {
+    height: 80px;
+    width: auto;
+    padding: 0.1%;
+    margin-right: 1%;
+}
+
+.videoSubmit {
+    display: flex;
+    flex-direction: row;
+    padding: 0.25%;
+}
+
+#linkError {
+    display: none;
+    color: red;
+}
+
+#videoError {
+    display: none;
+    color: red;
+}
+
+#videoSuccess {
+    display: none;
+    color: greenyellow;
+}

@@ -6,9 +6,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="index_style.css"></link>
     <link rel="stylesheet" href="chat_style.css"></link>
+    <link rel="stylesheet" href="queue_style.css"></link>
     <script src="index_script.js"></script>
     <script src="config.js"></script>
-    <script src="queue.js"></script>
     <script src="chat.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -17,6 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-firestore.js"></script> 
+    <script src="queue.js" defer></script>
   </head>
   <body >
       
@@ -61,7 +62,8 @@
                 <textarea id="linkArea"></textarea>
                 <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">Add to queue</button>    
             </div>
-            <p id="linkError">Bad link!</p>
+            <p id="linkError">Please submit a properly formatted YouTube video link.</p>
+            <p id="videoError">There was an error trying to find your video. Please try again.</p>
           </div>
           <div id="guests" class="tab-pane">
             <h3>Guests</h3>

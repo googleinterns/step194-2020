@@ -148,27 +148,15 @@ public class SingleVideoSearch extends HttpServlet {
     } catch (Exception e) {
       System.out.println("bad firestore authorization");
     }
-    ApiFuture<QuerySnapshot> queueFuture =
-        db
-            .collection("rooms")
-            .document(roomID)
-            .collection("information")
-            .document("queue")
-            .collection("videos")
-            .get(); // get all videos in the room's queue
-    List<QueryDocumentSnapshot> queueVideos = queueFuture.get().getDocuments();
-    DocumentReference docRef = 
-        db
-            .collection("rooms")
-            .document(roomID)
-            .collection("information")
-            .document("queue")
-            .collection("videos")
-            .document("video" + queueVideos.size()); // create new video instance in queue
-    ApiFuture<DocumentSnapshot> future = docRef.get();
-    DocumentSnapshot document = future.get();
     Map<String, Object> videoData = new HashMap<>();
-    findItems(items, videoData, docRef, videoID);// might change method name
+    ApiFuture<DocumentReference> vidRef = 
+        db
+            .collection("rooms")
+            .document(roomID)
+            .collection("information")
+            .document("queue")
+            .collection("videos")
+            .add(getVideoInformation(items, videoData, videoID)); // add new video
     db.close();
   }
 
@@ -177,8 +165,9 @@ public class SingleVideoSearch extends HttpServlet {
    * the given map, eventually adding the video to the database and notifying
    * the console of when the item was successfully added
    */
-  private void findItems(JsonArray items, Map<String, Object> videoData,
-      DocumentReference docRef, String videoID) {
+  private Map<String, Object> getVideoInformation(JsonArray items, 
+    //   Map<String, Object> videoData, DocumentReference docRef, String videoID) {
+        Map<String, Object> videoData, String videoID) {
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =
@@ -205,12 +194,12 @@ public class SingleVideoSearch extends HttpServlet {
         videoData.put("channelName", channelName);
         videoData.put("releaseDate", releaseDate);
         videoData.put("requestTime", System.currentTimeMillis());
-        ApiFuture<WriteResult> result = docRef.set(videoData);
-        System.out.println("Update time : " + result.get().getUpdateTime());
+        return videoData;
       } catch (Exception e) {
-          System.out.println("Error: can't put video into firestore");
+        System.out.println("Error: can't put video into firestore");
       }
     }
+    return new HashMap<>();
   }
 
   /**

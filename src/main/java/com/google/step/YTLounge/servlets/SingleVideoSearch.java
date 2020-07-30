@@ -1,7 +1,5 @@
 package com.google.step.YTLounge.servlets;
 
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -139,7 +137,7 @@ public class SingleVideoSearch extends HttpServlet {
       System.out.println("bad firestore authorization");
     }
     Map<String, Object> videoData = new HashMap<>();
-    ApiFuture<DocumentReference> vidRef = 
+    ApiFuture<DocumentReference> vidRef =
         db.collection("rooms")
             .document(roomID)
             .collection("information")
@@ -151,11 +149,11 @@ public class SingleVideoSearch extends HttpServlet {
 
   /**
    * Iterates through the given items and adds the relevant information to the given map, eventually
-   * adding the video to the database and notifying the console of when the item was successfully 
+   * adding the video to the database and notifying the console of when the item was successfully
    * added
    */
-  private Map<String, Object> getVideoInformation(JsonArray items, Map<String, Object> videoData,
-      String videoID) {
+  private Map<String, Object> getVideoInformation(
+      JsonArray items, Map<String, Object> videoData, String videoID) {
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =

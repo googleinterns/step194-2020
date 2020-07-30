@@ -1,6 +1,6 @@
 // Initializes resources for reading/writing to Firestore
 const firebaseConfig = {
-  apiKey: config.apiKey,
+  apiKey: config.apiKey, // eslint-disable-line no-undef
   authDomain: 'lounge-95f01.firebaseapp.com',
   databaseURL: 'https://lounge-95f01.firebaseio.com',
   projectId: 'youtube-lounge',
@@ -9,13 +9,13 @@ const firebaseConfig = {
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
   measurementId: 'G-JSDHBSMHS3',
 };
-const app = firebase.initializeApp(firebaseConfig);
-db = firebase.firestore(app);
+const app = firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+db = firebase.firestore(app); // eslint-disable-line no-undef
 
 // Track realtime changes to the database and update the visual queue on change
 // hardcoded for one room for now, can access different rooms through
 // window.location.search property
-db.collection('rooms').doc('47jGbulshBCjcc8YOt8a').collection('information')
+db.collection('rooms').doc('47jGbulshBCjcc8YOt8a').collection('information') // eslint-disable-line no-undef
     .doc('queue').collection('videos')
     .onSnapshot(function(snapshot) {
       snapshot.docChanges().forEach(function(change) {
@@ -81,7 +81,7 @@ async function getVideoData(id) {
  * it if found.
  */
 async function removeVideo(roomid, name) {
-  const selectedVideo = await db
+  const selectedVideo = await db // eslint-disable-line no-undef
       .collection('rooms')
       .doc(roomid)
       .collection('information')
@@ -90,7 +90,7 @@ async function removeVideo(roomid, name) {
       .doc(name)
       .get();
   if (selectedVideo.exists) {
-    await db
+    await db // eslint-disable-line no-undef
         .collection('rooms')
         .doc(roomid)
         .collection('information')
@@ -112,7 +112,7 @@ async function getRoomQueue(roomid) {
   if (roomid == '') {
     console.log('NO ROOM ID PROVIDED');
   }
-  let videosArray = await db
+  const videosArray = await db // eslint-disable-line no-undef
       .collection('rooms')
       .doc(roomid)
       .collection('information')
@@ -162,12 +162,12 @@ function parseTime(duration) {
   let minutes = 0;
   let seconds = 0;
   let hours = 0;
-  let result = "";
+  let result = '';
   hours = (duration / 3600) | 0;
   minutes = ((duration - (hours * 3600)) / 60) | 0;
   seconds = duration - (hours * 3600) - (minutes * 60);
   if (hours > 0) {
-    result += hours + ":";
+    result += hours + ':';
   }
   if (minutes < 10) {
     minutes = '0' + minutes;

@@ -4,6 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.Query.Direction;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -43,15 +45,14 @@ public class RetrieveQueue extends HttpServlet {
       response.getWriter().println(gson.toJson("error: DocSnap error"));
     }
     if (room.exists()) {
-      ApiFuture<QuerySnapshot> queueFuture = 
+      ApiFuture<QuerySnapshot> queueFuture =
           db.collection("rooms")
               .document(roomid)
               .collection("information")
               .document("queue")
               .collection("videos")
               .orderBy("requestTime", Direction.ASCENDING)
-              .get(); // sort all videos for this room by their requestTime
-              
+              .get(); // sort all videos for this room by their requestTime     
       List<QueryDocumentSnapshot> queueVideos = null;
       List<Object> queueFormatted = new ArrayList<>();
       try {

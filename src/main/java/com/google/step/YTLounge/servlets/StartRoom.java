@@ -1,11 +1,14 @@
 package com.google.step.YTLounge.servlets;
 
-import com.google.appengine.api.datastore.*;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,25 +20,44 @@ public class StartRoom extends HttpServlet {
 
   // framework, still a work in progress
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     response.setContentType("application/json");
-
-    //   response.sendRedirect("/?roomid=" + roomid); //go to main page but with room id
+    String roomid = generateRoomID();
+    response.sendRedirect("/lounge.html/?roomid=" + roomid);
   }
 
   /**
-   * Locates the name parameter in the given request and returns that value.
+   * If a room wasn't found from the query, create a new room ID while respecting the current IDs in
+   * DataStore. Initializes necessary properties for the room.
    *
-   * @return defaultValue if name parameter wasn't found
-   * @return found value for name parameter
+   * @return a string representing a room's identifier
    */
-  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
-    String value = request.getParameter(name);
-    if (value == null) {
-      return defaultValue;
+  private String generateRoomID() {
+    Firestore db = null;
+    try {
+      db = authorize();
+    } catch (Exception e) {
+      System.out.println("bad firestore authorization");
     }
-    return value;
+    Map<String, Object> roomData = new HashMap<>();
+    roomData.put("members", new HashMap<>());
+    roomData.put("nowPlaying", null);
+    roomData.put("queue", null);
+    roomData.put("duration", 0);
+    roomData.put("elapsedTime", 0);
+    roomData.put("log", null);
+    ApiFuture<DocumentReference> addedDocRef = db.collection("rooms").add(roomData);
+    String id = null;
+    try {
+      id = addedDocRef.get().getId();
+      System.out.println("Added document with ID: " + id);
+      db.close();
+      return id;
+    } catch (Exception e) {
+      System.out.println("UNABLE to get id");
+    }
+    return "";
   }
 
   /** Creates a Firestore that's available for reading and writing data to the database. */

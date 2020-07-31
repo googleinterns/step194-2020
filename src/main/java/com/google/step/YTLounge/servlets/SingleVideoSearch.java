@@ -8,7 +8,6 @@ import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
-import com.google.appengine.api.datastore.*;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
@@ -63,7 +62,8 @@ public class SingleVideoSearch extends HttpServlet {
     String videoID = getParameter(request, "id", "");
     String roomID = getParameter(request, "roomid", "");
     if (roomID.equals("")) {
-      roomID = generateRoomID();
+      response.getWriter().println(gson.toJson("error: no room found"));
+      return;
     }
 
     YouTube youtubeService = null;
@@ -93,41 +93,8 @@ public class SingleVideoSearch extends HttpServlet {
   }
 
   /**
-   * If a room wasn't found from the query, create a new room ID while respecting the current IDs in
-   * DataStore. Initializes necessary properties for the room.
-   *
-   * @return a string representing a room's identifier
-   */
-  private String generateRoomID() {
-    Firestore db = null;
-    try {
-      db = authorize();
-    } catch (Exception e) {
-      System.out.println("bad firestore authorization");
-    }
-    Map<String, Object> roomData = new HashMap<>();
-    roomData.put("members", new HashMap<>());
-    roomData.put("nowPlaying", null);
-    roomData.put("queue", null);
-    roomData.put("duration", 0);
-    roomData.put("elapsedTime", 0);
-    roomData.put("log", null);
-    ApiFuture<DocumentReference> addedDocRef = db.collection("rooms").add(roomData);
-    String id = null;
-    try {
-      id = addedDocRef.get().getId();
-      System.out.println("Added document with ID: " + id);
-      db.close();
-      return id;
-    } catch (Exception e) {
-      System.out.println("UNABLE to get id");
-    }
-    return "";
-  }
-
-  /**
    * Iterates through the given items and locates specific values to create a new Video and upload
-   * the video to DataStore
+   * the video to Firestore
    */
   private void extractVideo(JsonArray items, String videoID, String roomID) throws Exception {
     Firestore db = null;

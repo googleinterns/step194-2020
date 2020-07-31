@@ -59,8 +59,10 @@
           <div id="queue" class="tab-pane">
             <div id="videoContainer"></div>
             <div class="videoSubmit">
-                <textarea id="linkArea"></textarea>
-                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">Add to queue</button>    
+                <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
+                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
+                    <img id="removeFromQueueIMG" src="images/add-to-queue.svg"/>
+                </button>    
             </div>
             <p id="linkError">Please submit a properly formatted YouTube video link.</p>
             <p id="videoError">There was an error trying to find your video. Please try again.</p>

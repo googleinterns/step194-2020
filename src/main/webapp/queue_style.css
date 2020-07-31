@@ -13,8 +13,46 @@
 
 .videoSubmit {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     padding: 0.25%;
+}
+
+#linkArea {
+    display: inline-block;
+    width: 100%;
+    left: 0px;
+    position: absolute;
+    bottom: 0px;
+    background:var(--co-nr3wg, #91a9b5);
+    margin: auto;
+    font: 400 16px/25.2px Roboto;
+    padding: 10px 16px 16px 43px;
+    color:var(--co-text-light, #FFFFFF);
+    letter-spacing: 0.1px;
+}
+
+#queueBtn {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+    display:block;
+    font-size: 25px;
+    height:70px;
+    width:70px;
+    right: 5px;
+    position:absolute;
+    opacity:1;
+    bottom:0;
+    margin:auto;
+    z-index:10;
+}
+
+#removeFromQueueIMG {
+    height: 40px;
+    width: 40px;
 }
 
 #linkError {

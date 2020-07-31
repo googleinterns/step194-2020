@@ -16,10 +16,15 @@ let videoUpdating; // is video currently updating to match Firestore info?
 let updateInterval; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 const VIDEO_QUEUE = ['y0U4sD3_lX4','VYOjWnS4cMY', 'F1B9Fk_SgI0'];
+thumbnail = document.getElementById("thumbnailDisplay");
+  if (thumbnail.style.display === "none") {
+    thumbnail.style.display = "block";
+  } else {
+    thumbnail.style.display = "none";
+}
 
-const FISRT_VIDEO_ID = VIDEO_QUEUE.shift();
 document.getElementById('ytplayer').src = 
-    'https://www.youtube.com/embed/' + FISRT_VIDEO_ID + '?enablejsapi=1';
+    'https://www.youtube.com/embed/' + VIDEO_QUEUE.shift() + '?enablejsapi=1';
 
 const firebaseConfig = {
   apiKey: API_KEY, // eslint-disable-line no-undef
@@ -34,8 +39,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
-// Hard coded for now, but eventually will update to point
-// to current video in queue
 const docRef = firestore.doc('CurrentVideo/PlaybackData');
 
 let player; // var representing iframe ytplayer
@@ -50,12 +53,11 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 }
 
 function onPlayerReady(event) {
-    catchUserUp(true);
-    getRealtimeUpdates();
+  catchUserUp(true);
+  getRealtimeUpdates();
 }
 
 function catchUserUp(justStarting) {
-  console.log('does this get called twice? ' + justStarting);
   docRef.get().then(function(doc) {
     if (doc && doc.exists) {
       const vidData = doc.data();
@@ -97,79 +99,66 @@ function updateInfo(goal) { // send info to Firestore
   });
 }
 
-
 let catchUp = false; // Does this vid need to catch up to Firestore?
 
-/*
-  The purpose of the pause timeout is to differentiate between
-  users pausing the video and moving ahead in the video. When
-  the IFrame seeks (user moves to a different part of video) the
-  following steps are taken:
-    1. pause the video
-    2. (sometimes) buffer while moving playhead
-    3. play the video at new playhead position
-  This means when a user goes to move the playhead, the pause
-  case is triggered, and I didn't want to send needless requests
-  to the Firestore, so I delayed the request until buffering/play hadn't
-  been called for 100 ms.
-
-  The purpose of the buffering timeout is to decide when a user's
-  video buffered for too long. If the video buffers for an amount of
-  time greater than the SYNC_WINDOW, then they can no longer make changes
-  to the Firestore until they've caught up to everyone else's video play.
-  It's possible a user's video could buffer then play in small increments
-  multiple times (i.e. video buffers for 1 second 5 times with a 5 second
-  SYNC_WINDOW) and then they'd fall out of the timeframe and this code would
-  not catch it. In the future, I may add a summing total of buffering to solve
-  this issue, but I think it's a rare enough occurence to fix later.
-
-  Pause interval just makes sure seek information is sent
-  while the video isn't playing.
-*/
 let pauseTimeout;
 let bufferTimeout;
 let pauseInterval;
-let firstVid = true;
+let stopUpdating = false;
 function onPlayerStateChange() {
-  switch (player.getPlayerState()) {
-    case 1: // Playing
-      clearTimeout(pauseTimeout);
-      clearTimeout(bufferTimeout);
-      clearInterval(pauseInterval);
-      bufferingChecks();
-      if (!videoUpdating) updateInfo('play');
-      break;
-    case 2: // paused
-      if (!catchUp && !videoUpdating) {
-        pauseTimeout = setTimeout(updateInfo, 100, 'pause');
-        let lastTime = player.getCurrentTime();
-        pauseInterval = setInterval(function() {
-          if (player.getCurrentTime() != lastTime) {
-            lastTime = player.getCurrentTime();
-            updateInfo('Update on Pause Seek');
-          }
-        }, 1000);
-      }
-      break;
-    case 3: // Buffering
-      clearTimeout(pauseTimeout);
-      clearInterval(pauseInterval);
-      bufferTimeout = setTimeout(function() {
-        catchUp = true;
+  if (!stopUpdating) {
+    switch (player.getPlayerState()) {
+      case 1: // Playing
+        clearTimeout(pauseTimeout);
+        clearTimeout(bufferTimeout);
+        clearInterval(pauseInterval);
+        bufferingChecks();
+        if (!videoUpdating) updateInfo('play');
+        break;
+      case 2: // paused
+        if (!catchUp && !videoUpdating) {
+          pauseTimeout = setTimeout(updateInfo, 100, 'pause');
+          let lastTime = player.getCurrentTime();
+          pauseInterval = setInterval(function() {
+            if (player.getCurrentTime() != lastTime) {
+              lastTime = player.getCurrentTime();
+              updateInfo('Update on Pause Seek');
+            }
+          }, 1000);
+        }
+        break;
+      case 3: // Buffering
+        console.log('buffering');
+        clearTimeout(pauseTimeout);
+        clearInterval(pauseInterval);
+        bufferTimeout = setTimeout(function() {
+          catchUp = true;
+          clearInterval(updateInterval);
+        }, SYNC_WINDOW*1000);
+        break;
+      case 0: // Ended
+        // will load the next video
+        console.log('did it at least end?');
+        stopUpdating = true;
         clearInterval(updateInterval);
-      }, SYNC_WINDOW*1000);
-      break;
-    case 5:
-      console.log('cued');
-      waitForOthers();
-      removeOneViewer();
-      break;
-    case 0: // Ended
-      // will load the next video
-      clearInterval(updateInterval);
-      // removeOneViewer();
-      player.cueVideoById({videoId: VIDEO_QUEUE.shift(),});
-      // removeOneViewer();
+        switchDisplay();
+        waitForOthers();
+        removeOneViewer();
+    }
+  }
+}
+
+function switchDisplay() {
+  var x = document.getElementById("ytplayer");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+  if (thumbnail.style.display === "none") {
+    thumbnail.style.display = "block";
+  } else {
+    thumbnail.style.display = "none";
   }
 }
 
@@ -177,12 +166,14 @@ let pleaseDoNotCallAgain = false;
 function waitForOthers() {
   docRef.onSnapshot(function(doc) {
     if (doc && doc.exists && !pleaseDoNotCallAgain) {
-      console.log(pleaseDoNotCallAgain);
+      console.log('waiting For others called');
       const vidData = doc.data();
       if (vidData.numPeopleWatching === 0) {
+        player.loadVideoById({videoId: VIDEO_QUEUE.shift(),});
         pleaseDoNotCallAgain = true;
+        switchDisplay();
         resetPlaybackInfo();
-        player.playVideo();
+        stopUpdating = false;
         catchUserUp(true);
         console.log('did this happen twice?');
         console.log(vidData.numPeopleWatching);
@@ -196,7 +187,7 @@ function resetPlaybackInfo() {
   docRef.update({
     isPlaying: true,
     timestamp: 0,
-    videoSpeed: player.getPlaybackRate(),
+    videoSpeed: 1,
   }).then(function() {
     console.log('reset request sent');
   }).catch(function(error) {
@@ -230,6 +221,7 @@ function onPlayerPlaybackRateChange() {
 function getRealtimeUpdates() {
   docRef.onSnapshot(function(doc) {
     if (doc && doc.exists) {
+      console.log('Firestore Update');
       const vidData = doc.data();
       videoUpdating = true;
       if (player.getPlaybackRate() != vidData.videoSpeed) {
@@ -273,5 +265,5 @@ function differentStates(firestoreVidIsPlaying) {
 }
 
 function isVideoPlaying() {
-  return (player.getPlayerState() == 1);
+  return (player.getPlayerState() !== 2);
 }

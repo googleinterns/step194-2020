@@ -16,15 +16,16 @@ let videoUpdating; // is video currently updating to match Firestore info?
 let updateInterval; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 const VIDEO_QUEUE = ['y0U4sD3_lX4','VYOjWnS4cMY', 'F1B9Fk_SgI0'];
-thumbnail = document.getElementById("thumbnailDisplay");
-  if (thumbnail.style.display === "none") {
-    thumbnail.style.display = "block";
+y = document.getElementById("thumbnailDisplay");
+  if (y.style.display === "none") {
+    y.style.display = "block";
   } else {
-    thumbnail.style.display = "none";
+    y.style.display = "none";
 }
 
+const FISRT_VIDEO_ID = VIDEO_QUEUE.shift();
 document.getElementById('ytplayer').src = 
-    'https://www.youtube.com/embed/' + VIDEO_QUEUE.shift() + '?enablejsapi=1';
+    'https://www.youtube.com/embed/' + FISRT_VIDEO_ID + '?enablejsapi=1';
 
 const firebaseConfig = {
   apiKey: API_KEY, // eslint-disable-line no-undef
@@ -39,6 +40,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
+// Hard coded for now, but eventually will update to point
+// to current video in queue
 const docRef = firestore.doc('CurrentVideo/PlaybackData');
 
 let player; // var representing iframe ytplayer
@@ -53,11 +56,12 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 }
 
 function onPlayerReady(event) {
-  catchUserUp(true);
-  getRealtimeUpdates();
+    catchUserUp(true);
+    getRealtimeUpdates();
 }
 
 function catchUserUp(justStarting) {
+  console.log('does this get called twice? ' + justStarting);
   docRef.get().then(function(doc) {
     if (doc && doc.exists) {
       const vidData = doc.data();
@@ -69,6 +73,7 @@ function catchUserUp(justStarting) {
       sendInitialInfo('start');
     }
   }).then(function() {
+    console.log('hey');
     updateInterval = setInterval(updateInfo, SYNC_WINDOW*1000, 'update');
     if (justStarting) addOneViewer();
   });
@@ -99,6 +104,7 @@ function updateInfo(goal) { // send info to Firestore
   });
 }
 
+
 let catchUp = false; // Does this vid need to catch up to Firestore?
 
 let pauseTimeout;
@@ -113,8 +119,8 @@ function onPlayerStateChange() {
         clearTimeout(bufferTimeout);
         clearInterval(pauseInterval);
         bufferingChecks();
-        if (!videoUpdating) updateInfo('play');
-        break;
+          if (!videoUpdating) updateInfo('play');
+          break;
       case 2: // paused
         if (!catchUp && !videoUpdating) {
           pauseTimeout = setTimeout(updateInfo, 100, 'pause');
@@ -140,6 +146,7 @@ function onPlayerStateChange() {
         // will load the next video
         console.log('did it at least end?');
         stopUpdating = true;
+        pleaseDoNotCallAgain = false;
         clearInterval(updateInterval);
         switchDisplay();
         waitForOthers();
@@ -155,32 +162,31 @@ function switchDisplay() {
   } else {
     x.style.display = "none";
   }
-  if (thumbnail.style.display === "none") {
-    thumbnail.style.display = "block";
+  if (y.style.display === "none") {
+    y.style.display = "block";
   } else {
-    thumbnail.style.display = "none";
+    y.style.display = "none";
   }
 }
 
-let pleaseDoNotCallAgain = false;
+let pleaseDoNotCallAgain;
 function waitForOthers() {
   docRef.onSnapshot(function(doc) {
     if (doc && doc.exists && !pleaseDoNotCallAgain) {
       console.log('waiting For others called');
       const vidData = doc.data();
       if (vidData.numPeopleWatching === 0) {
-        player.loadVideoById({videoId: VIDEO_QUEUE.shift(),});
         pleaseDoNotCallAgain = true;
+        setTimeout(function() { 
+        player.loadVideoById({videoId: VIDEO_QUEUE.shift(),});
         switchDisplay();
         resetPlaybackInfo();
         stopUpdating = false;
         catchUserUp(true);
-        console.log('did this happen twice?');
-        console.log(vidData.numPeopleWatching);
+        }, 500);
       }
     }
   });
-  setTimeout(function() {pleaseDoNotCallAgain = false; console.log('yoyoyo')}, SYNC_WINDOW*1000);
 }
 
 function resetPlaybackInfo() {

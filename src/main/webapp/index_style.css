@@ -88,12 +88,10 @@ letter-spacing:normal
 
 #tabsbar a { 
     font:500 20px/30px Roboto;
-    padding: 8px 20px 8px 0px;
+    padding: 12px 20px 0px 0px;
     text-decoration: none;
-     font-size: 15px;
+    font-size: 15px;
     color: white;
-     display: block;
-    transition: 0.3s;
     float:left;
     text-align:left;
     left:0;
@@ -101,6 +99,13 @@ letter-spacing:normal
 
 .tab-pane{
     height: 100%;
+}
+#tabsbar {
+border-bottom: none;
+}
+
+.material-icons{
+    font-size:25px;
 }
 
 .queueVideo {

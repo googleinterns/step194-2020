@@ -138,7 +138,7 @@
 }
 
 #dialog{
-    width:500px;
+    width:600px;
     text-align: center;
     font: Roboto;
     color: white;
@@ -158,17 +158,24 @@
     padding:0px;
 }
 
-.image-button{
-    width: 22%;
-    padding: 1px 3.75px;
-}
 
-.img-class{
+.image-button{
     width: 50px;
     height: 50px;
+    padding: 1px 3.75px;
+    background-color: transparent;
+      display: inline;
 }
-.img-class:hover{
+
+.image-button:hover{
     transform: scale(1.05);
     transition: .3s ease;
     cursor: pointer;
+}
+
+.selected{
+  border: 1px solid white;
+  border-radius:30px;
+  background-color: white;
+  
 }

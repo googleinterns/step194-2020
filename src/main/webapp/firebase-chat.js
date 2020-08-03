@@ -1,6 +1,6 @@
 /* eslint-disable */
 const firebaseConfig = {
-  // apiKey: removed ,
+  //apiKey: removed,
   authDomain: 'lounge-95f01.firebaseapp.com',
   databaseURL: 'https://lounge-95f01.firebaseio.com',
   projectId: 'youtube-lounge',
@@ -9,12 +9,8 @@ const firebaseConfig = {
   appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
   measurementId: 'G-JSDHBSMHS3',
 };
-firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 
-function signIn() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
-}
+firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 
 function anonymousSignIn() {
   firebase.auth().signInAnonymously();
@@ -30,21 +26,15 @@ function initFirebaseAuth() {
 }
 
 function getProfilePicUrl() {
-  if (signInButtonElement.clicked==true) {
-    return firebase.auth().currentUser.photoURL;
-  } else {
     // placeholder profile picture for anonymous
-    return 'https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png';
-  }
+    return 'defaultUser.png';
 }
 
 function getUserName() {
-  if (signInButtonElement.clicked==true) {
-    return firebase.auth().currentUser.displayName;
-  } else {
-    // placeholder username for anonymous
-    return 'John Smith';
+  if (displayName.value == '') {
+    return 'Lounge Viewer';
   }
+  return displayName.value;
 }
 
 function getTimestamp() {
@@ -236,31 +226,24 @@ function toggleButton() {
   }
 }
 
+
 const messageListElement = document.getElementById('messages');
 const messageFormElement = document.getElementById('message-form');
 const messageInputElement = document.getElementById('message');
 const submitButtonElement = document.getElementById('submit');
 const userPicElement = document.getElementById('user-pic');
 const userNameElement = document.getElementById('user-name');
-const signInButtonElement = document.getElementById('sign-in');
-const anonymousSignInElement = document.getElementById('anonymous-signin');
 const signOutButtonElement = document.getElementById('sign-out');
 const signInSnackbarElement = document.getElementById('must-signin-snackbar');
 const dialog = document.getElementById('dialog');
+const displayNameFormElement = document.getElementById('name-form');
+const displayName = document.getElementById("userName");
+const anonymousSignInElement = document.getElementById('anonymous-signin');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   dialog.showModal();
-  if (signInButtonElement.clicked==true) {
-    signOut();
-  } else {
-    firebase.auth().signOut();
-  }
-});
-
-signInButtonElement.addEventListener('click', function() {
-  dialog.close();
-  signIn();
+  firebase.auth().signOut();
 });
 
 anonymousSignInElement.addEventListener('click', function() {

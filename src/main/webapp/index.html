@@ -24,29 +24,23 @@
         <h4 class="mdl-dialog__title" style="font-weight: bold;">Welcome to your Lounge!</h4>
 
         <div class="mdl-dialog__content">
-         <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-        <i class="material-icons">account_circle</i>Sign-in with Google
-        </button>
-        <h5 style="font-variant: small-caps; color:white; line-height: 10px;"> OR </h5>
-        <h7 style = "font-weight:bold;"> Select a Display Image:<h7>
+        <h6 style = "font-weight:bold; color: white;"> Select a Display Image:<h6>
             <div id="icon-holder-template"> 
-                <ul id="icon-holder">
-                    <a class="image-button"> 
-                    <img class ="img-class" src = "https://cdn.iconscout.com/icon/free/png-512/avatar-372-456324.png">
-                    </a></li>
-                    <a class="image-button"> 
-                    <img class ="img-class" src = "https://www.pngkey.com/png/full/203-2037403_flat-faces-icons-circle-girl-flat-icon-png.png">
-                    </a></li>
-                </ul>
+                <div id="icon-holder">
+                  <!-- default image in place -->
+                </div>
             </div>  <br>
-        <h7 style = "font-weight:bold;"> Display Name:  <h7>
+        <form id="name-form" action="#">
+        <h7 style = "font-weight:bold; color: white;"> Display Name:  </h7>
             <div class="mdl-textfield mdl-js-textfield">
-                <input class="mdl-textfield__input" type="text" id="userName" required>
+                <input class="mdl-textfield__input mdl-color-text--white" required="required" type="text" id="userName" required>
                 <label class="mdl-textfield__label" for="userName">Add a Nickname</label>
             </div>
-        </div>
-        <div class="mdl-dialog__actions">
-	    <button id = "anonymous-signin" type="sumbit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">Sign In</button>
+            <div class="mdl-dialog__actions">
+	        <button id = "anonymous-signin" type="sumbit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+                JOIN ROOM</button>
+            </div>
+        </form>
         </div>
       </dialog>
       
@@ -93,7 +87,7 @@
                     </div>
                     <form id="message-form" action="#">
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="message" autocomplete="off">
+                    <input class="mdl-textfield__input" type="text" id="message" autocomplete="off" spellcheck>
                     <label class="mdl-textfield__label" for="message">Message...</label>
                     </div>
                     <button id="submit" disabled type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
@@ -171,8 +165,10 @@
             </div>
             <div class="guest">
                 <img id="sundar" class="userPic" src="images/sundar.jpg"/>
-                <h4 class="username">sundar@google.com</h4>
+                <h4 class="username">sundar@google.com</h4> 
             </div>
+            <p> Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> 
+             from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></p>
           </div>
         </div>
         </div>

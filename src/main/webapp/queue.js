@@ -5,9 +5,9 @@ const firebaseConfig = {
   databaseURL: 'https://lounge-95f01.firebaseio.com',
   projectId: 'youtube-lounge',
   storageBucket: 'youtube-lounge.appspot.com',
-  messagingSenderId: '681171972170',
-  appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
-  measurementId: 'G-JSDHBSMHS3',
+  messagingSenderId: config.messagingSenderId,
+  appId: config.appId,
+  measurementId: config.measurementId,
 };
 const app =
     firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef

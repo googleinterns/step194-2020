@@ -5,9 +5,9 @@ const firebaseConfig = {
   databaseURL: 'https://lounge-95f01.firebaseio.com',
   projectId: 'youtube-lounge',
   storageBucket: 'youtube-lounge.appspot.com',
-  messagingSenderId: config.messagingSenderId,
-  appId: config.appId,
-  measurementId: config.measurementId,
+  messagingSenderId: config.messagingSenderId, // eslint-disable-line no-undef
+  appId: config.appId, // eslint-disable-line no-undef
+  measurementId: config.measurementId, // eslint-disable-line no-undef
 };
 const app =
     firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
@@ -39,18 +39,21 @@ db.collection('rooms') // eslint-disable-line no-undef
       getRoomQueue(roomParam);
     });
 
-// Find the roomid in the url query parameters and send to error page if the 
+// Find the roomid in the url query parameters and send to error page if the
 // room given hasn't been created or if no room was passed in the url
 async function validateRoom() {
   if (roomParam === null) { // verify that we were passed a room identifier
-      window.location.href = "error.html";
+    window.location.href = 'error.html';
   } else {
-      const verifyRoom = await db.collection('rooms').doc(roomParam).get();
-      console.log('verifyRoom: ' + verifyRoom);
-      console.log('exists: ' + verifyRoom.exists);
-      if (!verifyRoom.exists) { // verify room exists in firestore
-          window.location.href = "error.html";
-      }
+    const verifyRoom = 
+        await db.collection('rooms') // eslint-disable-line no-undef
+            .doc(roomParam)
+            .get();
+    console.log('verifyRoom: ' + verifyRoom);
+    console.log('exists: ' + verifyRoom.exists);
+    if (!verifyRoom.exists) { // verify room exists in firestore
+      window.location.href = 'error.html';
+    }
   }
 }
 

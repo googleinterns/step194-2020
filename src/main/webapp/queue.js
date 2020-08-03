@@ -12,12 +12,16 @@ const firebaseConfig = {
 const app =
     firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const roomParam = urlParams.get('roomid');
+validateRoom();
 
 // Track realtime changes to the database and update the visual queue on change
 // hardcoded for one room for now, can access different rooms through
 // window.location.search property
 db.collection('rooms') // eslint-disable-line no-undef
-    .doc('47jGbulshBCjcc8YOt8a')
+    .doc(roomParam)
     .collection('information')
     .doc('queue').collection('videos')
     .onSnapshot(function(snapshot) {
@@ -32,8 +36,23 @@ db.collection('rooms') // eslint-disable-line no-undef
           console.log('removed: ', change.doc.data());
         }
       });
-      getRoomQueue('47jGbulshBCjcc8YOt8a');
+      getRoomQueue(roomParam);
     });
+
+// Find the roomid in the url query parameters and send to error page if the 
+// room given hasn't been created or if no room was passed in the url
+async function validateRoom() {
+  if (roomParam === null) { // verify that we were passed a room identifier
+      window.location.href = "error.html";
+  } else {
+      const verifyRoom = await db.collection('rooms').doc(roomParam).get();
+      console.log('verifyRoom: ' + verifyRoom);
+      console.log('exists: ' + verifyRoom.exists);
+      if (!verifyRoom.exists) { // verify room exists in firestore
+          window.location.href = "error.html";
+      }
+  }
+}
 
 /* exported verifyURLStructure */
 /*
@@ -128,7 +147,7 @@ async function getRoomQueue(roomid) {
   fetch('/queueRefresh?roomid=' + roomid)
       .then((response) => response.json())
       .then((queue) => {
-        if (queue != null) {
+        if (queue != null && queue != undefined && queue.length > 0) {
           console.log(queue);
           document.getElementById('videoContainer').innerHTML = '';
           const videoCount =

@@ -8,14 +8,14 @@ import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.step.YTLounge.data.FirestoreAuth;
+import com.google.step.YTLounge.data.Parameter;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -59,8 +59,8 @@ public class SingleVideoSearch extends HttpServlet {
     // accesses YouTube API to get a specific video as long as the given URL is valid
     Gson gson = new Gson();
     response.setContentType("application/json");
-    String videoID = getParameter(request, "id", "");
-    String roomID = getParameter(request, "roomid", "");
+    String videoID = Parameter.getParameter(request, "id", "");
+    String roomID = Parameter.getParameter(request, "roomid", "");
     if (roomID.equals("")) {
       response.getWriter().println(gson.toJson("error: no room found"));
       return;
@@ -99,7 +99,7 @@ public class SingleVideoSearch extends HttpServlet {
   private void extractVideo(JsonArray items, String videoID, String roomID) throws Exception {
     Firestore db = null;
     try {
-      db = authorize();
+      db = FirestoreAuth.authorize();
     } catch (Exception e) {
       System.out.println("bad firestore authorization");
     }
@@ -125,6 +125,8 @@ public class SingleVideoSearch extends HttpServlet {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =
           snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get("url").toString();
+      String bigThumbnailURL =
+          snippet.getAsJsonObject("thumbnails").getAsJsonObject("maxres").get("url").toString();
       String title = snippet.get("title").toString();
       String duration =
           items
@@ -178,38 +180,6 @@ public class SingleVideoSearch extends HttpServlet {
     seconds += Integer.parseInt(shortenedTime);
 
     return seconds;
-  }
-
-  /**
-   * Locates the name parameter in the given request and returns that value.
-   *
-   * @return defaultValue if name parameter wasn't found
-   * @return found value for name parameter
-   */
-  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
-    String value = request.getParameter(name);
-    if (value == null) {
-      return defaultValue;
-    }
-    return value;
-  }
-
-  /** Creates a Firestore that's available for reading and writing data to the database. */
-  private Firestore authorize() throws Exception {
-    Firestore db = null;
-    try {
-      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-      FirestoreOptions firestoreOptions =
-          FirestoreOptions.getDefaultInstance().toBuilder()
-              .setProjectId("youtube-lounge")
-              .setCredentials(GoogleCredentials.getApplicationDefault())
-              .build();
-      db = firestoreOptions.getService();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      return db;
-    }
   }
 
   /** Locate the necessary API key to access needed data */

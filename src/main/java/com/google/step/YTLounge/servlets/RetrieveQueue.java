@@ -1,15 +1,15 @@
 package com.google.step.YTLounge.servlets;
 
 import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.Query.Direction;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.gson.Gson;
+import com.google.step.YTLounge.data.FirestoreAuth;
+import com.google.step.YTLounge.data.Parameter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +26,13 @@ public class RetrieveQueue extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     response.setContentType("application/json");
-    String roomid = getParameter(request, "roomid", "");
+    String roomid = Parameter.getParameter(request, "roomid", "");
     if (roomid.equals("")) {
       response.getWriter().println(gson.toJson("error: no room found"));
     }
     Firestore db = null;
     try {
-      db = authorize();
+      db = FirestoreAuth.authorize();
     } catch (Exception e) {
       System.out.println("bad firestore authorization");
     }
@@ -71,43 +71,6 @@ public class RetrieveQueue extends HttpServlet {
       db.close();
     } catch (Exception e) {
       response.getWriter().println(gson.toJson("error: db never opened"));
-    }
-  }
-
-  /**
-   * Locates the name parameter in the given request and returns that value.
-   *
-   * @return defaultValue if name parameter wasn't found
-   * @return found value for name parameter
-   */
-  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
-    String value = request.getParameter(name);
-    if (value == null) {
-      return defaultValue;
-    }
-    return value;
-  }
-
-  /**
-   * Retrieves validation for Firestore access.
-   *
-   * @return null if access denied
-   * @return Validated Firestore object
-   */
-  private Firestore authorize() throws Exception {
-    Firestore db = null;
-    try {
-      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-      FirestoreOptions firestoreOptions =
-          FirestoreOptions.getDefaultInstance().toBuilder()
-              .setProjectId("youtube-lounge")
-              .setCredentials(GoogleCredentials.getApplicationDefault())
-              .build();
-      db = firestoreOptions.getService();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      return db;
     }
   }
 }

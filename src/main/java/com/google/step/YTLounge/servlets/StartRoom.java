@@ -1,11 +1,10 @@
 package com.google.step.YTLounge.servlets;
 
 import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.google.gson.Gson;
+import com.google.step.YTLounge.data.FirestoreAuth;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class StartRoom extends HttpServlet {
   private String generateRoomID() {
     Firestore db = null;
     try {
-      db = authorize();
+      db = FirestoreAuth.authorize();
     } catch (Exception e) {
       System.out.println("bad firestore authorization");
     }
@@ -58,23 +57,5 @@ public class StartRoom extends HttpServlet {
       System.out.println("UNABLE to get id");
     }
     return "";
-  }
-
-  /** Creates a Firestore that's available for reading and writing data to the database. */
-  private Firestore authorize() throws Exception {
-    Firestore db = null;
-    try {
-      GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-      FirestoreOptions firestoreOptions =
-          FirestoreOptions.getDefaultInstance().toBuilder()
-              .setProjectId("youtube-lounge")
-              .setCredentials(GoogleCredentials.getApplicationDefault())
-              .build();
-      db = firestoreOptions.getService();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      return db;
-    }
   }
 }

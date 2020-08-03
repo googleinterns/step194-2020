@@ -45,7 +45,7 @@ async function validateRoom() {
   if (roomParam === null) { // verify that we were passed a room identifier
     window.location.href = 'error.html';
   } else {
-    const verifyRoom = 
+    const verifyRoom =
         await db.collection('rooms') // eslint-disable-line no-undef
             .doc(roomParam)
             .get();
@@ -83,7 +83,7 @@ async function getVideoData(id) {
     console.log('NO ID');
     return;
   }
-  fetch('/vSearch?id=' + id)
+  fetch('/vSearch?id=' + id + '&roomid=' + roomParam)
       .then((response) => response.json())
       .then((video) => {
         if (video.error == null) { // video was found, add to firestore

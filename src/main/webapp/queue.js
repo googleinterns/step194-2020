@@ -1,10 +1,10 @@
 // Initializes resources for reading/writing to Firestore
 const firebaseConfig = {
   apiKey: config.apiKey, // eslint-disable-line no-undef
-  authDomain: config.authDomain,
-  databaseURL: config.databaseURL,
-  projectId: config.projectId,
-  storageBucket: config.storageBucket,
+  authDomain: config.authDomain, // eslint-disable-line no-undef
+  databaseURL: config.databaseURL, // eslint-disable-line no-undef
+  projectId: config.projectId, // eslint-disable-line no-undef
+  storageBucket: config.storageBucket, // eslint-disable-line no-undef
   messagingSenderId: config.messagingSenderId, // eslint-disable-line no-undef
   appId: config.appId, // eslint-disable-line no-undef
   measurementId: config.measurementId, // eslint-disable-line no-undef

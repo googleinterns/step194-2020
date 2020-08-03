@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
     <link rel="stylesheet" href="chat_style.css"></link>
     <link rel="stylesheet" href="index_style.css"></link>
+    <link rel="stylesheet" href="queue_style.css"></link>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="index_script.js"></script>
+    <script src="config.js"></script>
     <script src="IFrame.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script> 
@@ -18,6 +20,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-auth.js"></script>
+    <script src="queue.js" defer></script>
   </head>
   <body>
       <dialog class="mdl-dialog" id="dialog">
@@ -75,7 +78,6 @@
                   <a href = "#guests-panel" class = "mdl-tabs__tab"><span class="material-icons">people</span> Guests</a>
                </div>
   
-        <!-- each tab contains placeholder text -->
         <div class="tab-content">
            <div class = "mdl-tabs__panel is-active" id = "chat-panel">
             <div id="messages-card-container" class="mdl-cell mdl-cell--12-col">
@@ -96,57 +98,16 @@
                     </form>
                 </div>
             </div>
-            </div>
-            </div>
-
-          <div class = "mdl-tabs__panel" id = "queue-panel">
-            <div id="videoContainer">
-                <h3>Queue</h3>
-                <div id="video1" class="queueVideo">
-                    <img 
-                        class="videoThumbnail" 
-                        src="images/shaq.png"
-                    />
-                    <div id="video1Info" class="videoInfo">
-                        <p class="videoTitle">Shaq Tries to Not Make a Face While Eating Spicy Wings | Hot Ones</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn1" onclick="removeVideo(document.getElementById('video1'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>31:09</p>
-                    </div>
-                </div>
-                <div id="video2" class="queueVideo">
-                    <img 
-                        class="videoThumbnail"
-                        src="images/bwb.png"
-                    />
-                    <div id="video2Info" class="videoInfo">
-                        <p class="videoTitle">Binging with Babish: Ratatouille (Confit Byaldi) from Ratatouille</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn2" onclick="removeVideo(document.getElementById('video2'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>4:04</p>
-                    </div>
-                </div>
-                <div id="video3" class="queueVideo">
-                    <img 
-                        class="videoThumbnail"
-                        src="images/japancars.png"
-                    />
-                    <div id="video3Info" class="videoInfo">
-                        <p class="videoTitle">Japan's Surprising Obsession with American Cars</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn3" onclick="removeVideo(document.getElementById('video3'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>9:56</p>
-                    </div>
-                </div>
-            </div>
+          <div id="queue" class="tab-pane">
+            <div id="videoContainer"></div>
             <div class="videoSubmit">
-                <textarea id="linkArea"></textarea>
-                <button class="submitBtn" id="queueBtn" onclick="addToQueue(document.getElementById('linkArea').value)">Add to queue</button>    
+                <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
+                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
+                    <img id="removeFromQueueIMG" src="images/add-to-queue.svg"/>
+                </button>    
             </div>
-            <p id="linkError">Bad link!</p>
+            <p id="linkError">Please submit a properly formatted YouTube video link.</p>
+            <p id="videoError">There was an error trying to find your video. Please try again.</p>
           </div>
           
           <div class = "mdl-tabs__panel" id = "guests-panel">

@@ -45,7 +45,6 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 }
 
 var catchUp; // Does this vid need to catch up to Firestore?
-var firstVideo = true; // is this the first video?
 function onPlayerReady() {
   getRealtimeUpdates();
   catchUp = true;
@@ -102,9 +101,10 @@ function setPauseInterval() {
 
 var pauseTimeout;
 var pauseInterval;
-var pauseStoppedInterval;
+var pauseStoppedInterval = false;
 var bufferTimeout;
 var stopUpdating = false;
+var pleaseDoNotCallAgain = true;
 function onPlayerStateChange() {
   clearAll();
   if (!stopUpdating) {
@@ -116,19 +116,16 @@ function onPlayerStateChange() {
       case 2: // paused
         if (!catchUp && !videoUpdating) {
           pauseTimeout = setTimeout(updateInfo, 100, 'pause');
-          setPauseInterval()
+          setPauseInterval();
         }
         break;
       case 3: // Buffering
-        console.log('buffering at ' + player.getCurrentTime());
         bufferTimeout = setTimeout(function() {
           catchUp = true;
           clearInterval(updateInterval);
         }, SYNC_WINDOW*1000);
         break;
       case 0: // Ended
-        // will load the next video
-        console.log('did it at least end?');
         clearInterval(updateInterval);
         stopUpdating = true;
         pleaseDoNotCallAgain = false;
@@ -146,23 +143,24 @@ function switchDisplay() {
   } else {
     playerTag.style.display = "none";
   }
+
   if (thumbnail.style.display === "none") {
+    // code to get next thumbnail here
     thumbnail.style.display = "block";
   } else {
     thumbnail.style.display = "none";
   }
 }
 
-var pleaseDoNotCallAgain = true;
 function waitForOthers(vidData) {
-    if (vidData.numPeopleWatching === 0) {
-      pleaseDoNotCallAgain = true;
-      setTimeout(function() { 
+  if (vidData.numPeopleWatching === 0) {
+    pleaseDoNotCallAgain = true;
+    setTimeout(function() { 
       player.loadVideoById({videoId: VIDEO_QUEUE.shift(),});
       switchDisplay();
       resetPlaybackInfo();
       stopUpdating = false;
-      catchUserUp();
+      catchUserUp(); // is this needed?
       addOneViewer();
     }, 500);
   }
@@ -195,7 +193,7 @@ function addOneViewer() {
 function bufferingChecks() {
   if (catchUp) {
     videoUpdating = true;
-    catchUserUp(false);
+    catchUserUp();
     catchUp = false;
     videoUpdating = false;
   }
@@ -206,15 +204,15 @@ function bufferingChecks() {
 }
 
 function onPlayerPlaybackRateChange() {
-  if (!videoUpdating) updateInfo('Change Speed');
+  if (!videoUpdating && !catchUp) updateInfo('Change Speed');
 }
 
 function getRealtimeUpdates() {
   docRef.onSnapshot(function(doc) {
     clearInterval(updateInterval);
     if (doc && doc.exists) {
-      const vidData = doc.data();
       videoUpdating = true;
+      const vidData = doc.data();
       if (player.getPlaybackRate() != vidData.videoSpeed) {
         player.setPlaybackRate(vidData.videoSpeed);
         console.log('new speed: ' + player.getPlaybackRate());

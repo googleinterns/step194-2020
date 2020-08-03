@@ -27,16 +27,6 @@ const FISRT_VIDEO_ID = VIDEO_QUEUE.shift();
 document.getElementById('ytplayer').src = 
     'https://www.youtube.com/embed/' + FISRT_VIDEO_ID + '?enablejsapi=1';
 
-const firebaseConfig = {
-  apiKey: API_KEY, // eslint-disable-line no-undef
-  authDomain: 'lounge-95f01.firebaseapp.com',
-  databaseURL: 'https://lounge-95f01.firebaseio.com',
-  projectId: 'youtube-lounge',
-  storageBucket: 'youtube-lounge.appspot.com',
-  messagingSenderId: '681171972170',
-  appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
-  measurementId: 'G-JSDHBSMHS3',
-};
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 

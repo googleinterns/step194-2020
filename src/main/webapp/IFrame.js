@@ -15,16 +15,6 @@
 let videoUpdating; // is video currently updating to match Firestore info?
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 
-const firebaseConfig = {
-  apiKey: API_KEY, // eslint-disable-line no-undef
-  authDomain: 'lounge-95f01.firebaseapp.com',
-  databaseURL: 'https://lounge-95f01.firebaseio.com',
-  projectId: 'youtube-lounge',
-  storageBucket: 'youtube-lounge.appspot.com',
-  messagingSenderId: '681171972170',
-  appId: '1:681171972170:web:4c6526b8eb788af9d876b3',
-  measurementId: 'G-JSDHBSMHS3',
-};
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 

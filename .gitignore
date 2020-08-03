@@ -1,2 +1,5 @@
 client_secret.json
 target/
+dataSecret.txt
+config.js
+node_modules/

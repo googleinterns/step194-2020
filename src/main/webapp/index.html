@@ -6,13 +6,18 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="index_style.css"></link>
     <link rel="stylesheet" href="chat_style.css"></link>
+    <link rel="stylesheet" href="queue_style.css"></link>
     <script src="index_script.js"></script>
-    <script src="js/queue.js"></script>
+    <script src="config.js"></script>
     <script src="chat.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="IFrame.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script> 
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-firestore.js"></script> 
+    <script src="queue.js" defer></script>
   </head>
   <body >
       
@@ -52,53 +57,15 @@
              </div>
         </div>
           <div id="queue" class="tab-pane">
-            <div id="videoContainer">
-                <h3>Queue</h3>
-                <div id="video1" class="queueVideo">
-                    <img 
-                        class="videoThumbnail" 
-                        src="images/shaq.png"
-                    />
-                    <div id="video1Info" class="videoInfo">
-                        <p class="videoTitle">Shaq Tries to Not Make a Face While Eating Spicy Wings | Hot Ones</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn1" onclick="removeVideo(document.getElementById('video1'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>31:09</p>
-                    </div>
-                </div>
-                <div id="video2" class="queueVideo">
-                    <img 
-                        class="videoThumbnail"
-                        src="images/bwb.png"
-                    />
-                    <div id="video2Info" class="videoInfo">
-                        <p class="videoTitle">Binging with Babish: Ratatouille (Confit Byaldi) from Ratatouille</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn2" onclick="removeVideo(document.getElementById('video2'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>4:04</p>
-                    </div>
-                </div>
-                <div id="video3" class="queueVideo">
-                    <img 
-                        class="videoThumbnail"
-                        src="images/japancars.png"
-                    />
-                    <div id="video3Info" class="videoInfo">
-                        <p class="videoTitle">Japan's Surprising Obsession with American Cars</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn3" onclick="removeVideo(document.getElementById('video3'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>9:56</p>
-                    </div>
-                </div>
-            </div>
+            <div id="videoContainer"></div>
             <div class="videoSubmit">
-                <textarea id="linkArea"></textarea>
-                <button class="submitBtn" id="queueBtn" onclick="addToQueue(document.getElementById('linkArea').value)">Add to queue</button>    
+                <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
+                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
+                    <img id="removeFromQueueIMG" src="images/add-to-queue.svg"/>
+                </button>    
             </div>
-            <p id="linkError">Bad link!</p>
+            <p id="linkError">Please submit a properly formatted YouTube video link.</p>
+            <p id="videoError">There was an error trying to find your video. Please try again.</p>
           </div>
           <div id="guests" class="tab-pane">
             <h3>Guests</h3>

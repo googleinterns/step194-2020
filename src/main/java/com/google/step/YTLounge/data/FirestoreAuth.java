@@ -5,9 +5,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 
 public class FirestoreAuth {
-  
   public FirestoreAuth() {}
-  
   /** Creates a Firestore that's available for reading and writing data to the database. */
   public static Firestore authorize() throws Exception {
     Firestore db = null;

@@ -105,14 +105,14 @@ async function getVideoData(id) {
  * Determines if the given video name exists within the database, then deletes
  * it if found.
  */
-async function removeVideo(roomid, name) {
+async function removeVideo(roomid, vidRef) {
   const selectedVideo = await db // eslint-disable-line no-undef
       .collection('rooms')
       .doc(roomid)
       .collection('information')
       .doc('queue')
       .collection('videos')
-      .doc(name)
+      .doc(vidRef)
       .get();
   if (selectedVideo.exists) {
     await db // eslint-disable-line no-undef
@@ -121,9 +121,9 @@ async function removeVideo(roomid, name) {
         .collection('information')
         .doc('queue')
         .collection('videos')
-        .doc(name)
+        .doc(vidRef)
         .delete();
-    console.log('Video ' + name + ' deleted');
+    console.log('Video ' + vidRef + ' deleted');
   }
 }
 

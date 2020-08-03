@@ -23,7 +23,7 @@ public class StartRoom extends HttpServlet {
     Gson gson = new Gson();
     response.setContentType("application/json");
     String roomid = generateRoomID();
-    response.sendRedirect("/lounge.html/?roomid=" + roomid);
+    response.sendRedirect("/lounge.html/?room_id=" + roomid);
   }
 
   /**

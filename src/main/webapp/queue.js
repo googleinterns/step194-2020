@@ -1,10 +1,10 @@
 // Initializes resources for reading/writing to Firestore
 const firebaseConfig = {
   apiKey: config.apiKey, // eslint-disable-line no-undef
-  authDomain: 'lounge-95f01.firebaseapp.com',
-  databaseURL: 'https://lounge-95f01.firebaseio.com',
-  projectId: 'youtube-lounge',
-  storageBucket: 'youtube-lounge.appspot.com',
+  authDomain: config.authDomain,
+  databaseURL: config.databaseURL,
+  projectId: config.projectId,
+  storageBucket: config.storageBucket,
   messagingSenderId: config.messagingSenderId, // eslint-disable-line no-undef
   appId: config.appId, // eslint-disable-line no-undef
   measurementId: config.measurementId, // eslint-disable-line no-undef
@@ -14,7 +14,7 @@ const app =
 db = firebase.firestore(app); // eslint-disable-line no-undef
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const roomParam = urlParams.get('roomid');
+const roomParam = urlParams.get('room_id');
 validateRoom();
 
 // Track realtime changes to the database and update the visual queue on change
@@ -83,7 +83,7 @@ async function getVideoData(id) {
     console.log('NO ID');
     return;
   }
-  fetch('/vSearch?id=' + id + '&roomid=' + roomParam)
+  fetch('/vSearch?id=' + id + '&room_id=' + roomParam)
       .then((response) => response.json())
       .then((video) => {
         if (video.error == null) { // video was found, add to firestore
@@ -147,7 +147,7 @@ async function getRoomQueue(roomid) {
       .get();
   console.log('videos array: ' + videosArray);
   const room = '47jGbulshBCjcc8YOt8a';
-  fetch('/queueRefresh?roomid=' + roomid)
+  fetch('/queueRefresh?room_id=' + roomid)
       .then((response) => response.json())
       .then((queue) => {
         if (queue != null && queue != undefined && queue.length > 0) {

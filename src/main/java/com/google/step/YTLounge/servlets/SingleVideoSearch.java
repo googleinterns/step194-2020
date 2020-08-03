@@ -15,7 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.step.YTLounge.data.FirestoreAuth;
-import com.google.step.YTLounge.data.Parameter;
+import com.google.step.YTLounge.data.RequestParameter;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -59,8 +59,8 @@ public class SingleVideoSearch extends HttpServlet {
     // accesses YouTube API to get a specific video as long as the given URL is valid
     Gson gson = new Gson();
     response.setContentType("application/json");
-    String videoID = Parameter.getParameter(request, "id", "");
-    String roomID = Parameter.getParameter(request, "roomid", "");
+    String videoID = RequestParameter.getParameter(request, "id", "");
+    String roomID = RequestParameter.getParameter(request, "room_id", "");
     if (roomID.equals("")) {
       response.getWriter().println(gson.toJson("error: no room found"));
       return;

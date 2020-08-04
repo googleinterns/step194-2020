@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var videoUpdating; // is video currently updating to match Firestore info?
-var autoUpdate; // max time between updates
-var justJoined = true; // 
+let videoUpdating; // is video currently updating to match Firestore info?
+let autoUpdate; // max time between updates
+let justJoined = true;
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
-const VIDEO_QUEUE = ['y0U4sD3_lX4','VYOjWnS4cMY', 'F1B9Fk_SgI0'];
-var thumbnail = document.getElementById("thumbnailDisplay");
-thumbnail.style.display = "none";
+const VIDEO_QUEUE = ['y0U4sD3_lX4', 'VYOjWnS4cMY', 'F1B9Fk_SgI0'];
+let thumbnail = document.getElementById("thumbnailDisplay");
+thumbnail.style.display = 'none';
 
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
 const docRef = firestore.doc('CurrentVideo/PlaybackData');
 
-var player; // var representing iframe ytplayer
+let player; // var representing iframe ytplayer
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
@@ -36,12 +36,13 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   });
 }
 
-var catchingUp; // Does this vid need to catch up to Firestore?
+let catchingUp; // Does this vid need to catch up to Firestore?
+let currentVidDuration;
 function onPlayerReady(event) {
-    player.loadVideoById({videoId: VIDEO_QUEUE.shift(),});
-    currentVidDuration = player.getDuration();
-    catchingUp = true;
-    addOneViewer();
+  player.loadVideoById({videoId: VIDEO_QUEUE.shift()});
+  currentVidDuration = player.getDuration();
+  catchingUp = true;
+  addOneViewer();
 }
 
 function seek(vidData) {
@@ -50,7 +51,7 @@ function seek(vidData) {
     player.seekTo(seekAhead, true);
   } else {
     player.seekTo(vidData.timestamp, true);
-  } 
+  }
 }
 
 function aboutToEnd() {
@@ -58,7 +59,7 @@ function aboutToEnd() {
 }
 
 // keeps firestore updated on pause
-function setPauseInterval() { 
+function setPauseInterval() {
   let lastTime = player.getCurrentTime();
   pauseInterval = setInterval(function() {
     if (player.getCurrentTime() != lastTime) {
@@ -71,18 +72,18 @@ function setPauseInterval() {
 }
 
 // switches to thumbnails between videos
+const playerTag = document.getElementById('ytplayer');
 function switchDisplay() {
-  let playerTag = document.getElementById("ytplayer");
-  if (playerTag.style.display === "none") {
-    playerTag.style.display = "block";
+  if (playerTag.style.display === 'none') {
+    playerTag.style.display = 'block';
   } else {
-    playerTag.style.display = "none";
+    playerTag.style.display = 'none';
   }
-  if (thumbnail.style.display === "none") {
+  if (thumbnail.style.display === 'none') {
     // Code to put next thumbnail goes here
-    thumbnail.style.display = "block";
+    thumbnail.style.display = 'block';
   } else {
-    thumbnail.style.display = "none";
+    thumbnail.style.display = 'none';
   }
 }
 
@@ -97,17 +98,23 @@ function resetPlaybackInfo() {
     console.log('reset caused an error: ', error);
   });
 }
-
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 function removeOneViewer() {
   docRef.update({
-    numPeopleWatching: firebase.firestore.FieldValue.increment(-1),
-  }).then(function() { console.log('removed one viewer'); });
+    numPeopleWatching: firebase.firestore.
+        FieldValue.increment(-1), // eslint-disable-line no-undef
+  }).then(function() {
+      console.log('removed one viewer'); 
+    });
 }
 
 function addOneViewer() {
   docRef.update({
-    numPeopleWatching: firebase.firestore.FieldValue.increment(1),
-  }).then(function() { console.log('added one viewer'); });
+    numPeopleWatching: firebase.firestore.
+        FieldValue.increment(1), // eslint-disable-line no-undef
+  }).then(function() {
+    console.log('added one viewer');
+  });
 }
 
 function alignWithFirestore() {
@@ -123,15 +130,16 @@ function alignWithFirestore() {
   }
   if (pauseStoppedInterval) {
     pauseStoppedInterval = false;
-    autoUpdate = setTimeout(regularFirestoreUpdate, SYNC_WINDOW*1000*0.75, 'buffering check');
+    autoUpdate = setTimeout(regularFirestoreUpdate,
+        SYNC_WINDOW*1000*0.75, 'buffering check');
   }
 }
 
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
-    setTimeout(function() { 
-      player.loadVideoById({videoId: VIDEO_QUEUE.shift(),});
+    setTimeout(function() {
+      player.loadVideoById({videoId: VIDEO_QUEUE.shift()});
       switchDisplay();
       resetPlaybackInfo();
       stopUpdating = false;
@@ -177,14 +185,14 @@ function updateInfo(goal) { // send info to Firestore
   });
 }
 
-var pauseTimeout; // Differentiates pause from seek
-var pauseInterval; // sends new information about paused videos
-var pauseStoppedInterval = false; // Tells when videos are paused
-var bufferTimeout; // Finds when user's video has fallen behind
-var stopUpdating = false; // makes code ignore ended videos
-var vidOver = false; // limits checks to start next video
+let pauseTimeout; // Differentiates pause from seek
+let pauseInterval; // sends new information about paused videos
+let pauseStoppedInterval = false; // Tells when videos are paused
+let bufferTimeout; // Finds when user's video has fallen behind
+let stopUpdating = false; // makes code ignore ended videos
+let vidOver = false; // limits checks to start next video
 
-function clearAll() { 
+function clearAll() {
   clearTimeout(pauseTimeout);
   clearTimeout(bufferTimeout);
   clearInterval(pauseInterval);
@@ -226,7 +234,9 @@ function onPlayerStateChange() {
 }
 
 function onPlayerPlaybackRateChange() {
-  if (!videoUpdating && !catchingUp && !stopUpdating) updateInfo('Change Speed');
+  if (!videoUpdating && !catchingUp && !stopUpdating) {
+    updateInfo('Change Speed');
+  }
 }
 
 function catchUserUp() {
@@ -238,10 +248,11 @@ function catchUserUp() {
       if (vidData.isPlaying) player.playVideo();
       else player.pauseVideo();
     } else {
-      console.log('there was no doc to read!')
+      console.log('there was no doc to read!');
     }
   }).then(function() {
-    autoUpdate = setTimeout(regularFirestoreUpdate, SYNC_WINDOW*1000*0.75, 'catch user up');
+    autoUpdate = setTimeout(regularFirestoreUpdate,
+        SYNC_WINDOW*1000*0.75, 'catch user up');
   });
 }
 
@@ -275,7 +286,8 @@ function getRealtimeUpdates() {
       if (vidOver) waitForOthers(vidData);
       videoUpdating = false;
     }
-    if (!stopUpdating) autoUpdate = setTimeout(regularFirestoreUpdate, SYNC_WINDOW*1000*0.75, 'realtime');
+    if (!stopUpdating) autoUpdate = setTimeout(regularFirestoreUpdate,
+        SYNC_WINDOW*1000*0.75, 'realtime');
   });
 }
 
@@ -283,7 +295,7 @@ function regularFirestoreUpdate(cause) {
   if (!stopUpdating) {
     console.log(stopUpdating);
     updateInfo('update');
-    console.log('updated because ' + cause)
+    console.log('updated because ' + cause);
   }
   autoUpdate = setTimeout(function() {
     if (!stopUpdating || aboutToEnd()) regularFirestoreUpdate('auto');

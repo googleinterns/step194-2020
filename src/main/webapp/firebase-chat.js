@@ -5,9 +5,6 @@ function anonymousSignIn() {
   firebase.auth().signInAnonymously();
 }
 
-function signOut() {
-  firebase.auth().signOut();
-}
 
 
 function initFirebaseAuth() {
@@ -16,7 +13,8 @@ function initFirebaseAuth() {
 
 function getProfilePicUrl() {
   const profilePic = document.getElementsByName('profile');
-  for(i = 0; i < profilePic.length; i++) { 
+  const i = 0;
+  for (i = 0; i < profilePic.length; i++) {
     if (profilePic[i].checked) {
       return profilePic[i].value;
     }

@@ -139,7 +139,7 @@ async function getRoomQueue(roomid) {
       .collection('queue')
       .orderBy('requestTime', 'asc')
       .get();
-  console.log("videosArray: " + videosArray);
+  console.log('videosArray: ' + videosArray);
   fetch('/queueRefresh?room_id=' + roomid)
       .then((response) => response.json())
       .then((queue) => {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 const config = firebaseConfig;
 firebase.initializeApp(config); // eslint-disable-line no-undef
 
@@ -5,16 +6,13 @@ function anonymousSignIn() {
   firebase.auth().signInAnonymously();
 }
 
-
-
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
 function getProfilePicUrl() {
   const profilePic = document.getElementsByName('profile');
-  const i = 0;
-  for (i = 0; i < profilePic.length; i++) {
+  for(i = 0; i < profilePic.length; i++) { 
     if (profilePic[i].checked) {
       return profilePic[i].value;
     }

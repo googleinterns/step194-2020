@@ -1,4 +1,3 @@
-/* eslint-disable */
 const config = firebaseConfig;
 firebase.initializeApp(config); // eslint-disable-line no-undef
 
@@ -16,8 +15,12 @@ function initFirebaseAuth() {
 }
 
 function getProfilePicUrl() {
-    // placeholder profile picture for anonymous
-    return 'defaultUser.png';
+  const profilePic = document.getElementsByName('profile');
+  for(i = 0; i < profilePic.length; i++) { 
+    if (profilePic[i].checked) {
+      return profilePic[i].value;
+    }
+  }
 }
 
 function getUserName() {
@@ -127,7 +130,7 @@ const MESSAGE_TEMPLATE =
     '<div class="message-container">' +
       '<div class="spacing"><div class="pic"></div></div>' +
       '<div class="message"></div>' +
-       '<div class="name" style="font-variant: small-caps;"></div>'+
+       '<div class="name"></div>'+
     '</div>';
 
 function addSizeToGoogleProfilePic(url) {

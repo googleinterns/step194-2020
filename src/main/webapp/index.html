@@ -3,25 +3,61 @@
   <head>
     <meta charset="UTF-8">
     <title>YouTube Lounge</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="index_style.css"></link>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
     <link rel="stylesheet" href="chat_style.css"></link>
+    <link rel="stylesheet" href="index_style.css"></link>
+    <link rel="stylesheet" href="queue_style.css"></link>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="index_script.js"></script>
-    <script src="js/queue.js"></script>
-    <script src="chat.js"></script>
+    <script src="config.js"></script>
+    <script src="IFrame.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="ApiKey.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-firestore.js"></script> 
+    <script src="https://www.youtube.com/iframe_api"></script> 
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-auth.js"></script>
+    <script src="queue.js" defer></script>
   </head>
   <body>
+      <dialog class="mdl-dialog" id="dialog">
+        <h4 class="mdl-dialog__title" style="font-weight: bold;">Welcome to your Lounge!</h4>
+
+        <div class="mdl-dialog__content">
+        <h6 style = "font-weight:bold; color: white;"> Select a Display Image:<h6>
+            <div id="icon-holder-template"> 
+                <div id="icon-holder">
+                  <!-- default image in place -->
+                </div>
+            </div>  <br>
+        <form id="name-form" action="#">
+        <h7 style = "font-weight:bold; color: white;"> Display Name:  </h7>
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input mdl-color-text--white" required="required" type="text" id="userName" required>
+                <label class="mdl-textfield__label" for="userName">Add a Nickname</label>
+            </div>
+            <div class="mdl-dialog__actions">
+	        <button id = "anonymous-signin" type="sumbit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+                JOIN ROOM</button>
+            </div>
+        </form>
+        </div>
+      </dialog>
       
       <!-- content that resizes when side bar opens -->
       <div id = "main">
-          <button id="sidebarBtn" onclick="openSidebar()"> <span class="glyphicon glyphicon-menu-left"></span></button> 
+          <button id="sidebarBtn" onclick="openSidebar()"> <span class="material-icons">chevron_left</span></button> 
            <div class= "header" >
+                <div id="user-container">
+                 <div hidden id="user-pic"></div>
+                  <div hidden id="user-name"></div>
+                  <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+                    Sign-out
+                  </button>
+                </div>
                 <img
                  src="https://firebasestorage.googleapis.com/v0/b/codesign-prod.google.com.a.appspot.com/o/user_assets%2FlyxSOzzXdt1gu3M1bgLd%2FfGwBG6ucZZcvCT6IQ54Y%2Foriginal.svg?alt=media&token=2e67a119-d7c8-4cbb-91de-04f256f74609"
                 class = "YTlogo" />
@@ -37,74 +73,46 @@
      </div>
 
      <div id="mySidebar" class="sidebar">
-        <ul class="nav nav-tabs" id= "tabs">
-        <li class="active"><a data-toggle="tab" href="#chat">  <span class="glyphicon glyphicon-comment"></span> Chat</a></li>
-        <li><a data-toggle="tab" href="#queue"> <span class="glyphicon glyphicon-th-list"></span> Queue</a></li>
-        <li><a data-toggle="tab" href="#guests"> <span class="glyphicon glyphicon-user"></span> Guests</a></li>
-        </ul>
+         <div class = "mdl-tabs mdl-js-tabs">
+               <div class = "mdl-tabs__tab-bar" id= 'tabsbar'>
+                  <a href = "#chat-panel" class = "mdl-tabs__tab is-active"><span class="material-icons"> chat</span> Chat</a>
+                  <a href = "#queue-panel" class = "mdl-tabs__tab"><span class="material-icons">queue</span> Queue</a>
+                  <a href = "#guests-panel" class = "mdl-tabs__tab"><span class="material-icons">people</span> Guests</a>
+               </div>
   
-        <!-- each tab contains placeholder text -->
         <div class="tab-content">
-          <div id="chat" class="tab-pane in active">
-             <div id="chat-display">
-                 <ul id ="chat-history"></ul> 
+           <div class = "mdl-tabs__panel is-active" id = "chat-panel">
+            <div id="messages-card-container" class="mdl-cell mdl-cell--12-col">
+
+      <!-- Messages container -->
+            <div id="messages-card" class="mdl-card mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+                <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                    <div id="messages">
+                    </div>
+                    <form id="message-form" action="#">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="message" autocomplete="off" spellcheck>
+                    <label class="mdl-textfield__label" for="message">Message...</label>
+                    </div>
+                    <button id="submit" disabled type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                    <span class="material-icons">send </span>
+                    </button>
+                    </form>
+                </div>
             </div>
-            <div class= "new-chat">
-                 <button id="emoji"> <span class="glyphicon glyphicon-sunglasses"></span> </button>
-                 <textarea id="new-message" type="text" placeholder="Type a chat message ..." spellcheck></textarea>
-                 <button id= "send" method="GET" action="chatmessages"> <span class= "glyphicon glyphicon-send"></span></button>
-             </div>
-        </div>
           <div id="queue" class="tab-pane">
-            <div id="videoContainer">
-                <h3>Queue</h3>
-                <div id="video1" class="queueVideo">
-                    <img 
-                        class="videoThumbnail" 
-                        src="images/shaq.png"
-                    />
-                    <div id="video1Info" class="videoInfo">
-                        <p class="videoTitle">Shaq Tries to Not Make a Face While Eating Spicy Wings | Hot Ones</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn1" onclick="removeVideo(document.getElementById('video1'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>31:09</p>
-                    </div>
-                </div>
-                <div id="video2" class="queueVideo">
-                    <img 
-                        class="videoThumbnail"
-                        src="images/bwb.png"
-                    />
-                    <div id="video2Info" class="videoInfo">
-                        <p class="videoTitle">Binging with Babish: Ratatouille (Confit Byaldi) from Ratatouille</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn2" onclick="removeVideo(document.getElementById('video2'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>4:04</p>
-                    </div>
-                </div>
-                <div id="video3" class="queueVideo">
-                    <img 
-                        class="videoThumbnail"
-                        src="images/japancars.png"
-                    />
-                    <div id="video3Info" class="videoInfo">
-                        <p class="videoTitle">Japan's Surprising Obsession with American Cars</p>
-                        <button class="removeVideoBtn" id="removeVideoBtn3" onclick="removeVideo(document.getElementById('video3'))">
-                            <img src="images/remove-from-queue.svg"/>
-                        </button>
-                        <p>9:56</p>
-                    </div>
-                </div>
-            </div>
+            <div id="videoContainer"></div>
             <div class="videoSubmit">
-                <textarea id="linkArea"></textarea>
-                <button class="submitBtn" id="queueBtn" onclick="addToQueue(document.getElementById('linkArea').value)">Add to queue</button>    
+                <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
+                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
+                    <img id="removeFromQueueIMG" src="images/add-to-queue.svg"/>
+                </button>    
             </div>
-            <p id="linkError">Bad link!</p>
+            <p id="linkError">Please submit a properly formatted YouTube video link.</p>
+            <p id="videoError">There was an error trying to find your video. Please try again.</p>
           </div>
-          <div id="guests" class="tab-pane">
+          
+          <div class = "mdl-tabs__panel" id = "guests-panel">
             <h3>Guests</h3>
             <div class="guest">
                 <img id="caroline" class="userPic" src="images/caroline.jpg"/>
@@ -120,13 +128,18 @@
             </div>
             <div class="guest">
                 <img id="sundar" class="userPic" src="images/sundar.jpg"/>
-                <h4 class="username">sundar@google.com</h4>
+                <h4 class="username">sundar@google.com</h4> 
             </div>
+            <p> Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> 
+             from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></p>
           </div>
         </div>
+        </div>
     </div>
+    <script src='firebase-config.js'></script>
+    <script src="firebase-chat.js"></script>
     <script src="index_script.js"></script>
     <script src="IFrame.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
-  </body>
+</body>
 </html>

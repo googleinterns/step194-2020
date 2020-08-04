@@ -26,7 +26,7 @@ public class RetrieveQueue extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     response.setContentType("application/json");
-    String roomid = Parameter.getParameter(request, "roomid", "");
+    String roomid = Parameter.getParameter(request, "room_id", "");
     if (roomid.equals("")) {
       response.getWriter().println(gson.toJson("error: no room found"));
     }
@@ -48,9 +48,7 @@ public class RetrieveQueue extends HttpServlet {
       ApiFuture<QuerySnapshot> queueFuture =
           db.collection("rooms")
               .document(roomid)
-              .collection("information")
-              .document("queue")
-              .collection("videos")
+              .collection("queue")
               .orderBy("requestTime", Direction.ASCENDING)
               .get(); // sort all videos for this room by their requestTime
       List<QueryDocumentSnapshot> queueVideos = null;

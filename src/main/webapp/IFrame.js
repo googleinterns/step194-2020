@@ -38,7 +38,7 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 
 let catchingUp; // Does this vid need to catch up to Firestore?
 let currentVidDuration;
-function onPlayerReady(event) {
+function onPlayerReady() {
   player.loadVideoById({videoId: VIDEO_QUEUE.shift()});
   currentVidDuration = player.getDuration();
   catchingUp = true;
@@ -204,8 +204,6 @@ function onPlayerStateChange() {
   if (!stopUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
-        console.log('play ' + player.getCurrentTime());
-        console.log(videoUpdating + ' ' + catchingUp);
         if (!videoUpdating && !catchingUp) updateInfo('play');
         alignWithFirestore();
         break;
@@ -216,7 +214,6 @@ function onPlayerStateChange() {
         }
         break;
       case 3: // Buffering
-        console.log('buffering');
         bufferTimeout = setTimeout(function() {
           catchingUp = true;
           clearTimeout(autoUpdate);
@@ -225,7 +222,6 @@ function onPlayerStateChange() {
       case 0: // Ended
         // will load the next video
         stopUpdating = true;
-        console.log('did it at least end?');
         clearTimeout(autoUpdate);
         vidOver = true;
         switchDisplay();
@@ -295,11 +291,7 @@ function getRealtimeUpdates() {
 }
 
 function regularFirestoreUpdate(cause) {
-  if (!stopUpdating) {
-    console.log(stopUpdating);
-    updateInfo('update');
-    console.log('updated because ' + cause);
-  }
+  if (!stopUpdating) updateInfo('update');
   autoUpdate = setTimeout(function() {
     if (!stopUpdating || aboutToEnd()) regularFirestoreUpdate('auto');
   }, SYNC_WINDOW*1000*0.75);

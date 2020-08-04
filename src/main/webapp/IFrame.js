@@ -186,6 +186,7 @@ function updateInfo(goal) { // send info to Firestore
   });
 }
 
+
 let pauseTimeout; // Differentiates pause from seek
 let pauseInterval; // sends new information about paused videos
 let pauseStoppedInterval = false; // Tells when videos are paused

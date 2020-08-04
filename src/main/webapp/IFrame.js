@@ -131,7 +131,7 @@ function alignWithFirestore() {
   if (pauseStoppedInterval) {
     pauseStoppedInterval = false;
     autoUpdate = setTimeout(regularFirestoreUpdate,
-        SYNC_WINDOW*1000*0.75, 'buffering check');
+        SYNC_WINDOW*1000*0.75);
   }
 }
 
@@ -250,7 +250,7 @@ function catchUserUp() {
     }
   }).then(function() {
     autoUpdate = setTimeout(regularFirestoreUpdate,
-        SYNC_WINDOW*1000*0.75, 'catch user up');
+        SYNC_WINDOW*1000*0.75);
   });
 }
 
@@ -286,12 +286,12 @@ function getRealtimeUpdates() {
     }
     if (!stopUpdating) {
       autoUpdate = setTimeout(regularFirestoreUpdate,
-          SYNC_WINDOW*1000*0.75, 'realtime');
+          SYNC_WINDOW*1000*0.75);
     }
   });
 }
 
-function regularFirestoreUpdate(cause) {
+function regularFirestoreUpdate() {
   if (!stopUpdating) updateInfo('update');
   autoUpdate = setTimeout(function() {
     if (!stopUpdating || aboutToEnd()) regularFirestoreUpdate('auto');

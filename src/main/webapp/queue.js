@@ -61,7 +61,7 @@ async function validateRoom() {
   Makes sure the stub of the user's URL is valid and will warn user
   if their link wasn't formatted correctly for the server to parse.
 */
-function verifyURLStructure(url) {
+async function verifyURLStructure(url) {
   const validator = new RegExp('' +
     /(^(?:https?:\/\/)?(?:www\.)?)/.source +
     /((?:youtu\.be\/|youtube\.com\/))/.source +
@@ -72,7 +72,8 @@ function verifyURLStructure(url) {
     document.getElementById('linkError').style.display = 'block';
     document.getElementById('videoError').style.display = 'none';
   } else if (document.getElementById('ytplayer') != null) {
-    getVideoData(document.getElementById('linkArea').value.substring(32));
+    await getVideoData(document.getElementById('linkArea').value.substring(32));
+    await getRoomQueue(roomParam);
   }
 }
 
@@ -82,7 +83,7 @@ async function getVideoData(id) {
     console.log('NO ID');
     return;
   }
-  fetch('/vSearch?id=' + id + '&room_id=' + roomParam)
+  await fetch('/vSearch?id=' + id + '&room_id=' + roomParam)
       .then((response) => response.json())
       .then((video) => {
         if (video.error == null) { // video was found, add to firestore

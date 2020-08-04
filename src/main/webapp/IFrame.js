@@ -17,7 +17,7 @@ let autoUpdate; // max time between updates
 let justJoined = true;
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 const VIDEO_QUEUE = ['y0U4sD3_lX4', 'VYOjWnS4cMY', 'F1B9Fk_SgI0'];
-let thumbnail = document.getElementById("thumbnailDisplay");
+const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
 
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
@@ -98,20 +98,20 @@ function resetPlaybackInfo() {
     console.log('reset caused an error: ', error);
   });
 }
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
 function removeOneViewer() {
   docRef.update({
-    numPeopleWatching: firebase.firestore.
-        FieldValue.increment(-1), // eslint-disable-line no-undef
+    numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
+        FieldValue.increment(-1),
   }).then(function() {
-      console.log('removed one viewer'); 
-    });
+    console.log('removed one viewer');
+  });
 }
 
 function addOneViewer() {
   docRef.update({
-    numPeopleWatching: firebase.firestore.
-        FieldValue.increment(1), // eslint-disable-line no-undef
+    numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
+        FieldValue.increment(1),
   }).then(function() {
     console.log('added one viewer');
   });
@@ -145,7 +145,8 @@ function waitForOthers(vidData) {
       stopUpdating = false;
       catchUserUp(); // is this needed?
       addOneViewer();
-      currentVidDuration = player.getDuration();
+      currentVidDuration = 
+          player.getDuration(); // eslint-disable-line no-unused-vars
     }, 500);
   }
 }
@@ -286,8 +287,10 @@ function getRealtimeUpdates() {
       if (vidOver) waitForOthers(vidData);
       videoUpdating = false;
     }
-    if (!stopUpdating) autoUpdate = setTimeout(regularFirestoreUpdate,
-        SYNC_WINDOW*1000*0.75, 'realtime');
+    if (!stopUpdating) {
+      autoUpdate = setTimeout(regularFirestoreUpdate,
+          SYNC_WINDOW*1000*0.75, 'realtime');
+    }
   });
 }
 

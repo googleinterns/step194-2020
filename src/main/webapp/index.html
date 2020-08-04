@@ -28,12 +28,43 @@
 
         <div class="mdl-dialog__content">
         <h6 style = "font-weight:bold; color: white;"> Select a Display Image:<h6>
+        <form id="name-form" action="#">
             <div id="icon-holder-template"> 
                 <div id="icon-holder">
-                  <!-- default image in place -->
+                  <label>
+                    <input type="radio" name="profile" value="images/hat.png" checked>
+                    <img src="images/hat.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/face-mask.png" >
+                    <img src="images/face-mask.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/dinosaur.png">
+                    <img src="images/dinosaur.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/duck.png" >
+                    <img src="images/duck.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/coffee.png" >
+                    <img src="images/coffee.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/insect.png" >
+                    <img src="images/insect.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/froyo.png" >
+                    <img src="images/froyo.png">
+                  </label>
+                  <label>
+                    <input type="radio" name="profile" value="images/dog.png" >
+                    <img src="images/dog.png">
+                  </label>
                 </div>
             </div>  <br>
-        <form id="name-form" action="#">
         <h7 style = "font-weight:bold; color: white;"> Display Name:  </h7>
             <div class="mdl-textfield mdl-js-textfield">
                 <input class="mdl-textfield__input mdl-color-text--white" required="required" type="text" id="userName" required>
@@ -98,7 +129,7 @@
                     </form>
                 </div>
             </div>
-          <div id="queue" class="tab-pane">
+          <div class = "mdl-tabs__panel" id = "queue-panel">
             <div id="videoContainer"></div>
             <div class="videoSubmit">
                 <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
@@ -136,8 +167,5 @@
     </div>
     <script src='firebase-config.js'></script>
     <script src="firebase-chat.js"></script>
-    <script src="index_script.js"></script>
-    <script src="IFrame.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>

@@ -145,8 +145,8 @@ function waitForOthers(vidData) {
       stopUpdating = false;
       catchUserUp(); // is this needed?
       addOneViewer();
-      currentVidDuration = 
-          player.getDuration(); // eslint-disable-line no-unused-vars
+      currentVidDuration = // eslint-disable-line no-unused-vars
+          player.getDuration();
     }, 500);
   }
 }

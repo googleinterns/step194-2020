@@ -148,34 +148,36 @@
 #sign-in{
     color: black;
 }
+
 #icon-holder-template{
     display:inline-block;
     flex-flow: wrap row;
 }
+
 #icon-holder{
     list-style: none;
     margin:0px;
     padding:0px;
 }
 
-
-.image-button{
-    width: 50px;
-    height: 50px;
-    padding: 1px 3.75px;
-    background-color: transparent;
-      display: inline;
+[type=radio] { 
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-.image-button:hover{
-    transform: scale(1.05);
-    transition: .3s ease;
-    cursor: pointer;
+[type=radio] + img {
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  padding: 1px 3.75px;
+  background-color: transparent;
+  display: inline;
 }
 
-.selected{
-  border: 1px solid white;
-  border-radius:30px;
+[type=radio]:checked + img {
+  border: 1px solid orange;
+  border-radius: 50%;
   background-color: white;
-  
 }

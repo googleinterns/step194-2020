@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let videoUpdating; // boolean for when server request is updating video
-let player;
+let videoUpdating; // is video currently updating to match Firestore info?
+const SYNC_WINDOW = 5; // max time diff between client and Firestore
+
+firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+const firestore = firebase.firestore(); // eslint-disable-line no-undef
+
+// Hard coded for now, but eventually will update to point
+// to current video in queue
+const docRef = firestore.doc('CurrentVideo/PlaybackData');
+
+let player; // var representing iframe ytplayer
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
     events: {
@@ -21,134 +30,135 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
     },
   });
+  // I'm still working on writing this as a promise, but it doesn't
+  // work unless these next two parts are delayed
+  setTimeout(function() {
+    sendInfo('start');
+    getRealtimeUpdates();
+  }, 1000);
 }
 
-function sendInfo(playing) {
-  const xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      console.log('Request sent');
-    }
-  };
-  xhttp.open('POST', '/Playback-Test', true);
-  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  const time = player.getCurrentTime();
-  const speed = player.getPlaybackRate();
-  xhttp.send('timestamp=' + time + '&videoSpeed=' + speed + '&isPlaying='+
-    playing);
+function sendInfo(goal) { // send info to Firestore
+  docRef.set({
+    isPlaying: isVideoPlaying(),
+    timestamp: player.getCurrentTime(),
+    videoSpeed: player.getPlaybackRate(),
+  }).then(function() {
+    console.log(goal + ' request sent');
+  }).catch(function(error) {
+    console.log(goal + ' caused an error: ', error);
+  });
 }
 
-let timeout;
+let catchUp = false; // Does this vid need to catch up to Firestore?
+
+let pauseTimeout; // Differentiates pause from seek
+let bufferTimeout; // Finds when user's video has fallen behind
+let pauseInterval; // sends new information about paused videos
 function onPlayerStateChange() {
-  console.log(player.getPlayerState());
-  if (!videoUpdating) {
-    switch (player.getPlayerState()) {
-      case 1: // Playing
-        clearTimeout(timeout);
-        sendInfo(true);
-        break;
-      case 2: // paused
-        timeout = setTimeout(sendInfo, 100, false);
-        break;
-      case 3: // Buffering
-        clearTimeout(timeout);
-        break;
-      case -1: // Just before video starts
-        beginFetchingLoop();
-        break;
-      case 0: // Ended
-        endFetchingLoop();
-    }
+  switch (player.getPlayerState()) {
+    case 1: // Playing
+      clearTimeout(pauseTimeout);
+      clearTimeout(bufferTimeout);
+      clearInterval(pauseInterval);
+      bufferingChecks();
+      if (!videoUpdating) sendInfo('play');
+      break;
+    case 2: // paused
+      if (!catchUp && !videoUpdating) {
+        pauseTimeout = setTimeout(sendInfo, 100, 'pause');
+        let lastTime = player.getCurrentTime();
+        pauseInterval = setInterval(function() {
+          if (player.getCurrentTime() != lastTime) {
+            lastTime = player.getCurrentTime();
+            sendInfo('Update on Pause Seek');
+          }
+        }, 1000);
+      }
+      break;
+    case 3: // Buffering
+      clearTimeout(pauseTimeout);
+      clearInterval(pauseInterval);
+      bufferTimeout = setTimeout(function() {
+        catchUp = true;
+      }, SYNC_WINDOW*1000);
+      break;
+    case -1: // Just before next video starts
+      // Will change the video docRef refers to
+      break;
+    case 0: // Ended
+      // will load the next video
   }
 }
 
-// Get the time of the current video
-function getTime() { // eslint-disable-line no-unused-vars
-  console.log(player.getCurrentTime());
+function bufferingChecks() {
+  if (catchUp) {
+    catchUserUp();
+    catchUp = false;
+  }
 }
 
-function setTime() { // eslint-disable-line no-unused-vars
-  player.seekTo(60, true);
+function catchUserUp() {
+  docRef.get().then(function(doc) {
+    if (doc && doc.exists) {
+      const vidData = doc.data();
+      player.seekTo(vidData.timestamp);
+      player.setPlaybackRate(vidData.videoSpeed);
+      if (vidData.isPlaying) player.playVideo();
+      else player.pauseVideo();
+    }
+  });
 }
 
 function onPlayerPlaybackRateChange() {
-  if (!videoUpdating) sendInfo(player.getPlayerState() === 1);
+  if (!videoUpdating) sendInfo('Change Speed');
 }
 
-function halfSpeed() { // eslint-disable-line no-unused-vars
-  player.setPlaybackRate(0.5);
-}
-
-function doubleSpeed() { // eslint-disable-line no-unused-vars
-  player.setPlaybackRate(2);
-}
-
-function normalSpeed() { // eslint-disable-line no-unused-vars
-  player.setPlaybackRate(1);
-}
-
-function fetchData() {
-  const request = new XMLHttpRequest();
-  request.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      updateVideo(this.responseText);
+function getRealtimeUpdates() {
+  docRef.onSnapshot(function(doc) {
+    if (doc && doc.exists) {
+      const vidData = doc.data();
+      videoUpdating = true;
+      if (player.getPlaybackRate() != vidData.videoSpeed) {
+        player.setPlaybackRate(vidData.videoSpeed);
+      }
+      if (!timesInRange(vidData.timestamp)) {
+        player.seekTo(vidData.timestamp, true);
+      }
+      if (differentStates(vidData.isPlaying)) {
+        switch (vidData.isPlaying) {
+          case true:
+            player.playVideo();
+            break;
+          case false:
+            player.pauseVideo();
+            player.seekTo(vidData.timestamp, true);
+        }
+      }
+      videoUpdating = false;
     }
-  };
-  request.open('GET', '/Playback-Test', true);
-  request.send();
+  });
 }
 
-const SYNC_WINDOW = 3; // max time diff between client and server
-// return true if player time is within 5 seconds of master time
-function timesInRange(serverVidTime) {
-  return Math.abs(player.getCurrentTime() - serverVidTime) < SYNC_WINDOW;
+// return true if player time is within 5 seconds of Firestore time
+function timesInRange(firestoreVidTime) {
+  return Math.abs(player.getCurrentTime() - firestoreVidTime) < SYNC_WINDOW;
 }
 
-// return true if player state is different than master state
-function differentStates(serverVidIsPlaying) {
+// return true if player state is different than Firestore state
+function differentStates(firestoreVidIsPlaying) {
   if (player.getPlayerState() != 1) { // player paused
-    if (serverVidIsPlaying) { // master playing
+    if (firestoreVidIsPlaying) { // Firestore playing
       return true;
     }
     return false;
   }
-  if (!serverVidIsPlaying) {
+  if (!firestoreVidIsPlaying) {
     return true;
   }
   return false;
 }
 
-const FETCH_PERIOD = 1.5; // time between information retreival in seconds
-const NUM_MEMBERS = 2; // number of room participants
-function updateVideo(text) {
-  console.log(text);
-  const videoInfo = JSON.parse(text);
-  videoUpdating = true;
-  if (!timesInRange(videoInfo.timestamp)) {
-    player.seekTo(videoInfo.timestamp - (FETCH_PERIOD / NUM_MEMBERS), true);
-  }
-  if (differentStates(videoInfo.isPlaying)) {
-    switch (videoInfo.isPlaying) {
-      case true:
-        player.playVideo();
-        break;
-      case false:
-        player.pauseVideo();
-        player.seekTo(videoInfo.timestamp, true);
-    }
-  }
-  if (player.getPlaybackRate() != videoInfo.videoSpeed) {
-    player.setPlaybackRate(videoInfo.videoSpeed);
-  }
-  videoUpdating = false;
-}
-
-let fetchingInterval; // Interval to retrieve information
-function beginFetchingLoop() {
-  clearInterval(fetchingInterval);
-  fetchingInterval = setInterval(fetchData, FETCH_PERIOD*1000);
-}
-
-function endFetchingLoop() {
-  clearInterval(fetchingInterval);
+function isVideoPlaying() {
+  return (player.getPlayerState() == 1);
 }

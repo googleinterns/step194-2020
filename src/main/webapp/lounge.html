@@ -16,7 +16,6 @@
     <script src="../config.js"></script>
     <script src="../IFrame.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script> 
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
     <!-- Add Firebase products that you want to use -->
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
@@ -99,7 +98,8 @@
           <!-- video placeholder --> 
         <!-- maintains video at 16:9 aspect ratio for all screen sizes -->
           <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
-            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4?autoplay=1&mute=1&enablejsapi=1" allow="autoplay" allowfullscreen></iframe>
+            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4?enablejsapi=1" allowfullscreen></iframe>
+            <img id="thumbnailDisplay" width="100%" height="100%" src="/images/shaq.png"></img>
           </div>
       </div>
 

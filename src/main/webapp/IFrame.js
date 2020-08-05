@@ -14,8 +14,8 @@
 
 let videoUpdating; // is video currently updating to match Firestore info?
 let autoUpdate; // max time between updates
-let justJoined = true;
-const VIDEO_QUEUE = ['y0U4sD3_lX4', 'VYOjWnS4cMY', 'F1B9Fk_SgI0'];
+const FIRST_VIDEO = 'y0U4sD3_lX4'; 
+const VIDEO_QUEUE = ['VYOjWnS4cMY', 'F1B9Fk_SgI0'];
 let videosArray = [];
 let thumbnailsArray = [];
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
@@ -318,6 +318,6 @@ function getRealtimeUpdates() {
 function regularFirestoreUpdate() {
   if (!stopUpdating) updateInfo('update');
   autoUpdate = setTimeout(function() {
-    if (!stopUpdating || aboutToEnd()) regularFirestoreUpdate('auto');
+    if (!stopUpdating && !aboutToEnd()) regularFirestoreUpdate('auto');
   }, SYNC_WINDOW*1000*0.75);
 }

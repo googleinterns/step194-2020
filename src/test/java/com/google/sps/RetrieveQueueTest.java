@@ -34,33 +34,6 @@ public final class RetrieveQueueTest {
   private RetrieveQueue servlet;
   private HttpServletRequest request;
   private HttpServletResponse response;
-  private final String oneVideo = "[{\"requestTime\":1596649245195,\"duration\":1777," +
-      "\"videoURL\":\"https://youtube.com/watch?v\\u003d8Mzb9zmnbJs\",\"releaseDate\"" +
-      ":\"{\\\"value\\\":1596567611000,\\\"dateOnly\\\":false,\\\"tzShift\\\":0}\"," +
-      "\"bigThumbnailURL\":\"\\\"https://i.ytimg.com/vi/8Mzb9zmnbJs/maxresdefault.jpg\\\"" +
-      "\",\"channelName\":\"\\\"Firebase\\\"\",\"videoID\":\"8Mzb9zmnbJs\",\"title\":\"" +
-      "\\\"Intermediate topics in Firebase Security Rules\\\"\",\"thumbnailURL\":" +
-      "\"\\\"https://i.ytimg.com/vi/8Mzb9zmnbJs/mqdefault.jpg\\\"\"}]";
-  private final String multipleVideos = "[{\"requestTime\":1596650642805,\"duration\":646," +
-      "\"videoURL\":\"https://youtube.com/watch?v\\u003dcH9MRy8UbKs\",\"releaseDate\":\"{\\" +
-      "\"value\\\":1567087161000,\\\"dateOnly\\\":false,\\\"tzShift\\\":0}\",\"" +
-      "bigThumbnailURL\":\"\\\"https://i.ytimg.com/vi/cH9MRy8UbKs/maxresdefault.jpg\\\"\",\"" +
-      "videoID\":\"cH9MRy8UbKs\",\"channelName\":\"\\\"TechLead\\\"\",\"title\":\"\\\"" +
-      "What I learned from getting fired at Facebook (with Q\\u0026A).\\\"\",\"thumbnailURL\"" +
-      ":\"\\\"https://i.ytimg.com/vi/cH9MRy8UbKs/mqdefault.jpg\\\"\"},{\"requestTime\"" +
-      ":1596650654875,\"duration\":646,\"videoURL\":\"https://youtube.com/watch?v\\" +
-      "u003dcH9MRy8UbKs\",\"releaseDate\":\"{\\\"value\\\":1567087161000,\\\"dateOnly\\\"" +
-      ":false,\\\"tzShift\\\":0}\",\"bigThumbnailURL\":\"\\\"https://i.ytimg.com/vi/" +
-      "cH9MRy8UbKs/maxresdefault.jpg\\\"\",\"videoID\":\"cH9MRy8UbKs\",\"channelName\":\"" +
-      "\\\"TechLead\\\"\",\"title\":\"\\\"What I learned from getting fired at Facebook (with" +
-      " Q\\u0026A).\\\"\",\"thumbnailURL\":\"\\\"https://i.ytimg.com/vi/cH9MRy8UbKs/mqdefault." +
-      "jpg\\\"\"},{\"duration\":646,\"requestTime\":1596650659951,\"videoURL\":\"https://" +
-      "youtube.com/watch?v\\u003dcH9MRy8UbKs\",\"releaseDate\":\"{\\\"value\\\":1567087161000," +
-      "\\\"dateOnly\\\":false,\\\"tzShift\\\":0}\",\"bigThumbnailURL\":\"\\\"https://i." +
-      "ytimg.com/vi/cH9MRy8UbKs/maxresdefault.jpg\\\"\",\"videoID\":\"cH9MRy8UbKs\",\"" +
-      "channelName\":\"\\\"TechLead\\\"\",\"title\":\"\\\"What I learned from getting fired " +
-      "at Facebook (with Q\\u0026A).\\\"\",\"thumbnailURL\":\"\\\"https://i.ytimg.com/vi/" +
-      "cH9MRy8UbKs/mqdefault.jpg\\\"\"}]";
 
   @Before
   public void setUp() {

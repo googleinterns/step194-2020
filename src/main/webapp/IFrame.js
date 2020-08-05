@@ -20,7 +20,6 @@ const SYNC_WINDOW = 5; // max time diff between client and Firestore
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
 
-firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
 /*
@@ -29,9 +28,10 @@ const urlParams = new URLSearchParams(queryString);
 const roomParam = urlParams.get('room_id');
 */
 const vidRef = firestore.doc('rooms/claytonTestRoom/CurrentVideo/PlaybackData');
-const queueRef = firestore.collection('rooms').doc('claytonTestRoom').collection('Queue');
+const queueRef = firestore.collection('rooms').doc('claytonTestRoom').collection('queue');
 
 async function updateQueue() {
+  console.log('cue updated');
   videosArray = [];
   thumbnailsArray = [];
   videoIdsArray = [];
@@ -39,8 +39,8 @@ async function updateQueue() {
     querySnapshot.forEach(function(doc) {
       const queueData = doc.data();
       videoIdsArray.push(doc.id);
-      videosArray.push(queueData.videoId);
-      thumbnailsArray.push(queueData.thumbnail); 
+      videosArray.push(queueData.videoID);
+      thumbnailsArray.push(queueData.bigThumbnailURL); 
     });
   })
   .catch(function(error) {
@@ -72,6 +72,16 @@ function getFirstVidFromQueue() {
     setTimeout(getCurrentVideo, 3000);
   } else {
     const firstVid = videosArray.shift();
+    if (!justJoined) {
+      switchDisplay();
+      resetPlaybackInfo(firstVid);
+      stopUpdating = false;
+      catchUserUp(); // is this needed?
+      addOneViewer();
+      setTimeout(function() {
+        queueRef.doc(videoIdsArray.shift()).delete();
+      }, SYNC_WINDOW*0.5);
+    }
     queueRef.doc(videoIdsArray.shift()).delete();
     vidRef.update({
       videoId: firstVid,
@@ -136,7 +146,8 @@ function switchDisplay() {
     playerTag.style.display = 'none';
   }
   if (thumbnail.style.display === 'none') {
-    thumbnail.src = thumbnailsArray.shift(); 
+    if (thumbnailsArray.length > 0) thumbnail.src = thumbnailsArray.shift(); 
+    else thumbnail.src = '/images/LoungeLogo.png'
     thumbnail.style.display = 'block';
   } else {
     thumbnail.style.display = 'none';
@@ -195,6 +206,7 @@ function alignWithFirestore() {
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
+    if (videosArray.length > 0) {
     setTimeout(function() {
       const nextVid = videosArray.shift();
       player.loadVideoById({videoId: nextVid});
@@ -207,6 +219,7 @@ function waitForOthers(vidData) {
         queueRef.doc(videoIdsArray.shift()).delete();
       }, SYNC_WINDOW*0.5);
     }, 500);
+    } else getCurrentVideo();
   }
 }
 

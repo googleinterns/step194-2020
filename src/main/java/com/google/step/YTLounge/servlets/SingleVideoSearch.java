@@ -159,7 +159,7 @@ public class SingleVideoSearch extends HttpServlet {
    *
    * @return a long for the number of seconds in encodedTime
    */
-  private long parseDuration(String encodedTime) {
+  public long parseDuration(String encodedTime) {
     String shortenedTime = encodedTime.substring(2);
     long hours = 0;
     long minutes = 0;

@@ -14,7 +14,6 @@
 
 let videoUpdating; // is video currently updating to match Firestore info?
 let autoUpdate; // max time between updates
-const VIDEO_QUEUE = ['y0U4sD3_lX4', 'VYOjWnS4cMY', 'F1B9Fk_SgI0'];
 let videosArray = [];
 let thumbnailsArray = [];
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
@@ -35,24 +34,21 @@ const queueRef = firestore.collection('rooms').doc('claytonTestRoom').collection
 async function updateQueue() {
   videosArray = [];
   thumbnailsArray = [];
+  videoIdsArray = [];
   queueRef.orderBy('requestTime', 'asc').get().then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
       const queueData = doc.data();
+      videoIdsArray.push(doc.id);
       videosArray.push(queueData.videoId);
-      thumbnailsArray.push(queueData.thumbnail); // might need to do more here to get tyhe actual thumbnail url
+      thumbnailsArray.push(queueData.thumbnail); 
     });
   })
   .catch(function(error) {
     console.log("Error getting documents: ", error);
   });
 }
-
-function getQueueRealtimeUpdates() {
-  queueRef.onSnapshot(updateQueue);
-}
-
 updateQueue();
-getQueueRealtimeUpdates();
+queueRef.onSnapshot(updateQueue);
 
 let firstVid;
 function getCurrentVideo() {
@@ -76,8 +72,9 @@ function getFirstVidFromQueue() {
     setTimeout(getCurrentVideo, 3000);
   } else {
     const firstVid = videosArray.shift();
+    queueRef.doc(videoIdsArray.shift()).delete();
     vidRef.update({
-    videoId: firstVid,
+      videoId: firstVid,
     });
     player.loadVideoById({videoId: firstVid});
     thumbnailsArray.shift();
@@ -199,13 +196,16 @@ function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
     setTimeout(function() {
-      const nextVid = videosArray.shift()
+      const nextVid = videosArray.shift();
       player.loadVideoById({videoId: nextVid});
       switchDisplay();
       resetPlaybackInfo(nextVid);
       stopUpdating = false;
       catchUserUp(); // is this needed?
       addOneViewer();
+      setTimeout(function() {
+        queueRef.doc(videoIdsArray.shift()).delete();
+      }, SYNC_WINDOW*0.5);
     }, 500);
   }
 }

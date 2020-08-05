@@ -104,7 +104,7 @@ public class SingleVideoSearch extends HttpServlet {
       System.out.println("bad firestore authorization");
     }
     Map<String, Object> videoData = new HashMap<>();
-    ApiFuture<DocumentReference> newVideo = 
+    ApiFuture<DocumentReference> newVideo =
         db.collection("rooms")
             .document(roomID)
             .collection("queue")

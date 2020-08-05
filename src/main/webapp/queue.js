@@ -10,7 +10,8 @@ const firebaseConfig = {
   measurementId: config.measurementId, // eslint-disable-line no-undef
 };
 const app =
-    firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+    firebase.initializeApp(config);
+    // firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -72,7 +73,10 @@ async function verifyURLStructure(url) {
     document.getElementById('linkError').style.display = 'block';
     document.getElementById('videoError').style.display = 'none';
   } else if (document.getElementById('ytplayer') != null) {
-    await getVideoData(document.getElementById('linkArea').value.substring(32));
+    const urlQuery = url.substring(url.indexOf('?'));
+    const videoParams = new URLSearchParams(urlQuery);
+    const videoParam = videoParams.get('v');
+    await getVideoData(videoParam);
     await getRoomQueue(roomParam);
   }
 }

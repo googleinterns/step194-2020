@@ -13,17 +13,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Returns a YouTube video based on a user's inputted YouTube URL */
+/** Creates a room and roomid, then returns necessary info to switch URLs */
 @WebServlet("/startRoom")
 public class StartRoom extends HttpServlet {
 
-  // framework, still a work in progress
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     response.setContentType("application/json");
     String roomid = generateRoomID();
-    response.sendRedirect("/lounge.html/?room_id=" + roomid);
+    response.getWriter().println(gson.toJson(roomid));
   }
 
   /**
@@ -41,11 +40,8 @@ public class StartRoom extends HttpServlet {
     }
     Map<String, Object> roomData = new HashMap<>();
     roomData.put("members", new HashMap<>());
-    roomData.put("nowPlaying", null);
-    roomData.put("queue", null);
     roomData.put("duration", 0);
     roomData.put("elapsedTime", 0);
-    roomData.put("log", null);
     ApiFuture<DocumentReference> addedDocRef = db.collection("rooms").add(roomData);
     String id = null;
     try {

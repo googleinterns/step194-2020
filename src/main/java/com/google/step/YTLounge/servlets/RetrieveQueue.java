@@ -48,9 +48,7 @@ public class RetrieveQueue extends HttpServlet {
       ApiFuture<QuerySnapshot> queueFuture =
           db.collection("rooms")
               .document(roomid)
-              .collection("information")
-              .document("queue")
-              .collection("videos")
+              .collection("queue")
               .orderBy("requestTime", Direction.ASCENDING)
               .get(); // sort all videos for this room by their requestTime
       List<QueryDocumentSnapshot> queueVideos = null;

@@ -4,11 +4,9 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
-import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -104,13 +102,10 @@ public class SingleVideoSearch extends HttpServlet {
       System.out.println("bad firestore authorization");
     }
     Map<String, Object> videoData = new HashMap<>();
-    ApiFuture<DocumentReference> vidRef =
-        db.collection("rooms")
-            .document(roomID)
-            .collection("information")
-            .document("queue")
-            .collection("videos")
-            .add(getVideoInformation(items, videoData, videoID)); // add new video
+    db.collection("rooms")
+        .document(roomID)
+        .collection("queue")
+        .add(getVideoInformation(items, videoData, videoID)); // add new video
     db.close();
   }
 
@@ -143,6 +138,7 @@ public class SingleVideoSearch extends HttpServlet {
       try {
         videoData.put("title", title);
         videoData.put("thumbnailURL", thumbnailURL);
+        videoData.put("bigThumbnailURL", bigThumbnailURL);
         videoData.put("videoURL", formattedVideoURL);
         videoData.put("videoID", videoID);
         videoData.put("duration", numberDuration);

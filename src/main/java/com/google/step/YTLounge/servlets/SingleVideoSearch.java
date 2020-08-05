@@ -181,7 +181,7 @@ public class SingleVideoSearch extends HttpServlet {
     }
     return seconds;
   }
-  
+
   /** Locate the necessary API key to access needed data */
   private String readSecrets() {
     try {

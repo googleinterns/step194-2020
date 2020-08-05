@@ -10,8 +10,7 @@ const firebaseConfig = {
   measurementId: config.measurementId, // eslint-disable-line no-undef
 };
 const app =
-    firebase.initializeApp(config);
-    // firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+    firebase.initializeApp(config); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);

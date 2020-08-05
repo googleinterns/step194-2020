@@ -66,10 +66,8 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 }
 
 let catchingUp; // Does this vid need to catch up to Firestore?
-let currentVidDuration;
-function onPlayerReady(event) {
-  player.loadVideoById({videoId: videosArray.shift()});
-  currentVidDuration = player.getDuration();
+function onPlayerReady() {
+  player.loadVideoById({videoId: VIDEO_QUEUE.shift()});
   catchingUp = true;
   addOneViewer();
 }
@@ -160,7 +158,7 @@ function alignWithFirestore() {
   if (pauseStoppedInterval) {
     pauseStoppedInterval = false;
     autoUpdate = setTimeout(regularFirestoreUpdate,
-        SYNC_WINDOW*1000*0.75, 'buffering check');
+        SYNC_WINDOW*1000*0.75);
   }
 }
 
@@ -174,8 +172,6 @@ function waitForOthers(vidData) {
       stopUpdating = false;
       catchUserUp(); // is this needed?
       addOneViewer();
-      currentVidDuration = // eslint-disable-line no-unused-vars
-          player.getDuration();
     }, 500);
   }
 }
@@ -214,6 +210,7 @@ function updateInfo(goal) { // send info to Firestore
     console.log(goal + ' caused an error: ', error);
   });
 }
+
 
 let pauseTimeout; // Differentiates pause from seek
 let pauseInterval; // sends new information about paused videos
@@ -277,7 +274,7 @@ function catchUserUp() {
     }
   }).then(function() {
     autoUpdate = setTimeout(regularFirestoreUpdate,
-        SYNC_WINDOW*1000*0.75, 'catch user up');
+        SYNC_WINDOW*1000*0.75);
   });
 }
 
@@ -313,12 +310,12 @@ function getRealtimeUpdates() {
     }
     if (!stopUpdating) {
       autoUpdate = setTimeout(regularFirestoreUpdate,
-          SYNC_WINDOW*1000*0.75, 'realtime');
+          SYNC_WINDOW*1000*0.75);
     }
   });
 }
 
-function regularFirestoreUpdate(cause) {
+function regularFirestoreUpdate() {
   if (!stopUpdating) updateInfo('update');
   autoUpdate = setTimeout(function() {
     if (!stopUpdating || aboutToEnd()) regularFirestoreUpdate('auto');

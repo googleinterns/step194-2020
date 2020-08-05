@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <!-- TODO: set project name. -->
-  <groupId>com.google.step.YOUR_PROJECT_NAME_HERE</groupId>
+  <groupId>com.google.step.youtube-lounge</groupId>
   <artifactId>webapp</artifactId>
   <version>1</version>
   <packaging>war</packaging>
@@ -64,6 +64,23 @@
       <artifactId>google-cloud-datastore</artifactId>
       <version>1.104.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.firebase</groupId>
+      <artifactId>firebase-admin</artifactId>
+      <version>6.15.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.10.19</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -76,7 +93,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-          <deploy.projectId>YOUR_PROJECT_ID_HERE</deploy.projectId>
+          <deploy.projectId>youtube-lounge</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>

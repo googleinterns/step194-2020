@@ -5,38 +5,38 @@ body, html {
 }
 
 .header {
-    height: 60px;
-    width: 100%;
-    text-align: center; 
-    float:center;
+  height: 60px;
+  width: 100%;
+  text-align: center; 
+  float:center;
 }
 
 .YTlogo{
-display: inline-block;
-width:202px;
-height:50px;
-object-position:50% 42%;
-position:relative;
-opacity:1;
-margin:auto;
-object-fit:cover;
-top:11px;
+  display: inline-block;
+  width:202px;
+  height:50px;
+  object-position:50% 42%;
+  position:relative;
+  opacity:1;
+  margin:auto;
+  object-fit:cover;
+  top:11px;
 }
 
 .title{
-overflow:visible visible;
-display: inline-block;
-position:relative;
-opacity:1;
-margin:auto;
-font:700 44px/58px Roboto;
-vertical-align:top;
-padding:6px 6px 6px 6px;
-align-self:start;
-top:6px;
-justify-self:start;
-color:var(--co-text-light, #FFFFFF);
-letter-spacing:normal
+  overflow:visible visible;
+  display: inline-block;
+  position:relative;
+  opacity:1;
+  margin:auto;
+  font:700 44px/58px Roboto;
+  vertical-align:top;
+  padding:6px 6px 6px 6px;
+  align-self:start;
+  top:6px;
+  justify-self:start;
+  color:var(--co-text-light, #FFFFFF);
+  letter-spacing:normal
 }
 
 #main {
@@ -64,20 +64,19 @@ letter-spacing:normal
   z-index:2;
   top: 0;
   right:0px;
-  background-color:#E0E0E0;
+  background-color:#111;
   overflow-x: hidden;
   transition: 0.5s;
 }
 
 #sidebarBtn {
-  top: 0;
   z-index:2;
-  font-size: 20px;
+  font-size: 40px;
   font-style: bold;
   cursor: pointer;
-  background-color: #111;
+  background-color: #33322e;
   color: white;
-  padding: 10px 15px;
+  padding: 10px;
   border: none;
   margin:0px;
   float: right;
@@ -87,56 +86,40 @@ letter-spacing:normal
   background-color: #444;
 }
 
-#tabs li { 
+#tabsbar a { 
     font:500 20px/30px Roboto;
-    padding: 8px 0px 8px 0px;
+    padding: 12px 20px 0px 0px;
     text-decoration: none;
-     font-size: 15px;
-    color: #818181;
-     display: block;
-    transition: 0.3s;
+    font-size: 15px;
+    color: white;
+    float:left;
+    text-align:left;
+    left:0;
 }
 
 .tab-pane{
-    padding: 15px;
     height: 100%;
 }
-
-.queueVideo {
-    display: flex;
-    flex-direction: row;
-    padding: 0.15%;
+#tabsbar {
+border-bottom: none;
 }
 
-.videoThumbnail {
-    height: 80px;
-    width: auto;
-    padding: 0.1%;
-}
-
-.videoSubmit {
-    display: flex;
-    flex-direction: row;
-    padding: 0.25%;
-}
-
-#linkError {
-    display: none;
-    color: red;
+.material-icons{
+    font-size:25px;
 }
 
 .guest {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 0.5%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0.5%;
 }
 
 .username {
-    padding-left: 5%;
+  padding-left: 5%;
 }
 
 .userPic {
-    width: 50px;
-    height: auto;
+  width: 50px;
+  height: auto;
 }

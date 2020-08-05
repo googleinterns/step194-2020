@@ -7,16 +7,18 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
-import com.google.appengine.api.datastore.*;
+import com.google.cloud.firestore.Firestore;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.step.YTLounge.data.FirestoreAuth;
+import com.google.step.YTLounge.data.RequestParameter;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -55,14 +57,19 @@ public class SingleVideoSearch extends HttpServlet {
     // accesses YouTube API to get a specific video as long as the given URL is valid
     Gson gson = new Gson();
     response.setContentType("application/json");
-    String videoID = getParameter(request, "id", "");
-    String roomid = getParameter(request, "roomid", generateRoomID());
+    String videoID = RequestParameter.getParameter(request, "id", "");
+    String roomID = RequestParameter.getParameter(request, "room_id", "");
+    if (roomID.equals("")) {
+      response.getWriter().println(gson.toJson("error: no room found"));
+      return;
+    }
 
     YouTube youtubeService = null;
     try {
       youtubeService = getService();
     } catch (GeneralSecurityException e) {
       response.getWriter().println("");
+      return;
     }
     if (youtubeService == null) {
       return;
@@ -75,40 +82,46 @@ public class SingleVideoSearch extends HttpServlet {
       return;
     }
 
-    extractVideo(jsonObject.getAsJsonArray("items"), videoID);
-    response.getWriter().println(gson.toJson(videoResponse));
-  }
-
-  /**
-   * If a room wasn't found from the query, create a new room ID while respecting the current IDs in
-   * DataStore. Initializes necessary properties for the room.
-   *
-   * @return a string representing a room's identifier
-   */
-  private String generateRoomID() {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity roomEntity = new Entity("room");
-    roomEntity.setProperty("members", new HashSet<Key>());
-    roomEntity.setProperty("nowPlaying", "");
-    roomEntity.setProperty("queue", new ArrayList<Key>());
-    roomEntity.setProperty("duration", 0);
-    roomEntity.setProperty("elapsedTime", 0);
-    roomEntity.setProperty("log", new ArrayList<Key>());
-    datastore.put(roomEntity);
-    return Long.toString(roomEntity.getKey().getId());
+    try {
+      extractVideo(jsonObject.getAsJsonArray("items"), videoID, roomID);
+      response.getWriter().println(gson.toJson(videoResponse));
+    } catch (Exception e) {
+      response.getWriter().println(gson.toJson("error: exception"));
+    }
   }
 
   /**
    * Iterates through the given items and locates specific values to create a new Video and upload
-   * the video to DataStore
+   * the video to Firestore
    */
-  private void extractVideo(JsonArray items, String videoID) {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity videoEntity = new Entity("Video");
+  private void extractVideo(JsonArray items, String videoID, String roomID) throws Exception {
+    Firestore db = null;
+    try {
+      db = FirestoreAuth.authorize();
+    } catch (Exception e) {
+      System.out.println("bad firestore authorization");
+    }
+    Map<String, Object> videoData = new HashMap<>();
+    db.collection("rooms")
+        .document(roomID)
+        .collection("queue")
+        .add(getVideoInformation(items, videoData, videoID)); // add new video
+    db.close();
+  }
+
+  /**
+   * Iterates through the given items and adds the relevant information to the given map, eventually
+   * adding the video to the database and notifying the console of when the item was successfully
+   * added
+   */
+  private Map<String, Object> getVideoInformation(
+      JsonArray items, Map<String, Object> videoData, String videoID) {
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
       String thumbnailURL =
           snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get("url").toString();
+      String bigThumbnailURL =
+          snippet.getAsJsonObject("thumbnails").getAsJsonObject("maxres").get("url").toString();
       String title = snippet.get("title").toString();
       String duration =
           items
@@ -118,19 +131,26 @@ public class SingleVideoSearch extends HttpServlet {
               .get("duration")
               .toString();
       duration = duration.substring(1, duration.length() - 1);
+      long numberDuration = parseDuration(duration);
       String formattedVideoURL = "https://youtube.com/watch?v=" + videoID;
       String channelName = snippet.get("channelTitle").toString();
       String releaseDate = snippet.get("publishedAt").toString();
-      videoEntity.setProperty("title", title);
-      videoEntity.setProperty("thumbnailURL", thumbnailURL);
-      videoEntity.setProperty("videoURL", formattedVideoURL);
-      videoEntity.setProperty("videoID", videoID);
-      videoEntity.setProperty("duration", parseDuration(duration));
-      videoEntity.setProperty("channelName", channelName);
-      videoEntity.setProperty("releaseDate", releaseDate);
-      videoEntity.setProperty("requestTime", System.currentTimeMillis());
-      datastore.put(videoEntity); // place video in queue for that room
+      try {
+        videoData.put("title", title);
+        videoData.put("thumbnailURL", thumbnailURL);
+        videoData.put("bigThumbnailURL", bigThumbnailURL);
+        videoData.put("videoURL", formattedVideoURL);
+        videoData.put("videoID", videoID);
+        videoData.put("duration", numberDuration);
+        videoData.put("channelName", channelName);
+        videoData.put("releaseDate", releaseDate);
+        videoData.put("requestTime", System.currentTimeMillis());
+        return videoData;
+      } catch (Exception e) {
+        System.out.println("Error: can't put video into firestore");
+      }
     }
+    return new HashMap<>();
   }
 
   /**
@@ -158,20 +178,7 @@ public class SingleVideoSearch extends HttpServlet {
     return seconds;
   }
 
-  /**
-   * Locates the name parameter in the given request and returns that value.
-   *
-   * @return defaultValue if name parameter wasn't found
-   * @return found value for name parameter
-   */
-  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
-    String value = request.getParameter(name);
-    if (value == null) {
-      return defaultValue;
-    }
-    return value;
-  }
-
+  /** Locate the necessary API key to access needed data */
   private String readSecrets() {
     try {
       File secretFile = new File("dataSecret.txt");

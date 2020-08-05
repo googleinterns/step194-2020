@@ -14,8 +14,7 @@
 
 let videoUpdating; // is video currently updating to match Firestore info?
 let autoUpdate; // max time between updates
-const FIRST_VIDEO = 'y0U4sD3_lX4'; 
-const VIDEO_QUEUE = ['VYOjWnS4cMY', 'F1B9Fk_SgI0'];
+const VIDEO_QUEUE = ['y0U4sD3_lX4', 'VYOjWnS4cMY', 'F1B9Fk_SgI0'];
 let videosArray = [];
 let thumbnailsArray = [];
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
@@ -25,12 +24,13 @@ thumbnail.style.display = 'none';
 firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
+/*
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const roomParam = urlParams.get('room_id');
-
-const vidRef = firestore.doc('CurrentVideo/PlaybackData');
-const queueRef = firestore.collection('rooms').doc(roomParam).collection('queue');
+*/
+const vidRef = firestore.doc('rooms/claytonTestRoom/CurrentVideo/PlaybackData');
+const queueRef = firestore.collection('rooms').doc('claytonTestRoom').collection('Queue');
 
 async function updateQueue() {
   videosArray = [];
@@ -54,6 +54,37 @@ function getQueueRealtimeUpdates() {
 updateQueue();
 getQueueRealtimeUpdates();
 
+let firstVid;
+function getCurrentVideo() {
+  vidRef.get().then(function(doc) {
+    if (doc && doc.exists) {
+      const vidData = doc.data();
+      if (vidData.videoId !== ('')) {
+        player.loadVideoById({videoId: vidData.videoId});
+      } else {
+        getFirstVidFromQueue();
+      }
+    } else {
+      console.log('there was no doc to read!');
+    }
+  });
+}
+
+function getFirstVidFromQueue() {
+  if (videosArray.length === 0) {
+    console.log('add videos to the queue!');
+    setTimeout(getCurrentVideo, 3000);
+  } else {
+    const firstVid = videosArray.shift();
+    vidRef.update({
+    videoId: firstVid,
+    });
+    player.loadVideoById({videoId: firstVid});
+    thumbnailsArray.shift();
+    // then remove the vid from firestore queue
+  }
+}
+
 let player; // var representing iframe ytplayer
 function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   player = new YT.Player('ytplayer', { // eslint-disable-line no-undef
@@ -66,8 +97,9 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 }
 
 let catchingUp; // Does this vid need to catch up to Firestore?
+let justJoined = true;
 function onPlayerReady() {
-  player.loadVideoById({videoId: VIDEO_QUEUE.shift()});
+  getCurrentVideo();
   catchingUp = true;
   addOneViewer();
 }
@@ -114,11 +146,12 @@ function switchDisplay() {
   }
 }
 
-function resetPlaybackInfo() {
+function resetPlaybackInfo(nextVid) {
   vidRef.update({
     isPlaying: true,
     timestamp: 0,
     videoSpeed: 1,
+    videoId: nextVid,
   }).then(function() {
     console.log('reset request sent');
   }).catch(function(error) {
@@ -166,9 +199,10 @@ function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
     setTimeout(function() {
-      player.loadVideoById({videoId: videosArray.shift()});
+      const nextVid = videosArray.shift()
+      player.loadVideoById({videoId: nextVid});
       switchDisplay();
-      resetPlaybackInfo();
+      resetPlaybackInfo(nextVid);
       stopUpdating = false;
       catchUserUp(); // is this needed?
       addOneViewer();

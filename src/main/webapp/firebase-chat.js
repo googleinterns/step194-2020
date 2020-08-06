@@ -1,3 +1,4 @@
+/* eslint-disable */
 const config = firebaseConfig;
 firebase.initializeApp(config); // eslint-disable-line no-undef
 
@@ -11,7 +12,7 @@ function initFirebaseAuth() {
 
 function getProfilePicUrl() {
   const profilePic = document.getElementsByName('profile');
-  for(i = 0; i < profilePic.length; i++) { 
+  for (i = 0; i < profilePic.length; i++) {
     if (profilePic[i].checked) {
       return profilePic[i].value;
     }
@@ -96,7 +97,7 @@ function authStateObserver(user) {
 
     div.querySelector('.pic').style.backgroundImage =
     'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
-    div.querySelector('.name').textContent = userName ;
+    div.querySelector('.name').textContent = userName;
     guestListElement.appendChild(div);
 
     dialog.close();
@@ -224,7 +225,7 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   }
   setTimeout(function() {
     div.classList.add('visible');
-    }, 1);
+  }, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
@@ -248,8 +249,7 @@ const userNameElement = document.getElementById('user-name');
 const signOutButtonElement = document.getElementById('sign-out');
 const signInSnackbarElement = document.getElementById('must-signin-snackbar');
 const dialog = document.getElementById('dialog');
-const displayNameFormElement = document.getElementById('name-form');
-const displayName = document.getElementById("userName");
+const displayName = document.getElementById('userName');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
 const guestListElement = document.getElementById('guests');
 

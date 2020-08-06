@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let videoUpdating; // is video currently updating to match Firestore info?
-let autoUpdate; // max time between updates
-let videosArray = [];
-let thumbnailsArray = [];
+let videoUpdating; // is video currently updating to match Firestore info? (Consider deleting this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)
+var autoUpdate; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
@@ -28,18 +26,21 @@ const roomId = params.get('room_id');
 const vidDataRef = firestore.collection('rooms').doc(roomId).collection('CurrentVideo').doc('PlaybackData');
 const queueDataRef = firestore.collection('rooms').doc(roomId).collection('queue');
 
+let videoIds;
+let thumbnails;
+let docIds;
 async function updateQueue() {
-  videosArray = []; // Holds video IDs
-  thumbnailsArray = []; // Holds Big THumbnails URLs
-  docIdsArray = []; // Holds Firestore Document IDs
+  videoIds = []; // Holds video IDs
+  thumbnails = []; // Holds Big THumbnails URLs
+  docIds = []; // Holds Firestore Document IDs
   queueDataRef.orderBy('requestTime', 'asc').get().then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
       const queueData = doc.data();
-      docIdsArray.push(doc.id);
-      videosArray.push(queueData.videoID);
+      docIds.push(doc.id);
+      videoIds.push(queueData.videoID);
       const thumbnailString = queueData.bigThumbnailURL;
       const thumbnailURL = thumbnailString.substring(1, thumbnailString.length - 1);
-      thumbnailsArray.push(thumbnailURL); 
+      thumbnails.push(thumbnailURL); 
     });
   })
   .catch(function(error) {
@@ -58,8 +59,8 @@ function getCurrentVideo() {
         switchDisplay();
         if (!justJoined) {
           addOneViewer();
-          stopUpdating = false;
         }
+        stopUpdating = false;
       } else {
         getFirstVidFromQueue();
       }
@@ -70,19 +71,22 @@ function getCurrentVideo() {
 }
 
 function getFirstVidFromQueue() {
-  if (videosArray.length === 0) {
+  if (videoIds.length === 0) {
     console.log('add videos to the queue!');
     setTimeout(getCurrentVideo, 3000);
   } else {
-    const firstVid = videosArray[0];
+    const firstVid = videoIds[0];
+    const firstVidDocId = docIds[0];
     updateVidPlaying(firstVid); 
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     if (!justJoined) {
       addOneViewer();
-      stopUpdating = false;
     }
-    queueDataRef.doc(docIdsArray[0]).delete();
+    stopUpdating = false;
+    setTimeout(function() {
+      queueDataRef.doc(firstVidDocId).delete();
+    }, SYNC_WINDOW*1000);
   }
 }
 
@@ -119,19 +123,6 @@ function aboutToEnd() {
   return (player.getDuration() - player.getCurrentTime() < SYNC_WINDOW);
 }
 
-// keeps firestore updated on pause
-function setPauseInterval() {
-  let lastTime = player.getCurrentTime();
-  pauseInterval = setInterval(function() {
-    if (player.getCurrentTime() != lastTime) {
-      clearTimeout(autoUpdate);
-      pauseStoppedInterval = true;
-      lastTime = player.getCurrentTime();
-      updateInfo('Update on Pause Seek');
-    }
-  }, 1000);
-}
-
 // switches to thumbnails between videos
 const playerTag = document.getElementById('ytplayer');
 function switchDisplay() {
@@ -141,7 +132,7 @@ function switchDisplay() {
     playerTag.style.display = 'none';
   }
   if (thumbnail.style.display === 'none') {
-    if (thumbnailsArray.length > 0) thumbnail.src = thumbnailsArray[0]; 
+    if (thumbnails.length > 0) thumbnail.src = thumbnails[0]; 
     else thumbnail.src = '/images/LoungeLogo.png'
     thumbnail.style.display = 'block';
   } else {
@@ -208,25 +199,14 @@ function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
     resetPlaybackInfo();
-    if (videosArray.length > 0) {
-      setTimeout(function() {
-        const nextVid = videosArray[0];
-        updateVidPlaying(nextVid);
-        player.loadVideoById({videoId: nextVid});
-        switchDisplay();
-        stopUpdating = false;
-        addOneViewer();
-        setTimeout(function() {
-          queueDataRef.doc(docIdsArray[0]).delete();
-        }, SYNC_WINDOW*0.5);
-      }, 500);
-    } else getCurrentVideo();
+    getCurrentVideo();
   }
 }
 
 // return true if player time is within 5 seconds of Firestore time
 function timesInRange(firestoreVidTime) {
-  return Math.abs(player.getCurrentTime() - firestoreVidTime) < SYNC_WINDOW;
+  return Math.abs(player.getCurrentTime() - firestoreVidTime) < 
+      SYNC_WINDOW * player.getPlaybackRate();
 }
 
 // return true if player state is different than Firestore state
@@ -259,22 +239,20 @@ function updateInfo(goal) { // send info to Firestore
   });
 }
 
-
 let pauseTimeout; // Differentiates pause from seek
-let pauseInterval; // sends new information about paused videos
 let pauseStoppedInterval = false; // Tells when videos are paused
 let bufferTimeout; // Finds when user's video has fallen behind
 let stopUpdating = false; // makes code ignore ended videos
 let vidOver = false; // limits checks to start next video
 
-function clearAll() {
+function clearTimeouts() {
   clearTimeout(pauseTimeout);
   clearTimeout(bufferTimeout);
-  clearInterval(pauseInterval);
+  clearTimeout(autoUpdate);
 }
 
 function onPlayerStateChange() {
-  clearAll();
+  clearTimeouts();
   if (!stopUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
@@ -284,18 +262,15 @@ function onPlayerStateChange() {
       case 2: // paused
         if (!catchingUp && !videoUpdating) {
           pauseTimeout = setTimeout(updateInfo, 100, 'pause');
-          setPauseInterval();
         }
         break;
       case 3: // Buffering
         bufferTimeout = setTimeout(function() {
           catchingUp = true;
-          clearTimeout(autoUpdate);
         }, SYNC_WINDOW*1000);
         break;
       case 0: // Ended
         stopUpdating = true;
-        clearTimeout(autoUpdate);
         vidOver = true;
         switchDisplay();
         removeOneViewer();
@@ -358,7 +333,7 @@ function getRealtimeUpdates() {
     videoUpdating = false;
     if (!stopUpdating) {
       autoUpdate = setTimeout(regularFirestoreUpdate,
-          SYNC_WINDOW*1000*0.75);
+          SYNC_WINDOW*1000);
     }
   });
 }
@@ -366,6 +341,6 @@ function getRealtimeUpdates() {
 function regularFirestoreUpdate() {
   if (!stopUpdating) updateInfo('update');
   autoUpdate = setTimeout(function() {
-    if (!stopUpdating && !aboutToEnd()) regularFirestoreUpdate('auto');
+    if (!stopUpdating && !aboutToEnd()) regularFirestoreUpdate();
   }, SYNC_WINDOW*1000*0.75);
 }

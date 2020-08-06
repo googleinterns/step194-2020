@@ -1,20 +1,10 @@
 // Initializes resources for reading/writing to Firestore
-const firebaseConfig = {
-  apiKey: config.apiKey, // eslint-disable-line no-undef
-  authDomain: 'lounge-95f01.firebaseapp.com',
-  databaseURL: 'https://lounge-95f01.firebaseio.com',
-  projectId: 'youtube-lounge',
-  storageBucket: 'youtube-lounge.appspot.com',
-  messagingSenderId: config.messagingSenderId, // eslint-disable-line no-undef
-  appId: config.appId, // eslint-disable-line no-undef
-  measurementId: config.measurementId, // eslint-disable-line no-undef
-};
 const app =
-    firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+    firebase.initializeApp(config); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const roomParam = urlParams.get('roomid');
+const roomParam = urlParams.get('room_id');
 validateRoom();
 
 // Track realtime changes to the database and update the visual queue on change
@@ -22,8 +12,7 @@ validateRoom();
 // window.location.search property
 db.collection('rooms') // eslint-disable-line no-undef
     .doc(roomParam)
-    .collection('information')
-    .doc('queue').collection('videos')
+    .collection('queue')
     .onSnapshot(function(snapshot) {
       snapshot.docChanges().forEach(function(change) {
         if (change.type === 'added') {
@@ -43,7 +32,7 @@ db.collection('rooms') // eslint-disable-line no-undef
 // room given hasn't been created or if no room was passed in the url
 async function validateRoom() {
   if (roomParam === null) { // verify that we were passed a room identifier
-    window.location.href = 'error.html';
+    window.location.href = '../error.html';
   } else {
     const verifyRoom =
         await db.collection('rooms') // eslint-disable-line no-undef
@@ -52,7 +41,7 @@ async function validateRoom() {
     console.log('verifyRoom: ' + verifyRoom);
     console.log('exists: ' + verifyRoom.exists);
     if (!verifyRoom.exists) { // verify room exists in firestore
-      window.location.href = 'error.html';
+      window.location.href = '../error.html';
     }
   }
 }
@@ -62,7 +51,7 @@ async function validateRoom() {
   Makes sure the stub of the user's URL is valid and will warn user
   if their link wasn't formatted correctly for the server to parse.
 */
-function verifyURLStructure(url) {
+async function verifyURLStructure(url) {
   const validator = new RegExp('' +
     /(^(?:https?:\/\/)?(?:www\.)?)/.source +
     /((?:youtu\.be\/|youtube\.com\/))/.source +
@@ -73,7 +62,11 @@ function verifyURLStructure(url) {
     document.getElementById('linkError').style.display = 'block';
     document.getElementById('videoError').style.display = 'none';
   } else if (document.getElementById('ytplayer') != null) {
-    getVideoData(document.getElementById('linkArea').value.substring(32));
+    const urlQuery = url.substring(url.indexOf('?'));
+    const videoParams = new URLSearchParams(urlQuery);
+    const videoParam = videoParams.get('v');
+    await getVideoData(videoParam);
+    await getRoomQueue(roomParam);
   }
 }
 
@@ -83,7 +76,7 @@ async function getVideoData(id) {
     console.log('NO ID');
     return;
   }
-  fetch('/vSearch?id=' + id + '&roomid=' + roomParam)
+  await fetch('/vSearch?id=' + id + '&room_id=' + roomParam)
       .then((response) => response.json())
       .then((video) => {
         if (video.error == null) { // video was found, add to firestore
@@ -97,6 +90,7 @@ async function getVideoData(id) {
         }
         console.log(video);
       });
+  getRoomQueue(roomParam);
   document.getElementById('linkArea').value = '';
 }
 
@@ -109,18 +103,14 @@ async function removeVideo(roomid, vidRef) {
   const selectedVideo = await db // eslint-disable-line no-undef
       .collection('rooms')
       .doc(roomid)
-      .collection('information')
-      .doc('queue')
-      .collection('videos')
+      .collection('queue')
       .doc(vidRef)
       .get();
   if (selectedVideo.exists) {
     await db // eslint-disable-line no-undef
         .collection('rooms')
         .doc(roomid)
-        .collection('information')
-        .doc('queue')
-        .collection('videos')
+        .collection('queue')
         .doc(vidRef)
         .delete();
     console.log('Video ' + vidRef + ' deleted');
@@ -140,19 +130,15 @@ async function getRoomQueue(roomid) {
   const videosArray = await db // eslint-disable-line no-undef
       .collection('rooms')
       .doc(roomid)
-      .collection('information')
-      .doc('queue')
-      .collection('videos')
+      .collection('queue')
       .orderBy('requestTime', 'asc')
       .get();
-  console.log('videos array: ' + videosArray);
-  const room = '47jGbulshBCjcc8YOt8a';
-  fetch('/queueRefresh?roomid=' + roomid)
+  console.log('videosArray: ' + videosArray);
+  fetch('/queueRefresh?room_id=' + roomid)
       .then((response) => response.json())
       .then((queue) => {
+        document.getElementById('videoContainer').innerHTML = '';
         if (queue != null && queue != undefined && queue.length > 0) {
-          console.log(queue);
-          document.getElementById('videoContainer').innerHTML = '';
           const videoCount =
             document.getElementById('videoContainer').childElementCount;
           for (let i = videoCount; i < queue.length; i++) {
@@ -166,14 +152,12 @@ async function getRoomQueue(roomid) {
               queue[i].title.substring(1, queue[i].title.length - 1) + '</p>' +
               '<button class="removeVideoBtn" id="removeVideoBtn' +
               i +
-              '" onclick="removeVideo(\'' + room + '\',\'' +
+              '" onclick="removeVideo(\'' + roomParam + '\',\'' +
               videosArray.docs[i].id + '\')">' +
-              '<img src="images/remove-from-queue.svg"/>' +'</button>' +
-              '<p>' + parseTime(queue[i].duration)+ '</p>' +
+              '<img src="../images/remove-from-queue.svg"/>' +'</button>' +
+              '<p class="duration">' + parseTime(queue[i].duration)+ '</p>' +
               '</div></div>';
           }
-        } else {
-          console.log('NO QUEUE FOUND');
         }
       });
 }

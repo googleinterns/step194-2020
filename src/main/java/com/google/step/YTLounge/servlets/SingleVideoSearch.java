@@ -4,9 +4,11 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -102,10 +104,12 @@ public class SingleVideoSearch extends HttpServlet {
       System.out.println("bad firestore authorization");
     }
     Map<String, Object> videoData = new HashMap<>();
-    db.collection("rooms")
-        .document(roomID)
-        .collection("queue")
-        .add(getVideoInformation(items, videoData, videoID)); // add new video
+    ApiFuture<DocumentReference> newVideo =
+        db.collection("rooms")
+            .document(roomID)
+            .collection("queue")
+            .add(getVideoInformation(items, videoData, videoID)); // add new video
+    System.out.println("Added new video with ID: " + newVideo.get().getId());
     db.close();
   }
 

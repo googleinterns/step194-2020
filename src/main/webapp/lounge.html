@@ -13,14 +13,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
     <script src="index_script.js"></script>
-    <script src="config.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
     <!-- Add Firebase products that you want to use -->
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-auth.js"></script>
-    <script src="queue.js" defer></script>
+    <script src="config.js"></script>
+    <script src="queue.js" defer></script> 
   </head>
   <body>
       <dialog class="mdl-dialog" id="dialog">
@@ -33,35 +33,35 @@
                 <div id="icon-holder">
                   <label>
                     <input type="radio" name="profile" value="images/hat.png" checked>
-                    <img src="images/hat.png">
+                    <img src="/images/hat.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/face-mask.png" >
-                    <img src="images/face-mask.png">
+                    <img src="/images/face-mask.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/dinosaur.png">
-                    <img src="images/dinosaur.png">
+                    <img src="/images/dinosaur.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/duck.png" >
-                    <img src="images/duck.png">
+                    <img src="/images/duck.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/coffee.png" >
-                    <img src="images/coffee.png">
+                    <img src="/images/coffee.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/insect.png" >
-                    <img src="images/insect.png">
+                    <img src="/images/insect.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/froyo.png" >
-                    <img src="images/froyo.png">
+                    <img src="/images/froyo.png">
                   </label>
                   <label>
                     <input type="radio" name="profile" value="images/dog.png" >
-                    <img src="images/dog.png">
+                    <img src="/images/dog.png">
                   </label>
                 </div>
             </div>  <br>
@@ -97,8 +97,8 @@
           <!-- video placeholder --> 
         <!-- maintains video at 16:9 aspect ratio for all screen sizes -->
           <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
-            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4?enablejsapi=1" allowfullscreen></iframe>
-            <img id="thumbnailDisplay" width="100%" height="100%" src="/images/shaq.png"></img>
+            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/?enablejsapi=1" allowfullscreen></iframe>
+            <img id="thumbnailDisplay" width="100%" height="100%" src=""></img>
           </div>
       </div>
 
@@ -166,9 +166,7 @@
           </div>
         </div>
     </div>
-    <script src='firebase-config.js'></script>
     <script src="firebase-chat.js"></script>
-    <script src="index_script.js"></script>
     <script src="IFrame.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </body>

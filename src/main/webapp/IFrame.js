@@ -22,25 +22,24 @@ thumbnail.style.display = 'none';
 
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
-/*
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const roomParam = urlParams.get('room_id');
-*/
-const vidRef = firestore.doc('rooms/claytonTestRoom/CurrentVideo/PlaybackData');
-const queueRef = firestore.collection('rooms').doc('claytonTestRoom').collection('queue');
+const urlQueryString = window.location.search;
+const params = new URLSearchParams(urlQueryString);
+const roomId = params.get('room_id');
+const vidDataRef = firestore.collection('rooms').doc(roomId).collection('CurrentVideo').doc('PlaybackData');
+const queueDataRef = firestore.collection('rooms').doc(roomId).collection('queue');
 
 async function updateQueue() {
-  console.log('cue updated');
-  videosArray = [];
-  thumbnailsArray = [];
-  videoIdsArray = [];
-  queueRef.orderBy('requestTime', 'asc').get().then(function(querySnapshot) {
+  videosArray = []; // Holds video IDs
+  thumbnailsArray = []; // Holds Big THumbnails URLs
+  docIdsArray = []; // Holds Firestore Document IDs
+  queueDataRef.orderBy('requestTime', 'asc').get().then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
       const queueData = doc.data();
-      videoIdsArray.push(doc.id);
+      docIdsArray.push(doc.id);
       videosArray.push(queueData.videoID);
-      thumbnailsArray.push(queueData.bigThumbnailURL); 
+      const thumbnailString = queueData.bigThumbnailURL;
+      const thumbnailURL = thumbnailString.substring(1, thumbnailString.length - 1);
+      thumbnailsArray.push(thumbnailURL); 
     });
   })
   .catch(function(error) {
@@ -48,15 +47,19 @@ async function updateQueue() {
   });
 }
 updateQueue();
-queueRef.onSnapshot(updateQueue);
+queueDataRef.onSnapshot(updateQueue);
 
-let firstVid;
 function getCurrentVideo() {
-  vidRef.get().then(function(doc) {
+  vidDataRef.get().then(function(doc) {
     if (doc && doc.exists) {
       const vidData = doc.data();
       if (vidData.videoId !== ('')) {
         player.loadVideoById({videoId: vidData.videoId});
+        switchDisplay();
+        if (!justJoined) {
+          addOneViewer();
+          stopUpdating = false;
+        }
       } else {
         getFirstVidFromQueue();
       }
@@ -71,24 +74,15 @@ function getFirstVidFromQueue() {
     console.log('add videos to the queue!');
     setTimeout(getCurrentVideo, 3000);
   } else {
-    const firstVid = videosArray.shift();
-    if (!justJoined) {
-      switchDisplay();
-      resetPlaybackInfo(firstVid);
-      stopUpdating = false;
-      catchUserUp(); // is this needed?
-      addOneViewer();
-      setTimeout(function() {
-        queueRef.doc(videoIdsArray.shift()).delete();
-      }, SYNC_WINDOW*0.5);
-    }
-    queueRef.doc(videoIdsArray.shift()).delete();
-    vidRef.update({
-      videoId: firstVid,
-    });
+    const firstVid = videosArray[0];
+    updateVidPlaying(firstVid); 
     player.loadVideoById({videoId: firstVid});
-    thumbnailsArray.shift();
-    // then remove the vid from firestore queue
+    switchDisplay();
+    if (!justJoined) {
+      addOneViewer();
+      stopUpdating = false;
+    }
+    queueDataRef.doc(docIdsArray[0]).delete();
   }
 }
 
@@ -106,6 +100,7 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 let catchingUp; // Does this vid need to catch up to Firestore?
 let justJoined = true;
 function onPlayerReady() {
+  switchDisplay();
   getCurrentVideo();
   catchingUp = true;
   addOneViewer();
@@ -146,7 +141,7 @@ function switchDisplay() {
     playerTag.style.display = 'none';
   }
   if (thumbnail.style.display === 'none') {
-    if (thumbnailsArray.length > 0) thumbnail.src = thumbnailsArray.shift(); 
+    if (thumbnailsArray.length > 0) thumbnail.src = thumbnailsArray[0]; 
     else thumbnail.src = '/images/LoungeLogo.png'
     thumbnail.style.display = 'block';
   } else {
@@ -154,12 +149,12 @@ function switchDisplay() {
   }
 }
 
-function resetPlaybackInfo(nextVid) {
-  vidRef.update({
+function resetPlaybackInfo() {
+  vidDataRef.update({
     isPlaying: true,
     timestamp: 0,
     videoSpeed: 1,
-    videoId: nextVid,
+    videoId: '',
   }).then(function() {
     console.log('reset request sent');
   }).catch(function(error) {
@@ -167,8 +162,14 @@ function resetPlaybackInfo(nextVid) {
   });
 }
 
+function updateVidPlaying(currentVid) {
+  vidDataRef.update({
+    videoId: currentVid,
+  });
+}
+
 function removeOneViewer() {
-  vidRef.update({
+  vidDataRef.update({
     numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
         FieldValue.increment(-1),
   }).then(function() {
@@ -177,7 +178,7 @@ function removeOneViewer() {
 }
 
 function addOneViewer() {
-  vidRef.update({
+  vidDataRef.update({
     numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
         FieldValue.increment(1),
   }).then(function() {
@@ -206,19 +207,19 @@ function alignWithFirestore() {
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
+    resetPlaybackInfo();
     if (videosArray.length > 0) {
-    setTimeout(function() {
-      const nextVid = videosArray.shift();
-      player.loadVideoById({videoId: nextVid});
-      switchDisplay();
-      resetPlaybackInfo(nextVid);
-      stopUpdating = false;
-      catchUserUp(); // is this needed?
-      addOneViewer();
       setTimeout(function() {
-        queueRef.doc(videoIdsArray.shift()).delete();
-      }, SYNC_WINDOW*0.5);
-    }, 500);
+        const nextVid = videosArray[0];
+        updateVidPlaying(nextVid);
+        player.loadVideoById({videoId: nextVid});
+        switchDisplay();
+        stopUpdating = false;
+        addOneViewer();
+        setTimeout(function() {
+          queueDataRef.doc(docIdsArray[0]).delete();
+        }, SYNC_WINDOW*0.5);
+      }, 500);
     } else getCurrentVideo();
   }
 }
@@ -247,7 +248,7 @@ function isVideoPlaying() {
 }
 
 function updateInfo(goal) { // send info to Firestore
-  vidRef.update({
+  vidDataRef.update({
     isPlaying: isVideoPlaying(),
     timestamp: player.getCurrentTime(),
     videoSpeed: player.getPlaybackRate(),
@@ -309,7 +310,7 @@ function onPlayerPlaybackRateChange() {
 }
 
 function catchUserUp() {
-  vidRef.get().then(function(doc) {
+  vidDataRef.get().then(function(doc) {
     if (doc && doc.exists) {
       const vidData = doc.data();
       seek(vidData); // move playhead
@@ -326,11 +327,11 @@ function catchUserUp() {
 }
 
 function getRealtimeUpdates() {
-  vidRef.onSnapshot(function(doc) {
+  vidDataRef.onSnapshot(function(doc) {
     clearTimeout(autoUpdate);
+    videoUpdating = true;
     if (doc && doc.exists) {
       const vidData = doc.data();
-      videoUpdating = true;
       if (!stopUpdating) {
         if (player.getPlaybackRate() != vidData.videoSpeed) {
           player.setPlaybackRate(vidData.videoSpeed);
@@ -353,8 +354,8 @@ function getRealtimeUpdates() {
         }
       }
       if (vidOver) waitForOthers(vidData);
-      videoUpdating = false;
     }
+    videoUpdating = false;
     if (!stopUpdating) {
       autoUpdate = setTimeout(regularFirestoreUpdate,
           SYNC_WINDOW*1000*0.75);

@@ -1,16 +1,6 @@
 // Initializes resources for reading/writing to Firestore
-const firebaseConfig = {
-  apiKey: config.apiKey, // eslint-disable-line no-undef
-  authDomain: config.authDomain, // eslint-disable-line no-undef
-  databaseURL: config.databaseURL, // eslint-disable-line no-undef
-  projectId: config.projectId, // eslint-disable-line no-undef
-  storageBucket: config.storageBucket, // eslint-disable-line no-undef
-  messagingSenderId: config.messagingSenderId, // eslint-disable-line no-undef
-  appId: config.appId, // eslint-disable-line no-undef
-  measurementId: config.measurementId, // eslint-disable-line no-undef
-};
 const app =
-    firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
+    firebase.initializeApp(config); // eslint-disable-line no-undef
 db = firebase.firestore(app); // eslint-disable-line no-undef
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -72,7 +62,10 @@ async function verifyURLStructure(url) {
     document.getElementById('linkError').style.display = 'block';
     document.getElementById('videoError').style.display = 'none';
   } else if (document.getElementById('ytplayer') != null) {
-    await getVideoData(document.getElementById('linkArea').value.substring(32));
+    const urlQuery = url.substring(url.indexOf('?'));
+    const videoParams = new URLSearchParams(urlQuery);
+    const videoParam = videoParams.get('v');
+    await getVideoData(videoParam);
     await getRoomQueue(roomParam);
   }
 }

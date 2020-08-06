@@ -88,6 +88,7 @@ public class SingleVideoSearch extends HttpServlet {
       extractVideo(jsonObject.getAsJsonArray("items"), videoID, roomID);
       response.getWriter().println(gson.toJson(videoResponse));
     } catch (Exception e) {
+      e.printStackTrace();
       response.getWriter().println(gson.toJson("error: exception"));
     }
   }
@@ -173,12 +174,15 @@ public class SingleVideoSearch extends HttpServlet {
       seconds += (hours * 3600);
       shortenedTime = shortenedTime.substring(shortenedTime.indexOf("H") + 1);
     }
-    minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
-    seconds += (minutes * 60);
-    shortenedTime =
-        shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
-    seconds += Integer.parseInt(shortenedTime);
-
+    if (shortenedTime.contains("M")) {
+      minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
+      seconds += (minutes * 60);
+      shortenedTime =
+          shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
+    }
+    if (shortenedTime.contains("S")) {
+      seconds += Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("S")));
+    }
     return seconds;
   }
 

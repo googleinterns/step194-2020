@@ -1,4 +1,3 @@
-/* eslint-disable */
 const config = firebaseConfig;
 firebase.initializeApp(config); // eslint-disable-line no-undef
 
@@ -80,6 +79,9 @@ function onMessageFormSubmit(e) {
 // Triggers when the auth state change for
 // instance when the user signs-in or signs-out.
 function authStateObserver(user) {
+  const container = document.createElement('div');
+  container.innerHTML = GUEST_TEMPLATE;
+  const div = container.firstChild;
   if (user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
@@ -91,6 +93,11 @@ function authStateObserver(user) {
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
+
+    div.querySelector('.pic').style.backgroundImage =
+    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+    div.querySelector('.name').textContent = userName ;
+    guestListElement.appendChild(div);
 
     dialog.close();
   } else {
@@ -129,6 +136,12 @@ const MESSAGE_TEMPLATE =
        '<div class="name"></div>'+
     '</div>';
 
+const GUEST_TEMPLATE =
+    '<div class="guest-container">' +
+      '<div class="spacing"><div class="pic"></div></div>' +
+       '<div class="name"></div>'+
+    '</div>';
+
 function addSizeToGoogleProfilePic(url) {
   if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
     return url + '?sz=150';
@@ -141,6 +154,16 @@ function deleteMessage(id) {
   if (div) {
     div.parentNode.removeChild(div);
   }
+}
+
+// deletes anonymous user at sign out
+function deleteUser() {
+  const user = firebase.auth().currentUser;
+  user.delete().then(function() {
+    console.log('deleted guest');
+  }).catch(function(error) {
+    console.error('Error deleting guest', error);
+  });
 }
 
 function createAndInsertMessage(id, timestamp) {
@@ -228,11 +251,13 @@ const dialog = document.getElementById('dialog');
 const displayNameFormElement = document.getElementById('name-form');
 const displayName = document.getElementById("userName");
 const anonymousSignInElement = document.getElementById('anonymous-signin');
+const guestListElement = document.getElementById('guests');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
-  dialog.showModal();
   firebase.auth().signOut();
+  deleteUser();
+  dialog.showModal();
 });
 
 anonymousSignInElement.addEventListener('click', function() {

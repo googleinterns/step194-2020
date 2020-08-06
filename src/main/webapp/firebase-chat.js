@@ -12,7 +12,7 @@ function initFirebaseAuth() {
 
 function getProfilePicUrl() {
   const profilePic = document.getElementsByName('profile');
-  for(i = 0; i < profilePic.length; i++) { 
+  for (i = 0; i < profilePic.length; i++) {
     if (profilePic[i].checked) {
       return profilePic[i].value;
     }
@@ -80,6 +80,9 @@ function onMessageFormSubmit(e) {
 // Triggers when the auth state change for
 // instance when the user signs-in or signs-out.
 function authStateObserver(user) {
+  const container = document.createElement('div');
+  container.innerHTML = GUEST_TEMPLATE;
+  const div = container.firstChild;
   if (user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
@@ -91,6 +94,11 @@ function authStateObserver(user) {
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
+
+    div.querySelector('.pic').style.backgroundImage =
+    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+    div.querySelector('.name').textContent = userName;
+    guestListElement.appendChild(div);
 
     dialog.close();
   } else {
@@ -129,6 +137,12 @@ const MESSAGE_TEMPLATE =
        '<div class="name"></div>'+
     '</div>';
 
+const GUEST_TEMPLATE =
+    '<div class="guest-container">' +
+      '<div class="spacing"><div class="pic"></div></div>' +
+       '<div class="name"></div>'+
+    '</div>';
+
 function addSizeToGoogleProfilePic(url) {
   if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
     return url + '?sz=150';
@@ -141,6 +155,16 @@ function deleteMessage(id) {
   if (div) {
     div.parentNode.removeChild(div);
   }
+}
+
+// deletes anonymous user at sign out
+function deleteUser() {
+  const user = firebase.auth().currentUser;
+  user.delete().then(function() {
+    console.log('deleted guest');
+  }).catch(function(error) {
+    console.error('Error deleting guest', error);
+  });
 }
 
 function createAndInsertMessage(id, timestamp) {
@@ -201,7 +225,7 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   }
   setTimeout(function() {
     div.classList.add('visible');
-    }, 1);
+  }, 1);
   messageListElement.scrollTop = messageListElement.scrollHeight;
   messageInputElement.focus();
 }
@@ -225,14 +249,15 @@ const userNameElement = document.getElementById('user-name');
 const signOutButtonElement = document.getElementById('sign-out');
 const signInSnackbarElement = document.getElementById('must-signin-snackbar');
 const dialog = document.getElementById('dialog');
-const displayNameFormElement = document.getElementById('name-form');
-const displayName = document.getElementById("userName");
+const displayName = document.getElementById('userName');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
+const guestListElement = document.getElementById('guests');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
-  dialog.showModal();
   firebase.auth().signOut();
+  deleteUser();
+  dialog.showModal();
 });
 
 anonymousSignInElement.addEventListener('click', function() {

@@ -59,7 +59,10 @@ async function verifyURLStructure(url) {
     document.getElementById('linkError').style.display = 'block';
     document.getElementById('videoError').style.display = 'none';
   } else if (document.getElementById('ytplayer') != null) {
-    await getVideoData(document.getElementById('linkArea').value.substring(32));
+    const urlQuery = url.substring(url.indexOf('?'));
+    const videoParams = new URLSearchParams(urlQuery);
+    const videoParam = videoParams.get('v');
+    await getVideoData(videoParam);
     await getRoomQueue(roomParam);
   }
 }
@@ -149,7 +152,7 @@ async function getRoomQueue(roomid) {
               '" onclick="removeVideo(\'' + roomParam + '\',\'' +
               videosArray.docs[i].id + '\')">' +
               '<img src="../images/remove-from-queue.svg"/>' +'</button>' +
-              '<p>' + parseTime(queue[i].duration)+ '</p>' +
+              '<p class="duration">' + parseTime(queue[i].duration)+ '</p>' +
               '</div></div>';
           }
         }

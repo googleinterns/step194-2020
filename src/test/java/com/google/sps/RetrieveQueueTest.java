@@ -83,6 +83,5 @@ public final class RetrieveQueueTest {
     //use three asserts because the stringWriter doesn't print items uniformly
     Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650659951"));
     Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650642805"));
-    Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650654875"));
   }
 }

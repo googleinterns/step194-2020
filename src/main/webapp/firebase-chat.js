@@ -1,6 +1,4 @@
 /* eslint-disable */
-const config = firebaseConfig;
-firebase.initializeApp(config); // eslint-disable-line no-undef
 
 function anonymousSignIn() {
   firebase.auth().signInAnonymously();

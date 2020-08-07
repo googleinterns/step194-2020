@@ -37,16 +37,16 @@ function updateQueue() {
   docIds = [];
   queueDataRef.orderBy('requestTime', 'asc').get()
       .then(function(querySnapshot) {
-    querySnapshot.forEach(function(doc) {
-      const queueData = doc.data();
-      docIds.push(doc.id);
-      videoIds.push(queueData.videoID);
-      const thumbnailString = queueData.bigThumbnailURL;
-      const thumbnailURL = thumbnailString.substring(1,
-          thumbnailString.length - 1);
-      thumbnails.push(thumbnailURL);
-    });
-  })
+        querySnapshot.forEach(function(doc) {
+          const queueData = doc.data();
+          docIds.push(doc.id);
+          videoIds.push(queueData.videoID);
+          const thumbnailString = queueData.bigThumbnailURL;
+          const thumbnailURL = thumbnailString.substring(1,
+              thumbnailString.length - 1);
+          thumbnails.push(thumbnailURL);
+        });
+      })
       .catch(function(error) {
         console.log('Error getting documents: ', error);
       });

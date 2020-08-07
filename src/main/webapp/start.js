@@ -17,12 +17,12 @@ async function startRoom() {
                 videoSpeed: 1,
                 videoId: '',
                 timestamp: 0,
-            }).then(function() {
-              console.log('Playback successfully written!');
-            }).catch(function(error) {
-              console.error('Error writing Playback: ', error);
-            });
-        window.location.href = 'lounge.html/?room_id=' + docRef.id;
+              }).then(function() {
+                console.log('Playback successfully written!');
+              }).catch(function(error) {
+                console.error('Error writing Playback: ', error);
+              });
+          window.location.href = 'lounge.html/?room_id=' + docRef.id;
         });
     startButtonCount++;
   }

@@ -20,7 +20,6 @@ const VIDEO_QUEUE = ['y0U4sD3_lX4', 'VYOjWnS4cMY', 'F1B9Fk_SgI0'];
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
 
-firebase.initializeApp(firebaseConfig); // eslint-disable-line no-undef
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
 const docRef = firestore.doc('CurrentVideo/PlaybackData');

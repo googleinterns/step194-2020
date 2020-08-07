@@ -1,4 +1,4 @@
-db = firebase.firestore(app); // eslint-disable-line no-undef
+db = firebase.firestore(); // eslint-disable-line no-undef
 let startButtonCount = 0;
 /* exported startRoom */
 // Takes the user to the lounge page when the start button is pressed

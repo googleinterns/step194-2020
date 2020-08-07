@@ -18,7 +18,6 @@ import static org.mockito.Mockito.*;
 
 import com.google.step.YTLounge.servlets.RetrieveQueue;
 import java.io.*;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;

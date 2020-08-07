@@ -14,9 +14,10 @@
 
 package com.google.sps;
 
+import static org.mockito.Mockito.*;
+
 import com.google.step.YTLounge.servlets.SingleVideoSearch;
 import java.io.*;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
@@ -24,9 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.mockito.Mockito.*;
-import org.mockito.Mock;
-import org.mockito.InjectMocks;
 
 /** */
 @RunWith(JUnit4.class)
@@ -66,7 +64,8 @@ public final class SingleVideoSearchTest {
     servlet.doGet(request, response);
     Assert.assertTrue(stringWriter.toString().contains("\"resultsPerPage\":0,\"totalResults\":0"));
   }
-    @Test
+
+  @Test
   public void testNoRoom() throws Exception {
     when(request.getParameter("room_id")).thenReturn("");
     when(request.getParameter("id")).thenReturn("JeUFrZtKkn8");

@@ -14,6 +14,8 @@
 
 package com.google.sps;
 
+import static org.mockito.Mockito.*;
+
 import com.google.step.YTLounge.servlets.RetrieveQueue;
 import java.io.*;
 import javax.servlet.http.HttpServlet;
@@ -24,9 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.mockito.Mockito.*;
-import org.mockito.Mock;
-import org.mockito.InjectMocks;
 
 /** */
 @RunWith(JUnit4.class)
@@ -75,12 +74,12 @@ public final class RetrieveQueueTest {
 
   @Test
   public void testGetMultipleVideos() throws Exception {
-      when(request.getParameter("room_id")).thenReturn("testMultipleVideos");
+    when(request.getParameter("room_id")).thenReturn("testMultipleVideos");
     StringWriter stringWriter = new StringWriter();
     PrintWriter writer = new PrintWriter(stringWriter);
     when(response.getWriter()).thenReturn(writer);
     servlet.doGet(request, response);
-    //use three asserts because the stringWriter doesn't print items uniformly
+    // use two asserts because the stringWriter doesn't print items uniformly
     Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650659951"));
     Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650642805"));
   }

@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <link href="https://fonts.googleapis.com/css?family=Oswald&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-auth.js"></script>
+    <script src="config.js"></script>
   </head>
 
   <body>
@@ -23,8 +29,9 @@
         <h3> Watch YouTube in a new way with your friends.</h3> 
         <p> YouTube Lounge allows you and your party to watch Youtube videos online together. The lounge provides users with 
             synchronized video playback, a chat box, and a queue to add you favorite YouTube content and keep the lounge going.</p>
-        <button class="startLounge"> Create Your Lounge! </button>
+        <button class="startLounge" onclick="startRoom()"> Create Your Lounge! </button>
     </div>
     </div>
+    <script src="start.js"></script>
   </body>
 </html>

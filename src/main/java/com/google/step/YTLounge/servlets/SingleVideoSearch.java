@@ -4,9 +4,11 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -86,6 +88,7 @@ public class SingleVideoSearch extends HttpServlet {
       extractVideo(jsonObject.getAsJsonArray("items"), videoID, roomID);
       response.getWriter().println(gson.toJson(videoResponse));
     } catch (Exception e) {
+      e.printStackTrace();
       response.getWriter().println(gson.toJson("error: exception"));
     }
   }
@@ -102,10 +105,12 @@ public class SingleVideoSearch extends HttpServlet {
       System.out.println("bad firestore authorization");
     }
     Map<String, Object> videoData = new HashMap<>();
-    System.out.println("Added: " + db.collection("rooms")
-        .document(roomID)
-        .collection("queue")
-        .add(getVideoInformation(items, videoData, videoID)).get().getId()); // add new video
+    ApiFuture<DocumentReference> newVideo =
+        db.collection("rooms")
+            .document(roomID)
+            .collection("queue")
+            .add(getVideoInformation(items, videoData, videoID)); // add new video
+    System.out.println("Added new video with ID: " + newVideo.get().getId());
     db.close();
   }
 
@@ -169,12 +174,15 @@ public class SingleVideoSearch extends HttpServlet {
       seconds += (hours * 3600);
       shortenedTime = shortenedTime.substring(shortenedTime.indexOf("H") + 1);
     }
-    minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
-    seconds += (minutes * 60);
-    shortenedTime =
-        shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
-    seconds += Integer.parseInt(shortenedTime);
-
+    if (shortenedTime.contains("M")) {
+      minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
+      seconds += (minutes * 60);
+      shortenedTime =
+          shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
+    }
+    if (shortenedTime.contains("S")) {
+      seconds += Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("S")));
+    }
     return seconds;
   }
 

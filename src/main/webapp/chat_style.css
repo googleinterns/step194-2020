@@ -41,6 +41,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 #message-filler {
   flex-grow: 1;
@@ -53,18 +54,13 @@
   margin-top: 10px;
   border-top: 1px solid #f3f3f3;
   padding-top: 10px;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
-}
-.message-container.visible {
-  opacity: 1;
 }
 .message-container .pic {
   background-image: url('/images/profile_placeholder.png');
   background-repeat: no-repeat;
-  width: 30px;
-  height: 30px;
-  background-size: 30px;
+  width: 35px;
+  height: 35px;
+  background-size: 35px;
   border-radius: 20px;
 }
 .message-container .spacing {
@@ -74,7 +70,7 @@
 .message-container .message {
   display: table-cell;
   width: calc(100% - 40px);
-  padding: 5px 0 5px 10px;
+  padding: 8px 0 5px 10px;
 }
 .message-container .name {
   display: inline-block;
@@ -137,6 +133,7 @@
   color:white;
 }
 
+/* Sign-in display box */
 #dialog{
     width:600px;
     text-align: center;
@@ -180,4 +177,44 @@
   border: 1px solid orange;
   border-radius: 50%;
   background-color: white;
+}
+
+
+/* Guest List */
+#guests {
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-left: 5px;
+  height: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.guest-container:first-of-type {
+  margin-top:15px;
+}
+.guest-container {
+  display: block;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.guest-container .pic {
+  background-repeat: no-repeat;
+  width: 45px;
+  height: 45px;
+  background-size: 45px;
+  border-radius: 20px;
+}
+.guest-container .spacing {
+  display: table-cell;
+  vertical-align: top;
+}
+.guest-container .name {
+  display: table-cell;
+  font-size: 16px;
+  font-weight: bold;
+  width: calc(100% - 40px);
+  padding: 15px 0 5px 10px;
 }

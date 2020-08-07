@@ -16,10 +16,14 @@
 
 #messages-card-container {
   padding-bottom: 0;
+  position: absolute;
+  bottom: 0px;
+
 }
 #messages-card {
   background-color: #111;
   margin-top: 15px;
+  bottom:0px;
 }
 .mdl-grid {
   max-width: 1024px;

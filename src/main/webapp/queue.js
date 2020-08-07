@@ -1,7 +1,4 @@
-// Initializes resources for reading/writing to Firestore
-const app =
-    firebase.initializeApp(config); // eslint-disable-line no-undef
-db = firebase.firestore(app); // eslint-disable-line no-undef
+db = firebase.firestore(); // eslint-disable-line no-undef
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const roomParam = urlParams.get('room_id');

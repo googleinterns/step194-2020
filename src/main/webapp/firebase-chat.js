@@ -77,6 +77,7 @@ function onMessageFormSubmit(e) {
   }
 }
 
+
 // Triggers when the auth state change for
 // instance when the user signs-in or signs-out.
 function authStateObserver(user) {
@@ -99,7 +100,6 @@ function authStateObserver(user) {
     'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
     div.querySelector('.name').textContent = userName;
     guestListElement.appendChild(div);
-
     dialog.close();
   } else {
     userNameElement.setAttribute('hidden', 'true');
@@ -109,6 +109,12 @@ function authStateObserver(user) {
   }
 }
 
+function addSizeToGoogleProfilePic(url) {
+  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
+    return url + '?sz=150';
+  }
+  return url;
+}
 
 function checkSignedInWithMessage() {
   if (isUserSignedIn()) {
@@ -143,12 +149,6 @@ const GUEST_TEMPLATE =
        '<div class="name"></div>'+
     '</div>';
 
-function addSizeToGoogleProfilePic(url) {
-  if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
-    return url + '?sz=150';
-  }
-  return url;
-}
 
 function deleteMessage(id) {
   const div = document.getElementById(id);
@@ -204,7 +204,6 @@ function createAndInsertMessage(id, timestamp) {
 function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   const div =
   document.getElementById(id) || createAndInsertMessage(id, timestamp);
-
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage =
     'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
@@ -257,12 +256,11 @@ messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
   deleteUser();
-  dialog.showModal();
 });
 
-anonymousSignInElement.addEventListener('click', function() {
+anonymousSignInElement.addEventListener('click', function(e) {
+  e.preventDefault();
   anonymousSignIn();
-  dialog.close();
 });
 
 firebase.auth().onAuthStateChanged((firebaseUser) => {

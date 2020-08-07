@@ -108,18 +108,3 @@ border-bottom: none;
     font-size:25px;
 }
 
-.guest {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 0.5%;
-}
-
-.username {
-  padding-left: 5%;
-}
-
-.userPic {
-  width: 50px;
-  height: auto;
-}

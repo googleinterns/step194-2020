@@ -201,6 +201,7 @@
 }
 
 .guest-container .pic {
+  background-image: url('/images/profile_placeholder.png');
   background-repeat: no-repeat;
   width: 45px;
   height: 45px;

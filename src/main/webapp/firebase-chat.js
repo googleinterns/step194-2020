@@ -1,3 +1,4 @@
+/* eslint-disable */
 const config = firebaseConfig;
 firebase.initializeApp(config); // eslint-disable-line no-undef
 
@@ -87,7 +88,7 @@ function authStateObserver(user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
 
-    userPicElement.style.backgroundImage = 
+    userPicElement.style.backgroundImage =
     'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
 

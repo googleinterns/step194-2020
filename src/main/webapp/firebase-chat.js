@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 function anonymousSignIn() {
   firebase.auth().signInAnonymously();
 }

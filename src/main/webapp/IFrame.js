@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-let videoUpdating; // is video currently updating to match Firestore info? 
+let videoUpdating; // is video currently updating to match Firestore info?
 let autoUpdate; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
 const thumbnail = document.getElementById('thumbnailDisplay');
@@ -23,8 +23,10 @@ const firestore = firebase.firestore(); // eslint-disable-line no-undef
 const urlQueryString = window.location.search;
 const params = new URLSearchParams(urlQueryString);
 const roomId = params.get('room_id');
-const vidDataRef = firestore.collection('rooms').doc(roomId).collection('CurrentVideo').doc('PlaybackData');
-const queueDataRef = firestore.collection('rooms').doc(roomId).collection('queue');
+const vidDataRef = firestore.collection('rooms').doc(roomId)
+    .collection('CurrentVideo').doc('PlaybackData');
+const queueDataRef = firestore.collection('rooms').doc(roomId)
+    .collection('queue');
 
 let videoIds;
 let thumbnails;
@@ -33,19 +35,21 @@ function updateQueue() {
   videoIds = [];
   thumbnails = [];
   docIds = [];
-  queueDataRef.orderBy('requestTime', 'asc').get().then(function(querySnapshot) {
+  queueDataRef.orderBy('requestTime', 'asc').get()
+      .then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
       const queueData = doc.data();
       docIds.push(doc.id);
       videoIds.push(queueData.videoID);
       const thumbnailString = queueData.bigThumbnailURL;
-      const thumbnailURL = thumbnailString.substring(1, thumbnailString.length - 1);
-      thumbnails.push(thumbnailURL); 
+      const thumbnailURL = thumbnailString.substring(1,
+          thumbnailString.length - 1);
+      thumbnails.push(thumbnailURL);
     });
   })
-  .catch(function(error) {
-    console.log("Error getting documents: ", error);
-  });
+      .catch(function(error) {
+        console.log('Error getting documents: ', error);
+      });
 }
 updateQueue();
 queueDataRef.onSnapshot(updateQueue);
@@ -75,7 +79,7 @@ function getFirstVidFromQueue() {
   } else {
     const firstVid = videoIds[0];
     const firstVidDocId = docIds[0];
-    updateVidPlaying(firstVid); 
+    updateVidPlaying(firstVid);
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
@@ -126,8 +130,8 @@ function switchDisplay() {
   }
 
   if (thumbnail.style.display === 'none') {
-    if (thumbnails.length > 0) thumbnail.src = thumbnails[0]; 
-    else thumbnail.src = '/images/LoungeLogo.png'
+    if (thumbnails.length > 0) thumbnail.src = thumbnails[0];
+    else thumbnail.src = '/images/LoungeLogo.png';
     thumbnail.style.display = 'block';
   } else {
     thumbnail.style.display = 'none';
@@ -197,7 +201,7 @@ function waitForOthers(vidData) {
 
 // return true if player time is within 5 seconds of Firestore time
 function timesInRange(firestoreVidTime) {
-  return Math.abs(player.getCurrentTime() - firestoreVidTime) < 
+  return Math.abs(player.getCurrentTime() - firestoreVidTime) <
       SYNC_WINDOW * player.getPlaybackRate();
 }
 
@@ -341,4 +345,4 @@ window.onbeforeunload = function() {
   if (!vidOver) removeOneViewer();
   alert('Sync ended, refresh to continue');
   return 'end of viewing';
-}
+};

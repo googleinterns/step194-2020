@@ -9,7 +9,20 @@ async function startRoom() {
       elapsedTime: '0',
     })
         .then(function(docRef) {
-          window.location.href = 'lounge.html/?room_id=' + docRef.id;
+          db.collection('rooms').doc(docRef.id)
+            .collection('CurrentVideo')
+            .doc('PlaybackData').set({
+              numPeopleWatching: 0,
+              isPlaying: false,
+              videoSpeed: 1,
+              videoId: '',
+              timestamp: 0,
+          }).then(function() {
+            console.log("Playback successfully written!");
+          }).catch(function(error) {
+            console.error("Error writing Playback: ", error);
+          });
+        window.location.href = 'lounge.html/?room_id=' + docRef.id;
         });
     startButtonCount++;
   }

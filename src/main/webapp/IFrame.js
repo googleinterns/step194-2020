@@ -193,7 +193,7 @@ function alignWithFirestore() {
 // everyone is ready.
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
-    vidOver = false; 
+    vidOver = false;
     // TODO: Change vidOver to change only once videoo starts
     resetPlaybackInfo();
     setTimeout(getCurrentVideo, 1000);

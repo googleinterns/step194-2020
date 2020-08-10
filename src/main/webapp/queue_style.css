@@ -1,10 +1,70 @@
-#queue-panel {
-    margin-top: 7%;
+.mdl-card {
+  min-height: 0;
+  background: linear-gradient(black);
+  justify-content: space-between;
+}
+
+#queue-card-container {
+    padding-bottom: 0;
+    background-color: #111;
+}
+
+#queue-card {
+    background-color: #111;
+    margin-top: 15px;
+    bottom: 0px;
+}
+
+#bigQueueContainer {
+    background-color: #111;
+}
+
+#videoContainer {
+    overflow-y: auto;
+    margin-bottom: 10px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#video-form {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    float: left;
+}
+
+#video-form .mdl-textfield {
+    width: 100%;
+}
+
+#video-form .mdl-textfield__input {
+    border-bottom: 1px solid rgba(158, 158, 158, .4);
+}
+
+#video-form .mdl-textfield__input:focus + label {
+    color: orange;
+}
+
+#video-form.mdl-textfield__input + label {
+    color: rgba(158, 158, 158, .4);
+}
+
+#message-form .mdl-textfield__label {
+    color: rgba(158, 158, 158, .4);
+}
+
+#video-form button {
+    width: 40px;
+    height: 40px;
+    margin: 15px 0 0 10px;
+    background: orange;
 }
 
 .queueVideo {
     display: flex;
     flex-direction: row;
+    /* padding-top: 1%; */
     margin: 1.5%;
     padding: 1%;
     max-height: 150px;
@@ -38,39 +98,9 @@
 
 .duration {
     color: white;
-}
-
-#linkArea {
-    display: inline-block;
-    width: 100%;
-    left: 0px;
-    position: absolute;
-    bottom: 0px;
-    background:var(--co-nr3wg, #414141);
+    background: var(--co-nr3wg, #414141);
     margin: auto;
     font: 400 16px/25.2px Roboto;
-    padding: 10px 16px 16px 43px;
-    color:var(--co-text-light, #FFFFFF);
-    letter-spacing: 0.1px;
-}
-
-#queueBtn {
-    background-color: Transparent;
-    background-repeat:no-repeat;
-    border: none;
-    cursor:pointer;
-    overflow: hidden;
-    outline:none;
-    display:block;
-    font-size: 25px;
-    height:70px;
-    width:70px;
-    right: 5px;
-    position:absolute;
-    opacity:1;
-    bottom:0;
-    margin:auto;
-    z-index:10;
 }
 
 .removeVideoBtn {
@@ -80,13 +110,7 @@
     cursor: pointer;
     overflow: hidden;
     outline: none;
-    position: absolute;
     margin: auto;
-}
-
-#removeFromQueueIMG {
-    height: 40px;
-    width: 40px;
 }
 
 #linkError {

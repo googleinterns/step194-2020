@@ -291,7 +291,6 @@ function onPlayerStateChange() {
       case 0: // Ended
         stopUpdating = true;
         vidOver = true;
-        clearInterval(pauseInterval);
         switchDisplay();
         removeOneViewer();
     }

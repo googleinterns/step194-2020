@@ -62,6 +62,7 @@ function getCurrentVideo() {
         player.loadVideoById({videoId: vidData.videoId});
         switchDisplay();
         addOneViewer();
+        vidOver = false;
         stopUpdating = false;
       } else { // No video is currently playing
         getFirstVidFromQueue();
@@ -83,6 +84,7 @@ function getFirstVidFromQueue() {
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
+    vidOver = false;
     stopUpdating = false;
     queueDataRef.doc(firstVidDocId).delete();
   }
@@ -193,7 +195,6 @@ function alignWithFirestore() {
 // everyone is ready.
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
-    vidOver = false;
     resetPlaybackInfo();
     setTimeout(getCurrentVideo, 1000);
   }
@@ -236,12 +237,25 @@ function updateInfo(goal) {
       console.log(goal + ' request sent');
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
-        if (!stopUpdating && !aboutToEnd()) updateInfo();
+        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo();
       }, SYNC_WINDOW*1000*0.66);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
     });
   }
+}
+
+// keeps firestore updated on pause
+let lastTime;
+let pauseInterval;
+function setPauseInterval() {
+  lastTime = player.getCurrentTime();
+  pauseInterval = setInterval(function() {
+    if (player.getCurrentTime() != lastTime) {
+      lastTime = player.getCurrentTime();
+      updateInfo('Update on Pause Seek');
+    }
+  }, 1000);
 }
 
 let pauseTimeout; // Differentiates pause from seek
@@ -253,6 +267,7 @@ function clearTimeouts() {
   clearTimeout(pauseTimeout);
   clearTimeout(bufferTimeout);
   clearTimeout(autoUpdate);
+  clearInterval(pauseInterval);
 }
 
 function onPlayerStateChange() {
@@ -266,6 +281,7 @@ function onPlayerStateChange() {
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
           pauseTimeout = setTimeout(updateInfo, 100, 'pause');
+          setPauseInterval();
         }
         break;
       case 3: // Buffering
@@ -300,8 +316,10 @@ function catchUserUp() {
       console.log('there was no doc to read!');
     }
   }).then(function() {
-    autoUpdate = setTimeout(updateInfo,
-        SYNC_WINDOW*1000*0.75);
+    if (isVideoPlaying()) {
+      autoUpdate = setTimeout(updateInfo,
+          SYNC_WINDOW*1000*0.75);
+    }
   });
 }
 
@@ -335,8 +353,10 @@ function getRealtimeUpdates() {
       if (vidOver) waitForOthers(vidData);
     }
     videoUpdating = false;
-    autoUpdate = setTimeout(updateInfo,
-        SYNC_WINDOW*1000*0.75);
+    if (isVideoPlaying()) {
+      autoUpdate = setTimeout(updateInfo,
+          SYNC_WINDOW*1000*0.75);
+    }
   });
 }
 

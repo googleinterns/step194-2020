@@ -43,8 +43,6 @@ function saveMessage(messageText) {
     text: messageText,
     profilePicUrl: getProfilePicUrl(),
     timestamp: getTimestamp(),
-  }).then(function() {
-    console.log('saved message');
   }).catch(function(error) {
     console.error('Error writing new message to database', error);
   });
@@ -267,6 +265,12 @@ anonymousSignInElement.addEventListener('click', function(e) {
 firebase.auth().onAuthStateChanged((firebaseUser) => {
   console.log(firebaseUser);
 });
+
+// when window closes or is refreshed
+window.addEventListener("beforeunload", function(e){
+  firebase.auth().signOut();
+  deleteUser();
+}, false);
 
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);

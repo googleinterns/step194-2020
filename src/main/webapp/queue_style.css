@@ -46,11 +46,7 @@
     color: orange;
 }
 
-#video-form.mdl-textfield__input + label {
-    color: rgba(158, 158, 158, .4);
-}
-
-#message-form .mdl-textfield__label {
+#video-form .mdl-textfield__label {
     color: rgba(158, 158, 158, .4);
 }
 

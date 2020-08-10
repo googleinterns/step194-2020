@@ -11,17 +11,6 @@ db.collection('rooms') // eslint-disable-line no-undef
     .doc(roomParameters)
     .collection('queue')
     .onSnapshot(function(snapshot) {
-      snapshot.docChanges().forEach(function(change) {
-        if (change.type === 'added') {
-          console.log('added: ', change.doc.data());
-        }
-        if (change.type === 'modified') {
-          console.log('modified: ', change.doc.data());
-        }
-        if (change.type === 'removed') {
-          console.log('removed: ', change.doc.data());
-        }
-      });
       getRoomQueue(roomParameters);
     });
 
@@ -35,8 +24,6 @@ async function validateRoom() {
         await db.collection('rooms') // eslint-disable-line no-undef
             .doc(roomParameters)
             .get();
-    console.log('verifyRoom: ' + verifyRoom);
-    console.log('exists: ' + verifyRoom.exists);
     if (!verifyRoom.exists) { // verify room exists in firestore
       window.location.href = '../error.html';
     }
@@ -77,11 +64,9 @@ async function getVideoData(id) {
       .then((response) => response.json())
       .then((video) => {
         if (video.error == null) { // video was found, add to firestore
-          console.log('VIDEO FOUND');
           document.getElementById('linkError').style.display = 'none';
           document.getElementById('videoError').style.display = 'none';
         } else if (video.items.length == 0) { // video not found, error
-          console.log('NO VIDEO FOUND');
           document.getElementById('linkError').style.display = 'none';
           document.getElementById('videoError').style.display = 'block';
         }
@@ -123,6 +108,7 @@ async function removeVideo(roomid, vidRef) {
 async function getRoomQueue(roomid) {
   if (roomid == '') {
     console.log('NO ROOM ID PROVIDED');
+    return;
   }
   const videosArray = await db // eslint-disable-line no-undef
       .collection('rooms')
@@ -130,7 +116,6 @@ async function getRoomQueue(roomid) {
       .collection('queue')
       .orderBy('requestTime', 'asc')
       .get();
-  console.log('videosArray: ' + videosArray);
   fetch('/queueRefresh?room_id=' + roomid)
       .then((response) => response.json())
       .then((queue) => {

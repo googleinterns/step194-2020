@@ -41,7 +41,7 @@ function updateQueue() {
           const queueData = doc.data();
           docIds.push(doc.id);
           videoIds.push(queueData.videoID);
-          const thumbnailString = queueData.bigThumbnailURL;
+          const thumbnailString = queueData.thumbnailURL;
           const thumbnailURL = thumbnailString.substring(1,
               thumbnailString.length - 1);
           thumbnails.push(thumbnailURL);

@@ -68,13 +68,17 @@
     flex-direction: row;
     padding-top: 1%;
     max-height: 150px;
+    background: #414141;
+    border-radius: 3pt;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
 .videoThumbnail {
     height: 120px;
     width: auto;
     padding: 0.1%;
-    margin-right: 1%;
+    margin-right: 2%;
+    border-radius: 3pt;
 }
 
 .videoSubmit {
@@ -83,8 +87,13 @@
     padding: 0.25%;
 }
 
+.videoInfo {
+    padding-left: 0.75%;
+}
+
 .videoTitle {
     color: white;
+    margin: 0px 0px 4px;
 }
 
 .duration {

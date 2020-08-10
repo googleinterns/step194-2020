@@ -177,8 +177,7 @@ public class SingleVideoSearch extends HttpServlet {
     if (shortenedTime.contains("M")) {
       minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
       seconds += (minutes * 60);
-      shortenedTime =
-          shortenedTime.substring(shortenedTime.indexOf("M") + 1);
+      shortenedTime = shortenedTime.substring(shortenedTime.indexOf("M") + 1);
     }
     if (shortenedTime.contains("S")) {
       seconds += Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("S")));

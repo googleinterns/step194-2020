@@ -1,16 +1,13 @@
 package com.google.sps;
 
-import com.google.step.YTLounge.servlets.SingleVideoSearch;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.util.HashMap;
 import java.util.Map;
 
 /* A shell class that has basic functionality of video search without integration tools */
 public class MockSVS {
-  public MockSVS(){}
+  public MockSVS() {}
 
   public long parseDuration(String encodedTime) {
     String shortenedTime = encodedTime.substring(2);
@@ -25,8 +22,7 @@ public class MockSVS {
     if (shortenedTime.contains("M")) {
       minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
       seconds += (minutes * 60);
-      shortenedTime =
-          shortenedTime.substring(shortenedTime.indexOf("M") + 1);
+      shortenedTime = shortenedTime.substring(shortenedTime.indexOf("M") + 1);
     }
     if (shortenedTime.contains("S")) {
       seconds += Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("S")));

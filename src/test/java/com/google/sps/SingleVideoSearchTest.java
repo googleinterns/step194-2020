@@ -40,29 +40,31 @@ public final class SingleVideoSearchTest {
   private HttpServletResponse response;
   private Map<String, Object> vData;
   private Gson gson;
-  private String REAL_VIDEO = 
-      "{\"kind\":\"youtube#videoListResponse\",\"etag\":\"YTWhke-BMMIKtBHO_uDWyOtb-XM\","+
-      "\"items\":[{\"kind\":\"youtube#video\",\"etag\":\"NME3R8704XZ1NfYPNKrN4jj9aGs\","+
-      "\"id\":\"9IVO5Dsz1KI\",\"snippet\":{\"publishedAt\":\"2020-07-30T17:00:22Z\","+
-      "\"channelId\":\"UCFl7yKfcRcFmIUbKeCA-SJQ\",\"title\":\"FTC\",\"description\":\"NOT SONG\","+
-      "\"thumbnails\":{\"default\":{\"url\":\"https://i.ytimg.com/vi/9IVO5Dsz1KI/default.jpg\"," +
-      "\"width\": 120,\"height\": 90},\"medium\": {\"url\": " +
-      "\"https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg\",\"width\": 320,\"height\": 180}," +
-      "\"high\": {\"url\": \"https://i.ytimg.com/vi/9IVO5Dsz1KI/hqdefault.jpg\",\"width\": 480," +
-      "\"height\":360}},\"channelTitle\":\"Joji\",\"tags\":[\"joji\",\"88rising\",\"ballads 1\","+
-      "\"slow dancing in the dark\",\"run\",\"sanctuary\",\"in tongues\",\"music video\","+
-      "\"official video\",\"will he\",\"midsummer madness\",\"pretty boy\","+
-      "\"nectar\",\"gimme love\"],\"categoryId\":\"10\",\"liveBroadcastContent\":\"none\"," +
-      "\"localized\": {\"title\": \"FTC\",\"description\": \"NOT SONG\"}},\"contentDetails\": {" +
-      "\"duration\":\"PT1M52S\",\"dimension\":\"2d\",\"definition\":\"sd\",\"caption\":\"false\","+
-      "\"licensedContent\":false,\"contentRating\": {},\"projection\": \"rectangular\"}," +
-      "\"statistics\":{\"likeCount\":\"117647\",\"dislikeCount\":\"761\","+
-      "\"favoriteCount\":\"0\",\"commentCount\":\"8883\"}}],\"pageInfo\":{\"totalResults\":1,"+
-      "\"resultsPerPage\":1}}";
+  private String REAL_VIDEO =
+      "{\"kind\":\"youtube#videoListResponse\",\"etag\":\"YTWhke-BMMIKtBHO_uDWyOtb-XM\","
+          + "\"items\":[{\"kind\":\"youtube#video\",\"etag\":\"NME3R8704XZ1NfYPNKrN4jj9aGs\","
+          + "\"id\":\"9IVO5Dsz1KI\",\"snippet\":{\"publishedAt\":\"2020-07-30T17:00:22Z\",\"channelId\":\"UCFl7yKfcRcFmIUbKeCA-SJQ\",\"title\":\"FTC\",\"description\":\"NOT"
+          + " SONG\","
+          + "\"thumbnails\":{\"default\":{\"url\":\"https://i.ytimg.com/vi/9IVO5Dsz1KI/default.jpg\",\"width\":"
+          + " 120,\"height\": 90},\"medium\": {\"url\":"
+          + " \"https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg\",\"width\": 320,\"height\":"
+          + " 180},\"high\": {\"url\":"
+          + " \"https://i.ytimg.com/vi/9IVO5Dsz1KI/hqdefault.jpg\",\"width\":"
+          + " 480,\"height\":360}},\"channelTitle\":\"Joji\",\"tags\":[\"joji\",\"88rising\",\"ballads"
+          + " 1\",\"slow dancing in the dark\",\"run\",\"sanctuary\",\"in tongues\",\"music"
+          + " video\",\"official video\",\"will he\",\"midsummer madness\",\"pretty"
+          + " boy\",\"nectar\",\"gimme"
+          + " love\"],\"categoryId\":\"10\",\"liveBroadcastContent\":\"none\",\"localized\":"
+          + " {\"title\": \"FTC\",\"description\": \"NOT SONG\"}},\"contentDetails\": {"
+          + "\"duration\":\"PT1M52S\",\"dimension\":\"2d\",\"definition\":\"sd\",\"caption\":\"false\",\"licensedContent\":false,\"contentRating\":"
+          + " {},\"projection\": \"rectangular\"},"
+          + "\"statistics\":{\"likeCount\":\"117647\",\"dislikeCount\":\"761\","
+          + "\"favoriteCount\":\"0\",\"commentCount\":\"8883\"}}],\"pageInfo\":{\"totalResults\":1,"
+          + "\"resultsPerPage\":1}}";
   private final String REAL_ID = "9IVO5Dsz1KI";
-  private final String FAKE_VIDEO = 
-      "{\"kind\": \"youtube#videoListResponse\",\"etag\": \"ilEkUQSqfx69LTHRUUhEulatfBk\", " +
-      "\"items\": [], \"pageInfo\": {\"totalResults\": 0,\"resultsPerPage\": 0}}";
+  private final String FAKE_VIDEO =
+      "{\"kind\": \"youtube#videoListResponse\",\"etag\": \"ilEkUQSqfx69LTHRUUhEulatfBk\", "
+          + "\"items\": [], \"pageInfo\": {\"totalResults\": 0,\"resultsPerPage\": 0}}";
   private final String FAKE_ID = "1";
 
   @Before
@@ -113,23 +115,21 @@ public final class SingleVideoSearchTest {
   public void testRealVideo() throws Exception {
     JsonObject rObj = new JsonParser().parse(REAL_VIDEO).getAsJsonObject();
     JsonArray items = rObj.getAsJsonArray("items");
-    Map<String, Object> resultMap = 
-        search.getVideoInformation(items, vData, REAL_ID);
+    Map<String, Object> resultMap = search.getVideoInformation(items, vData, REAL_ID);
     Assert.assertTrue(resultMap.get("title").equals("\"FTC\""));
     Assert.assertTrue(
         resultMap
-        .get("thumbnailURL")
-        .equals("\"https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg\""));
+            .get("thumbnailURL")
+            .equals("\"https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg\""));
     Assert.assertTrue(resultMap.get("videoURL").equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
     Assert.assertTrue(resultMap.get("channelName").equals("\"Joji\""));
   }
 
   @Test
   public void testFakeVideo() throws Exception {
-      JsonObject rObj = new JsonParser().parse(FAKE_VIDEO).getAsJsonObject();
-      JsonArray items = rObj.getAsJsonArray("items");
-      Map<String, Object> result =
-          search.getVideoInformation(items, vData, FAKE_ID);
+    JsonObject rObj = new JsonParser().parse(FAKE_VIDEO).getAsJsonObject();
+    JsonArray items = rObj.getAsJsonArray("items");
+    Map<String, Object> result = search.getVideoInformation(items, vData, FAKE_ID);
     Assert.assertEquals(result, new HashMap<>());
   }
 }

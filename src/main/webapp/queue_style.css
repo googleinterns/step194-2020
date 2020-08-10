@@ -7,8 +7,6 @@
 #queue-card-container {
     padding-bottom: 0;
     background-color: #111;
-    /* position: absolute;
-    bottom: 0px; */
 }
 
 #queue-card {
@@ -24,7 +22,7 @@
 #videoContainer {
     overflow-y: auto;
     margin-bottom: 10px;
-    height: 100%;
+    height: 85vh;
     display: flex;
     flex-direction: column;
 }

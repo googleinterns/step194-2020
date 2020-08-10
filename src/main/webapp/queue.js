@@ -11,17 +11,6 @@ db.collection('rooms') // eslint-disable-line no-undef
     .doc(roomParameters)
     .collection('queue')
     .onSnapshot(function(snapshot) {
-    //   snapshot.docChanges().forEach(function(change) {
-    //     if (change.type === 'added') {
-    //       console.log('added: ', change.doc.data());
-    //     }
-    //     if (change.type === 'modified') {
-    //       console.log('modified: ', change.doc.data());
-    //     }
-    //     if (change.type === 'removed') {
-    //       console.log('removed: ', change.doc.data());
-    //     }
-    //   });
       getRoomQueue(roomParameters);
     });
 

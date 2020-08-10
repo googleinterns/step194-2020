@@ -41,7 +41,7 @@ function updateQueue() {
           const queueData = doc.data();
           docIds.push(doc.id);
           videoIds.push(queueData.videoID);
-          const thumbnailString = queueData.bigThumbnailURL;
+          const thumbnailString = queueData.thumbnailURL;
           const thumbnailURL = thumbnailString.substring(1,
               thumbnailString.length - 1);
           thumbnails.push(thumbnailURL);
@@ -62,7 +62,6 @@ function getCurrentVideo() {
         player.loadVideoById({videoId: vidData.videoId});
         switchDisplay();
         addOneViewer();
-        vidOver = false;
         stopUpdating = false;
       } else { // No video is currently playing
         getFirstVidFromQueue();
@@ -84,7 +83,6 @@ function getFirstVidFromQueue() {
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
-    vidOver = false;
     stopUpdating = false;
     queueDataRef.doc(firstVidDocId).delete();
   }
@@ -195,6 +193,7 @@ function alignWithFirestore() {
 // everyone is ready.
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
+    vidOver = false;
     resetPlaybackInfo();
     setTimeout(getCurrentVideo, 1000);
   }
@@ -362,7 +361,7 @@ function getRealtimeUpdates() {
 
 window.onbeforeunload = function() {
   clearTimeouts();
-  if (!vidOver) removeOneViewer();
+  if (!vidOver && thumbnail.style.display !== 'block') removeOneViewer();
   alert('Sync ended, refresh to continue');
   return 'end of viewing';
 };

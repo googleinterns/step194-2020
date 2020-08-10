@@ -22,6 +22,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
@@ -36,12 +38,40 @@ public final class SingleVideoSearchTest {
   private MockSVS search;
   private HttpServletRequest request;
   private HttpServletResponse response;
+  private Map<String, Object> vData;
+  private Gson gson;
+  private String REAL_VIDEO = 
+      "{\"kind\":\"youtube#videoListResponse\",\"etag\":\"YTWhke-BMMIKtBHO_uDWyOtb-XM\","+
+      "\"items\":[{\"kind\":\"youtube#video\",\"etag\":\"NME3R8704XZ1NfYPNKrN4jj9aGs\","+
+      "\"id\":\"9IVO5Dsz1KI\",\"snippet\":{\"publishedAt\":\"2020-07-30T17:00:22Z\","+
+      "\"channelId\":\"UCFl7yKfcRcFmIUbKeCA-SJQ\",\"title\":\"FTC\",\"description\":\"NOT SONG\","+
+      "\"thumbnails\":{\"default\":{\"url\":\"https://i.ytimg.com/vi/9IVO5Dsz1KI/default.jpg\"," +
+      "\"width\": 120,\"height\": 90},\"medium\": {\"url\": " +
+      "\"https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg\",\"width\": 320,\"height\": 180}," +
+      "\"high\": {\"url\": \"https://i.ytimg.com/vi/9IVO5Dsz1KI/hqdefault.jpg\",\"width\": 480," +
+      "\"height\":360}},\"channelTitle\":\"Joji\",\"tags\":[\"joji\",\"88rising\",\"ballads 1\","+
+      "\"slow dancing in the dark\",\"run\",\"sanctuary\",\"in tongues\",\"music video\","+
+      "\"official video\",\"will he\",\"midsummer madness\",\"pretty boy\","+
+      "\"nectar\",\"gimme love\"],\"categoryId\":\"10\",\"liveBroadcastContent\":\"none\"," +
+      "\"localized\": {\"title\": \"FTC\",\"description\": \"NOT SONG\"}},\"contentDetails\": {" +
+      "\"duration\":\"PT1M52S\",\"dimension\":\"2d\",\"definition\":\"sd\",\"caption\":\"false\","+
+      "\"licensedContent\":false,\"contentRating\": {},\"projection\": \"rectangular\"}," +
+      "\"statistics\":{\"likeCount\":\"117647\",\"dislikeCount\":\"761\","+
+      "\"favoriteCount\":\"0\",\"commentCount\":\"8883\"}}],\"pageInfo\":{\"totalResults\":1,"+
+      "\"resultsPerPage\":1}}";
+  private final String REAL_ID = "9IVO5Dsz1KI";
+  private final String FAKE_VIDEO = 
+      "{\"kind\": \"youtube#videoListResponse\",\"etag\": \"ilEkUQSqfx69LTHRUUhEulatfBk\", " +
+      "\"items\": [], \"pageInfo\": {\"totalResults\": 0,\"resultsPerPage\": 0}}";
+  private final String FAKE_ID = "1";
 
   @Before
   public void setUp() {
     search = new MockSVS();
     request = mock(HttpServletRequest.class);
     response = mock(HttpServletResponse.class);
+    vData = new HashMap<>();
+    gson = new Gson();
   }
 
   @Test
@@ -79,40 +109,27 @@ public final class SingleVideoSearchTest {
     Assert.assertEquals(search.parseDuration("PT2H31M9S"), 9069);
   }
 
-//   @Test
-//   public void testVideo() throws Exception {
-//     System.out.println(new File(".").getAbsoluteFile());
-//     when(request.getParameter("room_id")).thenReturn("testOneSearch");
-//     when(request.getParameter("id")).thenReturn("JeUFrZtKkn8");
-//     StringWriter stringWriter = new StringWriter();
-//     PrintWriter writer = new PrintWriter(stringWriter);
-//     when(response.getWriter()).thenReturn(writer);
+  @Test
+  public void testRealVideo() throws Exception {
+    JsonObject rObj = new JsonParser().parse(REAL_VIDEO).getAsJsonObject();
+    JsonArray items = rObj.getAsJsonArray("items");
+    Map<String, Object> resultMap = 
+        search.getVideoInformation(items, vData, REAL_ID);
+    Assert.assertTrue(resultMap.get("title").equals("\"FTC\""));
+    Assert.assertTrue(
+        resultMap
+        .get("thumbnailURL")
+        .equals("\"https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg\""));
+    Assert.assertTrue(resultMap.get("videoURL").equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
+    Assert.assertTrue(resultMap.get("channelName").equals("\"Joji\""));
+  }
 
-//     servlet.doGet(request, response);
-//     Assert.assertTrue(stringWriter.toString().contains("\"etag\":\"jWEsonyluP7Tb3eDB0m6tV_RQ5g\""));
-//   }
-
-//   @Test
-//   public void testFakeVideo() throws Exception {
-//     when(request.getParameter("room_id")).thenReturn("testOneSearch");
-//     when(request.getParameter("id")).thenReturn("1");
-//     StringWriter stringWriter = new StringWriter();
-//     PrintWriter writer = new PrintWriter(stringWriter);
-//     when(response.getWriter()).thenReturn(writer);
-
-//     servlet.doGet(request, response);
-//     Assert.assertTrue(stringWriter.toString().contains("\"resultsPerPage\":0,\"totalResults\":0"));
-//   }
-
-//   @Test
-//   public void testNoRoom() throws Exception {
-//     when(request.getParameter("room_id")).thenReturn("");
-//     when(request.getParameter("id")).thenReturn("JeUFrZtKkn8");
-//     StringWriter stringWriter = new StringWriter();
-//     PrintWriter writer = new PrintWriter(stringWriter);
-//     when(response.getWriter()).thenReturn(writer);
-
-//     servlet.doGet(request, response);
-//     Assert.assertTrue(stringWriter.toString().contains("error: no room found"));
-//   }
+  @Test
+  public void testFakeVideo() throws Exception {
+      JsonObject rObj = new JsonParser().parse(FAKE_VIDEO).getAsJsonObject();
+      JsonArray items = rObj.getAsJsonArray("items");
+      Map<String, Object> result =
+          search.getVideoInformation(items, vData, FAKE_ID);
+    Assert.assertEquals(result, new HashMap<>());
+  }
 }

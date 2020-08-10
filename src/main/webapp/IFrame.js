@@ -62,6 +62,7 @@ function getCurrentVideo() {
         player.loadVideoById({videoId: vidData.videoId});
         switchDisplay();
         addOneViewer();
+        vidOver = false;
         stopUpdating = false;
       } else { // No video is currently playing
         getFirstVidFromQueue();
@@ -83,6 +84,7 @@ function getFirstVidFromQueue() {
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
+    vidOver = false;
     stopUpdating = false;
     queueDataRef.doc(firstVidDocId).delete();
   }
@@ -193,7 +195,6 @@ function alignWithFirestore() {
 // everyone is ready.
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
-    vidOver = false;
     resetPlaybackInfo();
     setTimeout(getCurrentVideo, 1000);
   }

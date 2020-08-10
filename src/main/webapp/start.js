@@ -9,6 +9,9 @@ async function startRoom() {
       elapsedTime: '0',
     })
         .then(function(docRef) {
+          alert('Share this link with your friends!\n' +
+            'https://youtube-lounge.appspot.com/lounge.html/?room_id' 
+            + docRef.id);
           window.location.href = 'lounge.html/?room_id=' + docRef.id;
         });
     startButtonCount++;

@@ -129,12 +129,21 @@
              </div>
           </div>
           <div class = "mdl-tabs__panel" id = "queue-panel">
-            <div id="videoContainer"></div>
-            <div class="videoSubmit">
-                <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
-                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
-                    <img id="removeFromQueueIMG" src="../images/add-to-queue.svg"/>
-                </button>    
+            <div id="queue-card-container" class="mdl-cell mdl-cell--12-col">
+                <div id="queue-card" class="mdl-card mdl-cell mdl-cell--12-col">
+                    <div class="mdl-card__supporting-text mdl-color-text--white" id="bigQueueContainer">
+                        <div id="videoContainer"></div>
+                            <div id="video-form" >
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                        <input class="mdl-textfield__input" id="linkArea" type="text" autocomplete="off" spellcheck>
+                                        <label class="mdl-textfield__label" for="linkArea">Enter a YouTube video link...</label>
+                                    </div>
+                                    <button class="submitBtn" id="queueBtn" type="submit" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
+                                        <img id="removeFromQueueIMG" src="../images/add-to-queue.svg"/>
+                                    </button>    
+                            </div>
+                    </div>
+                </div>
             </div>
             <p id="linkError">Please submit a properly formatted YouTube video link.</p>
             <p id="videoError">There was an error trying to find your video. Please try again.</p>

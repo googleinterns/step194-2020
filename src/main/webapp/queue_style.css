@@ -64,7 +64,9 @@
 .queueVideo {
     display: flex;
     flex-direction: row;
-    padding-top: 1%;
+    /* padding-top: 1%; */
+    margin: 1.5%;
+    padding: 1%;
     max-height: 150px;
     background: #414141;
     border-radius: 3pt;
@@ -96,6 +98,19 @@
 
 .duration {
     color: white;
+    background: var(--co-nr3wg, #414141);
+    margin: auto;
+    font: 400 16px/25.2px Roboto;
+}
+
+.removeVideoBtn {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    margin: auto;
 }
 
 #linkError {

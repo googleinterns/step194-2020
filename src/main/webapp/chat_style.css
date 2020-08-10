@@ -16,8 +16,10 @@
 
 #messages-card-container {
   padding-bottom: 0;
+
 }
 #messages-card {
+  background-color: #111;
   margin-top: 15px;
 }
 .mdl-grid {
@@ -36,9 +38,8 @@
   padding-bottom: 0;
 }
 #messages {
-  overflow-y: auto;
   margin-bottom: 10px;
-  height: 100%;
+  height: 85vh;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -91,16 +92,34 @@
 #message-form .mdl-textfield {
   width: 100%;
 }
+
+#message-form .mdl-textfield__input{
+    border-bottom: 1px solid rgba(158,158,158,.4)
+}
+
+#message-form .mdl-textfield__input:focus +  label {
+  color: orange;
+}
+
+#message-form .mdl-textfield__label {
+  color: rgba(158,158,158,.4);
+}
+
 #message-form button {
   width: 100px;
   margin: 15px 0 0 10px;
+  background:orange;
 }
 .mdl-card {
   min-height: 0;
 }
 .mdl-card {
-  background: linear-gradient(white, #f9f9f9);
+  background: linear-gradient(black);
   justify-content: space-between;
+}
+
+#message-form button[disabled] {
+ background:rgba(158,158,158,.3);
 }
 
 #user-container {

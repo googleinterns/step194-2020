@@ -1,4 +1,7 @@
 /* eslint-disable */
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const roomParam = urlParams.get('room_id');
 
 function anonymousSignIn() {
   firebase.auth().signInAnonymously();
@@ -35,7 +38,7 @@ function isUserSignedIn() {
 // Saves a new message to Cloud Firestore database.
 // Add a new message entry to the database.
 function saveMessage(messageText) {
-  return firebase.firestore().collection('messages').add({
+  return firebase.firestore().collection('rooms').doc(roomParam).collection('messages').add({
     name: getUserName(),
     text: messageText,
     profilePicUrl: getProfilePicUrl(),
@@ -50,7 +53,7 @@ function saveMessage(messageText) {
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   const query =
-  firebase.firestore().collection('messages').orderBy('timestamp', 'desc');
+  firebase.firestore().collection('rooms').doc(roomParam).collection('messages').orderBy('timestamp', 'desc');
   query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {

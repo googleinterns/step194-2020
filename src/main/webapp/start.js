@@ -23,8 +23,8 @@ async function startRoom() {
                 console.error('Error writing Playback: ', error);
               });
           alert('Share this link with your friends!\n' +
-            'https://youtube-lounge.appspot.com/lounge.html/?room_id' 
-            + docRef.id);
+            'https://youtube-lounge.appspot.com/lounge.html/?room_id' +
+            docRef.id);
           window.location.href = 'lounge.html/?room_id=' + docRef.id;
         });
     startButtonCount++;

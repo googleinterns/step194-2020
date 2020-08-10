@@ -194,7 +194,6 @@ function alignWithFirestore() {
 function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
-    // TODO: Change vidOver to change only once video starts
     resetPlaybackInfo();
     setTimeout(getCurrentVideo, 1000);
   }
@@ -362,7 +361,7 @@ function getRealtimeUpdates() {
 
 window.onbeforeunload = function() {
   clearTimeouts();
-  if (!vidOver) removeOneViewer();
+  if (!vidOver && thumbnail.style.display !== 'block') removeOneViewer();
   alert('Sync ended, refresh to continue');
   return 'end of viewing';
 };

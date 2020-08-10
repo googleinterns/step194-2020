@@ -350,7 +350,7 @@ function getRealtimeUpdates() {
       if (vidOver) waitForOthers(vidData);
     }
     videoUpdating = false;
-    if(isVideoPlaying()) {
+    if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
           SYNC_WINDOW*1000*0.75);
     }

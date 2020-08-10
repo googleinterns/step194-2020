@@ -134,6 +134,21 @@ function GuestList(user){
   }
 }
 
+function LoadGuests() {
+  const query =
+  firebase.firestore().collection('rooms').doc(roomParam).collection('guests');
+  query.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+     if (change.type === 'added') {
+          console.log('added: ', change.doc.data());
+        }
+    if (change.type === 'removed') {
+          console.log('removed: ', change.doc.data());
+        }
+    });
+  });
+}
+
 function addSizeToGoogleProfilePic(url) {
   if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
     return url + '?sz=150';

@@ -136,7 +136,7 @@ public class SingleVideoSearch extends HttpServlet {
       }
       String bigThumbnailURL = null;
       if (thumbnails.getAsJsonObject("maxres") != null) {
-        bigThumbnailURL = 
+        bigThumbnailURL =
             snippet.getAsJsonObject("thumbnails").getAsJsonObject("maxres").get("url").toString();
       }
       String title = snippet.get("title").toString();

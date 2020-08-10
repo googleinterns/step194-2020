@@ -39,7 +39,7 @@
 }
 #messages {
   margin-bottom: 10px;
-  height: 85vh;
+  height: 81vh;
   display: flex;
   flex-direction: column;
   overflow-y: auto;

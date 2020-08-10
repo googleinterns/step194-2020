@@ -43,8 +43,6 @@ function saveMessage(messageText) {
     text: messageText,
     profilePicUrl: getProfilePicUrl(),
     timestamp: getTimestamp(),
-  }).then(function() {
-    console.log('saved message');
   }).catch(function(error) {
     console.error('Error writing new message to database', error);
   });

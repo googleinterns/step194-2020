@@ -9,6 +9,7 @@ function anonymousSignIn() {
 
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
+  firebase.auth().onAuthStateChanged(GuestList);
 }
 
 function getProfilePicUrl() {
@@ -43,8 +44,6 @@ function saveMessage(messageText) {
     text: messageText,
     profilePicUrl: getProfilePicUrl(),
     timestamp: getTimestamp(),
-  }).then(function() {
-    console.log('saved message');
   }).catch(function(error) {
     console.error('Error writing new message to database', error);
   });
@@ -82,9 +81,6 @@ function onMessageFormSubmit(e) {
 // Triggers when the auth state change for
 // instance when the user signs-in or signs-out.
 function authStateObserver(user) {
-  const container = document.createElement('div');
-  container.innerHTML = GUEST_TEMPLATE;
-  const div = container.firstChild;
   if (user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
@@ -96,17 +92,45 @@ function authStateObserver(user) {
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
-
-    div.querySelector('.pic').style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
-    div.querySelector('.name').textContent = userName;
-    guestListElement.appendChild(div);
     dialog.close();
   } else {
     userNameElement.setAttribute('hidden', 'true');
     userPicElement.setAttribute('hidden', 'true');
     signOutButtonElement.setAttribute('hidden', 'true');
     dialog.showModal();
+  }
+}
+
+function GuestList(user){
+  const container = document.createElement('div');
+  container.innerHTML = GUEST_TEMPLATE;
+  const div = container.firstChild;
+  const profilePicUrl = getProfilePicUrl();
+  const userName = getUserName();
+
+  if (user) {
+    return firebase.firestore().collection('rooms').doc(roomParam).collection('guests').add({
+    name: getUserName(),
+    profilePicUrl: getProfilePicUrl(),
+    }).then(function() {
+    div.querySelector('.pic').style.backgroundImage =
+    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+    div.querySelector('.name').textContent = userName;
+    guestListElement.appendChild(div);
+    }).catch(function(error) {
+    console.error('Error adding guest to database', error);
+    });
+  }
+  else{
+    const query =
+    firebase.firestore().collection('rooms').doc(roomParam).collection('guests');
+    query.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        deleteMessage(change.doc.id);
+      } 
+     });
+    });
   }
 }
 
@@ -161,9 +185,7 @@ function deleteMessage(id) {
 // deletes anonymous user at sign out
 function deleteUser() {
   const user = firebase.auth().currentUser;
-  user.delete().then(function() {
-    console.log('deleted guest');
-  }).catch(function(error) {
+  user.delete().catch(function(error) {
     console.error('Error deleting guest', error);
   });
 }
@@ -263,6 +285,12 @@ anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
 });
+
+// when window closes or is refreshed
+window.addEventListener("beforeunload", function(e){
+  firebase.auth().signOut();
+  deleteUser();
+}, false);
 
 firebase.auth().onAuthStateChanged((firebaseUser) => {
   console.log(firebaseUser);

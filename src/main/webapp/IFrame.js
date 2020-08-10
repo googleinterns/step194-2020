@@ -315,8 +315,10 @@ function catchUserUp() {
       console.log('there was no doc to read!');
     }
   }).then(function() {
-    autoUpdate = setTimeout(updateInfo,
-        SYNC_WINDOW*1000*0.75);
+    if (isVideoPlaying()) {
+      autoUpdate = setTimeout(updateInfo,
+          SYNC_WINDOW*1000*0.75);
+    }
   });
 }
 

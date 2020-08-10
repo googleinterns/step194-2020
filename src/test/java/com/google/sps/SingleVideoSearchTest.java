@@ -16,7 +16,6 @@ package com.google.sps;
 
 import static org.mockito.Mockito.*;
 
-import com.google.sps.MockSVS;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

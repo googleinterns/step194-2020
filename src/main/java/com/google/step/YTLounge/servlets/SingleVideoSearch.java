@@ -123,10 +123,22 @@ public class SingleVideoSearch extends HttpServlet {
       JsonArray items, Map<String, Object> videoData, String videoID) {
     for (int i = 0; i < items.size(); i++) {
       JsonObject snippet = items.get(i).getAsJsonObject().getAsJsonObject("snippet");
-      String thumbnailURL =
-          snippet.getAsJsonObject("thumbnails").getAsJsonObject("medium").get("url").toString();
-      String bigThumbnailURL =
-          snippet.getAsJsonObject("thumbnails").getAsJsonObject("maxres").get("url").toString();
+      JsonObject thumbnails = snippet.getAsJsonObject("thumbnails");
+      String thumbnailURL = null; // go through each thumbnail possibility
+      if (thumbnails.getAsJsonObject("standard") != null) {
+        thumbnailURL = thumbnails.getAsJsonObject("standard").get("url").toString();
+      } else if (thumbnails.getAsJsonObject("high") != null) {
+        thumbnailURL = thumbnails.getAsJsonObject("high").get("url").toString();
+      } else if (thumbnails.getAsJsonObject("medium") != null) {
+        thumbnailURL = thumbnails.getAsJsonObject("medium").get("url").toString();
+      } else if (thumbnails.getAsJsonObject("default") != null) {
+        thumbnailURL = thumbnails.getAsJsonObject("default").get("url").toString();
+      }
+      String bigThumbnailURL = null;
+      if (thumbnails.getAsJsonObject("maxres") != null) {
+        bigThumbnailURL =
+            snippet.getAsJsonObject("thumbnails").getAsJsonObject("maxres").get("url").toString();
+      }
       String title = snippet.get("title").toString();
       String duration =
           items

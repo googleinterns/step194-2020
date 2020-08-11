@@ -4,7 +4,7 @@ import com.google.step.YTLounge.data.Video;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MockRQ {
+public class MockRetrieveQueue {
   private final String firstid = "100";
   private final String secondid = "101";
   private Map<String, Video> realRQ;
@@ -12,7 +12,7 @@ public class MockRQ {
   private Video vid1;
   private Video vid2;
 
-  public MockRQ() {
+  public MockRetrieveQueue() {
     realRQ = new HashMap<>();
     multipleRQ = new HashMap<>();
     vid1 =

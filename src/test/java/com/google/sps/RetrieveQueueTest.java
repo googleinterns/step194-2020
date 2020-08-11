@@ -28,13 +28,13 @@ import org.junit.runners.JUnit4;
 /** */
 @RunWith(JUnit4.class)
 public final class RetrieveQueueTest {
-  private MockRQ queue;
+  private MockRetrieveQueue queue;
   private Video vid1;
   private Video vid2;
 
   @Before
   public void setUp() {
-    queue = new MockRQ();
+    queue = new MockRetrieveQueue();
     vid1 =
         new Video(
             "FTC",
@@ -56,7 +56,7 @@ public final class RetrieveQueueTest {
     Assert.assertTrue(
         result
             .get("video1")
-            .getThumbnail()
+            .getThumbnailURL()
             .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
     Assert.assertTrue(
         result.get("video1").getVideoURL().equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
@@ -70,7 +70,7 @@ public final class RetrieveQueueTest {
     Assert.assertTrue(
         result
             .get("video1")
-            .getThumbnail()
+            .getThumbnailURL()
             .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
     Assert.assertTrue(
         result.get("video1").getVideoURL().equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
@@ -79,7 +79,7 @@ public final class RetrieveQueueTest {
     Assert.assertTrue(
         result
             .get("video2")
-            .getThumbnail()
+            .getThumbnailURL()
             .equals("https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg"));
     Assert.assertTrue(
         result.get("video2").getVideoURL().equals("https://youtube.com/watch?v=116sMd5U7UY"));

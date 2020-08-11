@@ -23,8 +23,6 @@ import com.google.gson.JsonParser;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,9 +32,7 @@ import org.junit.runners.JUnit4;
 /** */
 @RunWith(JUnit4.class)
 public final class SingleVideoSearchTest {
-  private MockSVS search;
-  private HttpServletRequest request;
-  private HttpServletResponse response;
+  private MockSingleVideoSearch search;
   private Map<String, Object> vData;
   private Gson gson;
   private String REAL_VIDEO =
@@ -68,9 +64,7 @@ public final class SingleVideoSearchTest {
 
   @Before
   public void setUp() {
-    search = new MockSVS();
-    request = mock(HttpServletRequest.class);
-    response = mock(HttpServletResponse.class);
+    search = new MockSingleVideoSearch();
     vData = new HashMap<>();
     gson = new Gson();
   }

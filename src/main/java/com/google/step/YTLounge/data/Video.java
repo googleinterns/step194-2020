@@ -18,7 +18,7 @@ public class Video {
     return title;
   }
 
-  public String getThumbnail() {
+  public String getThumbnailURL() {
     return thumbnailURL;
   }
 

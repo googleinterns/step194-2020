@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /* A shell class that has basic functionality of video search without integration tools */
-public class MockSVS {
-  public MockSVS() {}
+public class MockSingleVideoSearch {
+  public MockSingleVideoSearch() {}
 
   public long parseDuration(String encodedTime) {
     String shortenedTime = encodedTime.substring(2);

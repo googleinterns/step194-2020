@@ -15,6 +15,11 @@
 let videoUpdating; // is video currently updating to match Firestore info?
 let autoUpdate; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
+// These factors shorten the sync window variable in cases where time
+// for Firestore has to be accounted for or a call must be made
+// faster on one client than others.
+const SLOW_UPDATE_FACTOR = 0.85;
+const FAST_UPDATE_FACTOR = 0.75;
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
 
@@ -79,12 +84,14 @@ function getFirstVidFromQueue() {
   } else {
     const firstVid = nextVidID;
     const firstVidDocId = nextDocID;
-    updateVidPlaying(firstVid);
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
     stopUpdating = false;
-    queueDataRef.doc(firstVidDocId).delete();
+    setTimeout(function() {
+      updateVidPlaying(firstVid);
+      queueDataRef.doc(firstVidDocId).delete();
+    }, 1000);
   }
 }
 
@@ -109,7 +116,7 @@ function onPlayerReady() {
 // Move playhead slightly ahead of updated timestamp when needed
 function seek(vidData) {
   if (vidData.isPlaying) {
-    const seekAhead = vidData.timestamp + SYNC_WINDOW*0.75;
+    const seekAhead = vidData.timestamp + SYNC_WINDOW * SLOW_UPDATE_FACTOR;
     player.seekTo(seekAhead, true);
   } else {
     player.seekTo(vidData.timestamp, true);
@@ -195,7 +202,7 @@ function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
     resetPlaybackInfo();
-    setTimeout(getCurrentVideo, 1000);
+    getCurrentVideo();
   }
 }
 
@@ -237,7 +244,7 @@ function updateInfo(goal) {
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
         if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo();
-      }, SYNC_WINDOW*1000*0.66);
+      }, SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
     });
@@ -317,7 +324,7 @@ function catchUserUp() {
   }).then(function() {
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW*1000*0.75);
+          SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
     }
   });
 }
@@ -354,7 +361,7 @@ function getRealtimeUpdates() {
     videoUpdating = false;
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW*1000*0.75);
+          SYNC_WINDOW * 1000 * SLOW_UPDATE_FACTOR);
     }
   });
 }

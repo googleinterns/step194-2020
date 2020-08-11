@@ -85,7 +85,7 @@ function getFirstVidFromQueue() {
     stopUpdating = false;
     setTimeout(function() {
       updateVidPlaying(firstVid);
-      queueDataRef.doc(firstVidDocId).delete();  
+      queueDataRef.doc(firstVidDocId).delete();
     }, 1000);
   }
 }

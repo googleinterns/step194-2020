@@ -41,7 +41,7 @@ function updateShareTab() {
       '</button>' +
       '</div>' +
       '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
-      'lounge.html/?roomid='+ roomParameters +'" type="text" readonly</input>';
+      'lounge.html/?room_id='+ roomParameters +'" type="text" readonly</input>';
 }
 
 

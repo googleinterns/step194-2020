@@ -286,6 +286,11 @@ function loadGuests() {
   });
 }
 
+function removeGuest(guest){
+    const viewer = firebase.firestore().collection('rooms').doc(roomParam).collection('guests').doc(guest);
+    viewer.delete();
+}
+
 // Enables or disables the submit button
 function toggleButton() {
   if (messageInputElement.value) {
@@ -315,12 +320,16 @@ const dialog = document.getElementById('dialog');
 const displayName = document.getElementById('userName');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
 const guestListElement = document.getElementById('guests');
+const guestArray = firebase.firestore().collection('rooms').doc(roomParam).collection('guests').orderBy('timestamp', 'desc').get();
+const guestCount = guestListElement.childElementCount;
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
   deleteUser();
-  removeGuest(id);
+  for (let i = guestCount; i < guestArray.length; i++) {
+  removeGuest(guestArray.docs[i].id);
+  }
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {

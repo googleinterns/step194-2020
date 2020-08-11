@@ -41,7 +41,7 @@ function updateQueue() {
           const queueData = doc.data();
           docIds.push(doc.id);
           videoIds.push(queueData.videoID);
-          const thumbnailString = queueData.bigThumbnailURL;
+          const thumbnailString = queueData.thumbnailURL;
           const thumbnailURL = thumbnailString.substring(1,
               thumbnailString.length - 1);
           thumbnails.push(thumbnailURL);
@@ -236,12 +236,25 @@ function updateInfo(goal) {
       console.log(goal + ' request sent');
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
-        if (!stopUpdating && !aboutToEnd()) updateInfo();
+        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo();
       }, SYNC_WINDOW*1000*0.66);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
     });
   }
+}
+
+// keeps firestore updated on pause
+let lastTime;
+let pauseInterval;
+function setPauseInterval() {
+  lastTime = player.getCurrentTime();
+  pauseInterval = setInterval(function() {
+    if (player.getCurrentTime() != lastTime) {
+      lastTime = player.getCurrentTime();
+      updateInfo('Update on Pause Seek');
+    }
+  }, 1000);
 }
 
 let pauseTimeout; // Differentiates pause from seek
@@ -253,6 +266,7 @@ function clearTimeouts() {
   clearTimeout(pauseTimeout);
   clearTimeout(bufferTimeout);
   clearTimeout(autoUpdate);
+  clearInterval(pauseInterval);
 }
 
 function onPlayerStateChange() {
@@ -266,6 +280,7 @@ function onPlayerStateChange() {
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
           pauseTimeout = setTimeout(updateInfo, 100, 'pause');
+          setPauseInterval();
         }
         break;
       case 3: // Buffering
@@ -300,8 +315,10 @@ function catchUserUp() {
       console.log('there was no doc to read!');
     }
   }).then(function() {
-    autoUpdate = setTimeout(updateInfo,
-        SYNC_WINDOW*1000*0.75);
+    if (isVideoPlaying()) {
+      autoUpdate = setTimeout(updateInfo,
+          SYNC_WINDOW*1000*0.75);
+    }
   });
 }
 
@@ -335,14 +352,16 @@ function getRealtimeUpdates() {
       if (vidOver) waitForOthers(vidData);
     }
     videoUpdating = false;
-    autoUpdate = setTimeout(updateInfo,
-        SYNC_WINDOW*1000*0.75);
+    if (isVideoPlaying()) {
+      autoUpdate = setTimeout(updateInfo,
+          SYNC_WINDOW*1000*0.75);
+    }
   });
 }
 
 window.onbeforeunload = function() {
   clearTimeouts();
-  if (!vidOver) removeOneViewer();
+  if (!vidOver && thumbnail.style.display !== 'block') removeOneViewer();
   alert('Sync ended, refresh to continue');
   return 'end of viewing';
 };

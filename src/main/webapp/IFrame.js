@@ -28,23 +28,23 @@ const vidDataRef = firestore.collection('rooms').doc(roomId)
 const queueDataRef = firestore.collection('rooms').doc(roomId)
     .collection('queue');
 
-let videoIds;
-let thumbnails;
-let docIds;
+let nextVidID;
+let nextThumbnail;
+let nextDocID;
 function updateQueue() {
-  videoIds = [];
-  thumbnails = [];
-  docIds = [];
-  queueDataRef.orderBy('requestTime', 'asc').get()
+  nextVidID = '';
+  nextThumbnail = '';
+  nextDocID = '';
+  queueDataRef.orderBy('requestTime', 'asc').limit(1).get()
       .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
           const queueData = doc.data();
-          docIds.push(doc.id);
-          videoIds.push(queueData.videoID);
+          nextDocID += doc.id;
+          nextVidID += queueData.videoID;
           const thumbnailString = queueData.thumbnailURL;
           const thumbnailURL = thumbnailString.substring(1,
               thumbnailString.length - 1);
-          thumbnails.push(thumbnailURL);
+          nextThumbnail += thumbnailURL;
         });
       })
       .catch(function(error) {
@@ -73,12 +73,12 @@ function getCurrentVideo() {
 }
 
 function getFirstVidFromQueue() {
-  if (videoIds.length === 0) {
+  if (nextVidID === '') {
     console.log('add videos to the queue!');
     setTimeout(getCurrentVideo, 2000);
   } else {
-    const firstVid = videoIds[0];
-    const firstVidDocId = docIds[0];
+    const firstVid = nextVidID;
+    const firstVidDocId = nextDocID;
     updateVidPlaying(firstVid);
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
@@ -130,7 +130,7 @@ function switchDisplay() {
   }
 
   if (thumbnail.style.display === 'none') {
-    if (thumbnails.length > 0) thumbnail.src = thumbnails[0];
+    if (nextThumbnail !== '') thumbnail.src = nextThumbnail;
     else thumbnail.src = '/images/LoungeLogo.png';
     thumbnail.style.display = 'block';
   } else {

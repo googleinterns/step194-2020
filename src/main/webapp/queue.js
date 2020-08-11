@@ -3,6 +3,7 @@ const queryValue = window.location.search;
 const urlParameters = new URLSearchParams(queryValue);
 const roomParameters = urlParameters.get('room_id');
 validateRoom();
+updateShareTab();
 
 // Track realtime changes to the database and update the visual queue on change
 // hardcoded for one room for now, can access different rooms through
@@ -29,6 +30,20 @@ async function validateRoom() {
     }
   }
 }
+
+// Initializes share tab with lounge's link
+function updateShareTab() {
+  document.getElementById('share').innerHTML =
+      '<div id="linkInfo">' +
+      '<h6>Click the button to copy this lounge\'s link:</h6>' +
+      '<button id="copyBtn" onclick="copyLink()">' +
+      '<span id="shareImg" class="material-icons">content_copy</span>' +
+      '</button>' +
+      '</div>' +
+      '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
+      'lounge.html/?roomid='+ roomParameters +'" type="text" readonly</input>';
+}
+
 
 /* exported verifyURLStructure */
 /*

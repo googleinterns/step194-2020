@@ -39,12 +39,12 @@ function updateQueue() {
       .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
           const queueData = doc.data();
-          nextDocID += doc.id;
-          nextVidID += queueData.videoID;
+          nextDocID = doc.id;
+          nextVidID = queueData.videoID;
           const thumbnailString = queueData.thumbnailURL;
           const thumbnailURL = thumbnailString.substring(1,
               thumbnailString.length - 1);
-          nextThumbnail += thumbnailURL;
+          nextThumbnail = thumbnailURL;
         });
       })
       .catch(function(error) {

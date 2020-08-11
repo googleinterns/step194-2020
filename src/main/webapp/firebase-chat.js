@@ -1,4 +1,3 @@
-/* eslint-disable */
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const roomParam = urlParams.get('room_id');
@@ -86,7 +85,7 @@ function authStateObserver(user) {
     const userName = getUserName();
 
     userPicElement.style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+    'url(' + addSizeToProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
 
     userNameElement.removeAttribute('hidden');
@@ -101,14 +100,14 @@ function authStateObserver(user) {
   }
 }
 
- 
-function addSizeToGoogleProfilePic(url) {
+function addSizeToProfilePic(url) {
   if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
     return url + '?sz=150';
   }
   return url;
 }
 
+// Returns true if user is signed-in. Otherwise false and displays a message.
 function checkSignedInWithMessage() {
   if (isUserSignedIn()) {
     return true;
@@ -149,6 +148,7 @@ function createAndInsertMessage(id, timestamp) {
   const div = container.firstChild;
   div.setAttribute('id', id);
 
+  // If timestamp is null, assume we've gotten a brand new message.
   timestamp = timestamp ? timestamp.toMillis() : Date.now();
   div.setAttribute('timestamp', timestamp);
 
@@ -177,13 +177,13 @@ function createAndInsertMessage(id, timestamp) {
   return div;
 }
 
-
+// shows all stored messages in the UI.
 function displayMessage(id, timestamp, name, text, picUrl) {
   const div =
   document.getElementById(id) || createAndInsertMessage(id, timestamp);
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+    'url(' + addSizeToProfilePic(picUrl) + ')';
   }
   const date = new Date(timestamp * 1000);
   const hours = date.getHours();
@@ -206,7 +206,7 @@ function displayMessage(id, timestamp, name, text, picUrl) {
   messageInputElement.focus();
 }
 
-// Inputting guest list in database
+// Saves a new guest signed in on the Cloud Firestore, added entry to the Firebase database
 function saveGuestList() {
     return firebase.firestore().collection('rooms').doc(roomParam).collection('guests').add({
     name: getUserName(),
@@ -235,8 +235,9 @@ function createAndInsertGuest(id, timestamp) {
   const existingGuests = guestListElement.children;
   if (existingGuests.length === 0) {
     guestListElement.appendChild(div);
-  } else {
-    let guestListNode = existingGuests[0];
+    return div;
+  }
+  let guestListNode = existingGuests[0];
 
     while (guestListNode) {
       const guestListNodeTime = guestListNode.getAttribute('timestamp');
@@ -251,17 +252,17 @@ function createAndInsertGuest(id, timestamp) {
       }
       guestListNode = guestListNode.nextSibling;
     }
-    guestListElement.insertBefore(div, guestListNode);
-  }
+  guestListElement.insertBefore(div, guestListNode);
   return div;
 }
 
+// Displays the guests in room in the UI.
 function displayGuest(id, timestamp, name, picUrl) {
   const div =
   document.getElementById(id) || createAndInsertGuest(id, timestamp);
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+    'url(' + addSizeToProfilePic(picUrl) + ')';
   }
   div.querySelector('.name').textContent = name;
   setTimeout(function() {
@@ -270,6 +271,7 @@ function displayGuest(id, timestamp, name, picUrl) {
   guestListElement.scrollTop = guestListElement.scrollHeight;
 }
 
+// Loads guests recently signed-in and listens for new guests.
 function loadGuests() {
   const query =
   firebase.firestore().collection('rooms').doc(roomParam).collection('guests').orderBy('timestamp', 'desc');
@@ -287,11 +289,13 @@ function loadGuests() {
 }
 
 function removeGuest(guest){
-    const viewer = firebase.firestore().collection('rooms').doc(roomParam).collection('guests').doc(guest);
+    const viewer = firebase.firestore().collection('rooms')
+    .doc(roomParam).collection('guests').doc(guest);
     viewer.delete();
 }
 
-// Enables or disables the submit button
+// Enables or disables the submit button depending on
+// the values of the inputfields.
 function toggleButton() {
   if (messageInputElement.value) {
     submitButtonElement.removeAttribute('disabled');
@@ -301,7 +305,7 @@ function toggleButton() {
 }
 
 // deletes anonymous user at sign out
-function deleteUser() {
+function deleteAnonymousUser() {
   const user = firebase.auth().currentUser;
   user.delete().catch(function(error) {
     console.error('Error deleting guest', error);
@@ -326,7 +330,7 @@ const guestCount = guestListElement.childElementCount;
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
-  deleteUser();
+   deleteAnonymousUser();
   for (let i = guestCount; i < guestArray.length; i++) {
   removeGuest(guestArray.docs[i].id);
   }

@@ -79,12 +79,14 @@ function getFirstVidFromQueue() {
   } else {
     const firstVid = nextVidID;
     const firstVidDocId = nextDocID;
-    updateVidPlaying(firstVid);
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
     stopUpdating = false;
-    queueDataRef.doc(firstVidDocId).delete();
+    setTimeout(function() {
+      updateVidPlaying(firstVid);
+      queueDataRef.doc(firstVidDocId).delete();  
+    }, 1000);
   }
 }
 
@@ -109,7 +111,7 @@ function onPlayerReady() {
 // Move playhead slightly ahead of updated timestamp when needed
 function seek(vidData) {
   if (vidData.isPlaying) {
-    const seekAhead = vidData.timestamp + SYNC_WINDOW*0.75;
+    const seekAhead = vidData.timestamp + SYNC_WINDOW * 0.85;
     player.seekTo(seekAhead, true);
   } else {
     player.seekTo(vidData.timestamp, true);
@@ -195,7 +197,7 @@ function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
     resetPlaybackInfo();
-    setTimeout(getCurrentVideo, 1000);
+    getCurrentVideo();
   }
 }
 
@@ -237,7 +239,7 @@ function updateInfo(goal) {
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
         if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo();
-      }, SYNC_WINDOW*1000*0.66);
+      }, SYNC_WINDOW*1000*0.75);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
     });
@@ -354,7 +356,7 @@ function getRealtimeUpdates() {
     videoUpdating = false;
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW*1000*0.75);
+          SYNC_WINDOW*1000*0.85);
     }
   });
 }

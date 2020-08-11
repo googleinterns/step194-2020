@@ -1,3 +1,5 @@
+/* eslint-disable */
+// retrieve specific room id a user is in
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const roomParam = urlParams.get('room_id');
@@ -10,6 +12,7 @@ function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
+// selection from list presented in dialog box
 function getProfilePicUrl() {
   const profilePic = document.getElementsByName('profile');
   for (i = 0; i < profilePic.length; i++) {

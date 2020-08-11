@@ -16,10 +16,9 @@ package com.google.sps;
 
 import static org.mockito.Mockito.*;
 
-import com.google.step.YTLounge.servlets.RetrieveQueue;
+import com.google.step.YTLounge.data.Video;
 import java.io.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,57 +28,57 @@ import org.junit.runners.JUnit4;
 /** */
 @RunWith(JUnit4.class)
 public final class RetrieveQueueTest {
-  private RetrieveQueue servlet;
-  private HttpServletRequest request;
-  private HttpServletResponse response;
+  private MockRQ queue;
+  private Video vid1;
+  private Video vid2;
 
   @Before
   public void setUp() {
-    servlet = new RetrieveQueue();
-    request = mock(HttpServletRequest.class);
-    response = mock(HttpServletResponse.class);
+    queue = new MockRQ();
+    vid1 = new Video(
+      "FTC", 
+      "https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg",
+      "https://youtube.com/watch?v=9IVO5Dsz1KI",
+      112);
+    vid2 = new Video(
+      "Meet UX Designers at Google",
+      "https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg",
+      "https://youtube.com/watch?v=116sMd5U7UY",
+      136);
   }
 
   @Test
-  public void testEmptyRoom() throws Exception {
-    when(request.getParameter("room_id")).thenReturn("testEmptyQueue");
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter writer = new PrintWriter(stringWriter);
-    when(response.getWriter()).thenReturn(writer);
+  public void testRealRoomOneVideo() throws Exception {
+    Map<String, Video> result = queue.mockGet("100");
+    Assert.assertTrue(result.get("video1").getTitle().equals("FTC"));
+    Assert.assertTrue(result.get("video1").getThumbnail()
+        .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
+    Assert.assertTrue(result.get("video1").getVideoURL()
+        .equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
+    Assert.assertTrue(result.get("video1").getDuration() == 112);
+  }
 
-    servlet.doGet(request, response);
-    Assert.assertTrue(stringWriter.toString().contains(""));
+  @Test
+  public void testRealRoomTwoVideos() throws Exception {
+    Map<String, Video> result = queue.mockGet("101");
+    Assert.assertTrue(result.get("video1").getTitle().equals("FTC"));
+    Assert.assertTrue(result.get("video1").getThumbnail()
+        .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
+    Assert.assertTrue(result.get("video1").getVideoURL()
+        .equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
+    Assert.assertTrue(result.get("video1").getDuration() == 112);
+    Assert.assertTrue(result.get("video2").getTitle().equals("Meet UX Designers at Google"));
+    Assert.assertTrue(result.get("video2").getThumbnail()
+        .equals("https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg"));
+    Assert.assertTrue(result.get("video2").getVideoURL()
+        .equals("https://youtube.com/watch?v=116sMd5U7UY"));
+    Assert.assertTrue(result.get("video2").getDuration() == 136);
+    Assert.assertTrue(result.size() == 2);
   }
 
   @Test
   public void testFakeRoom() throws Exception {
-    when(request.getParameter("room_id")).thenReturn("FAKE ROOM");
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter writer = new PrintWriter(stringWriter);
-    when(response.getWriter()).thenReturn(writer);
-    servlet.doGet(request, response);
-    Assert.assertTrue(stringWriter.toString().contains("error: room does not exist"));
-  }
-
-  @Test
-  public void testGetOneVideo() throws Exception {
-    when(request.getParameter("room_id")).thenReturn("testOneVideo");
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter writer = new PrintWriter(stringWriter);
-    when(response.getWriter()).thenReturn(writer);
-    servlet.doGet(request, response);
-    Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596649245195"));
-  }
-
-  @Test
-  public void testGetMultipleVideos() throws Exception {
-    when(request.getParameter("room_id")).thenReturn("testMultipleVideos");
-    StringWriter stringWriter = new StringWriter();
-    PrintWriter writer = new PrintWriter(stringWriter);
-    when(response.getWriter()).thenReturn(writer);
-    servlet.doGet(request, response);
-    // use two asserts because the stringWriter doesn't print items uniformly
-    Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650659951"));
-    Assert.assertTrue(stringWriter.toString().contains("\"requestTime\":1596650642805"));
+    Map<String, Video> result = queue.mockGet("bad room");
+    Assert.assertTrue(result == null);
   }
 }

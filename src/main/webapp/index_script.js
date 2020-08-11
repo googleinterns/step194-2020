@@ -16,6 +16,7 @@ function openSidebar() { // eslint-disable-line no-unused-vars
   }
 }
 
+//Takes created link from loungeLink and copies it to user's clipboard
 function copyLink() {
   /* Get the text field */
   var copyText = document.getElementById("loungeLink");
@@ -24,9 +25,7 @@ function copyLink() {
   copyText.select();
   copyText.setSelectionRange(0, 99999); /*For mobile devices*/
 
-  /* Copy the text inside the text field */
   document.execCommand("copy");
 
-  /* Alert the copied text */
   alert("Copied the text: " + copyText.value);
 }

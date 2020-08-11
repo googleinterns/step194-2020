@@ -35,26 +35,31 @@ public final class RetrieveQueueTest {
   @Before
   public void setUp() {
     queue = new MockRQ();
-    vid1 = new Video(
-      "FTC", 
-      "https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg",
-      "https://youtube.com/watch?v=9IVO5Dsz1KI",
-      112);
-    vid2 = new Video(
-      "Meet UX Designers at Google",
-      "https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg",
-      "https://youtube.com/watch?v=116sMd5U7UY",
-      136);
+    vid1 =
+        new Video(
+            "FTC", 
+            "https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg",
+            "https://youtube.com/watch?v=9IVO5Dsz1KI",
+            112);
+    vid2 =
+        new Video(
+            "Meet UX Designers at Google",
+            "https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg",
+            "https://youtube.com/watch?v=116sMd5U7UY",
+            136);
   }
 
   @Test
   public void testRealRoomOneVideo() throws Exception {
     Map<String, Video> result = queue.mockGet("100");
     Assert.assertTrue(result.get("video1").getTitle().equals("FTC"));
-    Assert.assertTrue(result.get("video1").getThumbnail()
-        .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
-    Assert.assertTrue(result.get("video1").getVideoURL()
-        .equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
+    Assert.assertTrue(
+        result
+            .get("video1")
+            .getThumbnail()
+            .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
+    Assert.assertTrue(
+        result.get("video1").getVideoURL().equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
     Assert.assertTrue(result.get("video1").getDuration() == 112);
   }
 
@@ -62,16 +67,22 @@ public final class RetrieveQueueTest {
   public void testRealRoomTwoVideos() throws Exception {
     Map<String, Video> result = queue.mockGet("101");
     Assert.assertTrue(result.get("video1").getTitle().equals("FTC"));
-    Assert.assertTrue(result.get("video1").getThumbnail()
-        .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
-    Assert.assertTrue(result.get("video1").getVideoURL()
-        .equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
+    Assert.assertTrue(
+        result
+            .get("video1")
+            .getThumbnail()
+            .equals("https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg"));
+    Assert.assertTrue(
+        result.get("video1").getVideoURL().equals("https://youtube.com/watch?v=9IVO5Dsz1KI"));
     Assert.assertTrue(result.get("video1").getDuration() == 112);
     Assert.assertTrue(result.get("video2").getTitle().equals("Meet UX Designers at Google"));
-    Assert.assertTrue(result.get("video2").getThumbnail()
-        .equals("https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg"));
-    Assert.assertTrue(result.get("video2").getVideoURL()
-        .equals("https://youtube.com/watch?v=116sMd5U7UY"));
+    Assert.assertTrue(
+        result
+            .get("video2")
+            .getThumbnail()
+            .equals("https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg"));
+    Assert.assertTrue(
+        result.get("video2").getVideoURL().equals("https://youtube.com/watch?v=116sMd5U7UY"));
     Assert.assertTrue(result.get("video2").getDuration() == 136);
     Assert.assertTrue(result.size() == 2);
   }

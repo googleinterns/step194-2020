@@ -15,16 +15,18 @@ public class MockRQ {
   public MockRQ() {
     realRQ = new HashMap<>();
     multipleRQ = new HashMap<>();
-    vid1 = new Video(
-        "FTC", 
-        "https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg",
-        "https://youtube.com/watch?v=9IVO5Dsz1KI",
-        112);
-    vid2 = new Video(
-        "Meet UX Designers at Google",
-        "https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg",
-        "https://youtube.com/watch?v=116sMd5U7UY",
-        136);
+    vid1 =
+        new Video(
+            "FTC", 
+            "https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg",
+            "https://youtube.com/watch?v=9IVO5Dsz1KI",
+            112);
+    vid2 =
+        new Video(
+            "Meet UX Designers at Google",
+            "https://i.ytimg.com/vi/116sMd5U7UY/sddefault.jpg",
+            "https://youtube.com/watch?v=116sMd5U7UY",
+            136);
     realRQ.put("video1", vid1);
     multipleRQ.put("video1", vid1);
     multipleRQ.put("video2", vid2);

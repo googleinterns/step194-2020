@@ -31,7 +31,7 @@ async function validateRoom() {
   }
 }
 
-//Initializes share tab with lounge's link
+// Initializes share tab with lounge's link
 function updateShareTab() {
   document.getElementById('share').innerHTML = '';
   document.getElementById('share').innerHTML =
@@ -42,7 +42,7 @@ function updateShareTab() {
       '</button>' +
       '</div>' +
       '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
-      'lounge.html/?roomid=' + roomParameters + '" type="text" readonly</input>';
+      'lounge.html/?roomid='+ roomParameters +'" type="text" readonly</input>';
 }
 
 

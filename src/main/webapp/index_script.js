@@ -16,16 +16,11 @@ function openSidebar() { // eslint-disable-line no-unused-vars
   }
 }
 
-//Takes created link from loungeLink and copies it to user's clipboard
-function copyLink() {
-  /* Get the text field */
-  var copyText = document.getElementById("loungeLink");
-
-  /* Select the text field */
+// Takes created link from loungeLink and copies it to user's clipboard
+function copyLink() { // eslint-disable-line no-unused-vars
+  const copyText = document.getElementById('loungeLink');
   copyText.select();
-  copyText.setSelectionRange(0, 99999); /*For mobile devices*/
-
-  document.execCommand("copy");
-
-  alert("Copied the text: " + copyText.value);
+  copyText.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+  alert('Copied the text: ' + copyText.value);
 }

@@ -33,7 +33,6 @@ async function validateRoom() {
 
 // Initializes share tab with lounge's link
 function updateShareTab() {
-  document.getElementById('share').innerHTML = '';
   document.getElementById('share').innerHTML =
       '<div id="linkInfo">' +
       '<h6>Click the button to copy this lounge\'s link:</h6>' +

@@ -1,50 +1,49 @@
-// Initializes resources for reading/writing to Firestore
-const app =
-    firebase.initializeApp(config); // eslint-disable-line no-undef
-db = firebase.firestore(app); // eslint-disable-line no-undef
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const roomParam = urlParams.get('room_id');
+db = firebase.firestore(); // eslint-disable-line no-undef
+const queryValue = window.location.search;
+const urlParameters = new URLSearchParams(queryValue);
+const roomParameters = urlParameters.get('room_id');
 validateRoom();
+updateShareTab();
 
 // Track realtime changes to the database and update the visual queue on change
 // hardcoded for one room for now, can access different rooms through
 // window.location.search property
 db.collection('rooms') // eslint-disable-line no-undef
-    .doc(roomParam)
+    .doc(roomParameters)
     .collection('queue')
     .onSnapshot(function(snapshot) {
-      snapshot.docChanges().forEach(function(change) {
-        if (change.type === 'added') {
-          console.log('added: ', change.doc.data());
-        }
-        if (change.type === 'modified') {
-          console.log('modified: ', change.doc.data());
-        }
-        if (change.type === 'removed') {
-          console.log('removed: ', change.doc.data());
-        }
-      });
-      getRoomQueue(roomParam);
+      getRoomQueue(roomParameters);
     });
 
 // Find the roomid in the url query parameters and send to error page if the
 // room given hasn't been created or if no room was passed in the url
 async function validateRoom() {
-  if (roomParam === null) { // verify that we were passed a room identifier
+  if (roomParameters === null) { // verify that we were passed a room identifier
     window.location.href = '../error.html';
   } else {
     const verifyRoom =
         await db.collection('rooms') // eslint-disable-line no-undef
-            .doc(roomParam)
+            .doc(roomParameters)
             .get();
-    console.log('verifyRoom: ' + verifyRoom);
-    console.log('exists: ' + verifyRoom.exists);
     if (!verifyRoom.exists) { // verify room exists in firestore
       window.location.href = '../error.html';
     }
   }
 }
+
+// Initializes share tab with lounge's link
+function updateShareTab() {
+  document.getElementById('share').innerHTML =
+      '<div id="linkInfo">' +
+      '<h6>Click the button to copy this lounge\'s link:</h6>' +
+      '<button id="copyBtn" onclick="copyLink()">' +
+      '<span id="shareImg" class="material-icons">content_copy</span>' +
+      '</button>' +
+      '</div>' +
+      '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
+      'lounge.html/?roomid='+ roomParameters +'" type="text" readonly</input>';
+}
+
 
 /* exported verifyURLStructure */
 /*
@@ -66,7 +65,7 @@ async function verifyURLStructure(url) {
     const videoParams = new URLSearchParams(urlQuery);
     const videoParam = videoParams.get('v');
     await getVideoData(videoParam);
-    await getRoomQueue(roomParam);
+    await getRoomQueue(roomParameters);
   }
 }
 
@@ -76,21 +75,19 @@ async function getVideoData(id) {
     console.log('NO ID');
     return;
   }
-  await fetch('/vSearch?id=' + id + '&room_id=' + roomParam)
+  await fetch('/vSearch?id=' + id + '&room_id=' + roomParameters)
       .then((response) => response.json())
       .then((video) => {
         if (video.error == null) { // video was found, add to firestore
-          console.log('VIDEO FOUND');
           document.getElementById('linkError').style.display = 'none';
           document.getElementById('videoError').style.display = 'none';
         } else if (video.items.length == 0) { // video not found, error
-          console.log('NO VIDEO FOUND');
           document.getElementById('linkError').style.display = 'none';
           document.getElementById('videoError').style.display = 'block';
         }
         console.log(video);
       });
-  getRoomQueue(roomParam);
+  getRoomQueue(roomParameters);
   document.getElementById('linkArea').value = '';
 }
 
@@ -126,6 +123,7 @@ async function removeVideo(roomid, vidRef) {
 async function getRoomQueue(roomid) {
   if (roomid == '') {
     console.log('NO ROOM ID PROVIDED');
+    return;
   }
   const videosArray = await db // eslint-disable-line no-undef
       .collection('rooms')
@@ -133,7 +131,6 @@ async function getRoomQueue(roomid) {
       .collection('queue')
       .orderBy('requestTime', 'asc')
       .get();
-  console.log('videosArray: ' + videosArray);
   fetch('/queueRefresh?room_id=' + roomid)
       .then((response) => response.json())
       .then((queue) => {
@@ -150,12 +147,12 @@ async function getRoomQueue(roomid) {
               '"/><div id="video' + i + 'Info" class="videoInfo">' +
               '<p class="videoTitle">' +
               queue[i].title.substring(1, queue[i].title.length - 1) + '</p>' +
+              '<p class="duration">' + parseTime(queue[i].duration)+ '</p>' +
               '<button class="removeVideoBtn" id="removeVideoBtn' +
               i +
-              '" onclick="removeVideo(\'' + roomParam + '\',\'' +
+              '" onclick="removeVideo(\'' + roomParameters + '\',\'' +
               videosArray.docs[i].id + '\')">' +
               '<img src="../images/remove-from-queue.svg"/>' +'</button>' +
-              '<p class="duration">' + parseTime(queue[i].duration)+ '</p>' +
               '</div></div>';
           }
         }

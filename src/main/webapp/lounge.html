@@ -12,14 +12,12 @@
     <link rel="stylesheet" href="../queue_style.css"></link>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
-    <script src="../index_script.js"></script>
-    <script src="../config.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
     <!-- Add Firebase products that you want to use -->
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-messaging.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.17.0/firebase-auth.js"></script>
-    <script src="../queue.js" defer></script>
+    
   </head>
   <body>
       <dialog class="mdl-dialog" id="dialog">
@@ -70,7 +68,7 @@
                 <label class="mdl-textfield__label" for="userName">Add a Nickname</label>
             </div>
             <div class="mdl-dialog__actions">
-	        <button id = "anonymous-signin" type="sumbit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+	        <button id = "anonymous-signin" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
                 JOIN ROOM</button>
             </div>
         </form>
@@ -96,8 +94,8 @@
           <!-- video placeholder --> 
         <!-- maintains video at 16:9 aspect ratio for all screen sizes -->
           <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
-            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/y0U4sD3_lX4?enablejsapi=1" allowfullscreen></iframe>
-            <img id="thumbnailDisplay" width="100%" height="100%" src="/images/shaq.png"></img>
+            <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/?enablejsapi=1" allowfullscreen></iframe>
+            <img id="thumbnailDisplay" width="100%" height="100%" src=""></img>
           </div>
       </div>
 
@@ -107,14 +105,15 @@
                   <a href = "#chat-panel" class = "mdl-tabs__tab is-active"><span class="material-icons"> chat</span> Chat</a>
                   <a href = "#queue-panel" class = "mdl-tabs__tab"><span class="material-icons">queue</span> Queue</a>
                   <a href = "#guests-panel" class = "mdl-tabs__tab"><span class="material-icons">people</span> Guests</a>
+                  <a href = "#share-panel" class = "mdl-tabs__tab"><span class="material-icons">share</span> Share</a>
                </div>
   
            <div class = "mdl-tabs__panel is-active" id = "chat-panel">
-            <div id="messages-card-container" class="mdl-cell mdl-cell--12-col">
+            <div id="messages-card-container">
 
       <!-- Messages container -->
                 <div id="messages-card" class="mdl-card mdl-cell mdl-cell--12-col">
-                    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                    <div class="mdl-card__supporting-text mdl-color-text--white">
                         <div id="messages">
                         </div>
                         <form id="message-form" action="#">
@@ -131,12 +130,21 @@
              </div>
           </div>
           <div class = "mdl-tabs__panel" id = "queue-panel">
-            <div id="videoContainer"></div>
-            <div class="videoSubmit">
-                <textarea id="linkArea" type="text" placeholder="Enter a YouTube video link..."></textarea>
-                <button class="submitBtn" id="queueBtn" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
-                    <img id="removeFromQueueIMG" src="../images/add-to-queue.svg"/>
-                </button>    
+            <div id="queue-card-container" class="mdl-cell mdl-cell--12-col">
+                <div id="queue-card" class="mdl-card mdl-cell mdl-cell--12-col">
+                    <div class="mdl-card__supporting-text mdl-color-text--white" id="bigQueueContainer">
+                        <div id="videoContainer"></div>
+                            <div id="video-form" >
+                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                        <input class="mdl-textfield__input" id="linkArea" type="text" autocomplete="off" spellcheck>
+                                        <label class="mdl-textfield__label" for="linkArea">Enter a YouTube video link...</label>
+                                    </div>
+                                    <button class="submitBtn" id="queueBtn" type="submit" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
+                                        <img id="removeFromQueueIMG" src="../images/add-to-queue.svg"/>
+                                    </button>    
+                            </div>
+                    </div>
+                </div>
             </div>
             <p id="linkError">Please submit a properly formatted YouTube video link.</p>
             <p id="videoError">There was an error trying to find your video. Please try again.</p>
@@ -148,12 +156,18 @@
             <p style="color:white;"> Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> 
              from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></p>
           </div>
+
+          <div class="mdl-tabs__panel" id = "share-panel">
+            <div id = "share">
+            </div>
+          </div>
         </div>
     </div>
-    <script src='../firebase-config.js'></script>
-    <script src="../firebase-chat.js"></script>
     <script src="../index_script.js"></script>
+    <script src="../config.js"></script>
+    <script src="../firebase-chat.js"></script>
     <script src="../IFrame.js"></script>
+    <script src="../queue.js" defer></script>
     <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>

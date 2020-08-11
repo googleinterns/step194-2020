@@ -17,7 +17,7 @@ public class MockRQ {
     multipleRQ = new HashMap<>();
     vid1 =
         new Video(
-            "FTC", 
+            "FTC",
             "https://i.ytimg.com/vi/9IVO5Dsz1KI/mqdefault.jpg",
             "https://youtube.com/watch?v=9IVO5Dsz1KI",
             112);

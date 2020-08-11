@@ -9,7 +9,6 @@ function anonymousSignIn() {
 
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
-  firebase.auth().onAuthStateChanged(GuestList);
 }
 
 function getProfilePicUrl() {
@@ -66,6 +65,7 @@ function loadMessages() {
   });
 }
 
+
 // Check that the user entered a message and is signed in.
 function onMessageFormSubmit(e) {
   e.preventDefault();
@@ -101,54 +101,7 @@ function authStateObserver(user) {
   }
 }
 
-function GuestList(user){
-  const container = document.createElement('div');
-  container.innerHTML = GUEST_TEMPLATE;
-  const div = container.firstChild;
-  const profilePicUrl = getProfilePicUrl();
-  const userName = getUserName();
-
-  if (user) {
-    return firebase.firestore().collection('rooms').doc(roomParam).collection('guests').add({
-    name: getUserName(),
-    profilePicUrl: getProfilePicUrl(),
-    }).then(function() {
-    div.querySelector('.pic').style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
-    div.querySelector('.name').textContent = userName;
-    guestListElement.appendChild(div);
-    }).catch(function(error) {
-    console.error('Error adding guest to database', error);
-    });
-  }
-  else{
-    const query =
-    firebase.firestore().collection('rooms').doc(roomParam).collection('guests');
-    query.onSnapshot(function(snapshot) {
-    snapshot.docChanges().forEach(function(change) {
-      if (change.type === 'removed') {
-        deleteMessage(change.doc.id);
-      } 
-     });
-    });
-  }
-}
-
-function LoadGuests() {
-  const query =
-  firebase.firestore().collection('rooms').doc(roomParam).collection('guests');
-  query.onSnapshot(function(snapshot) {
-    snapshot.docChanges().forEach(function(change) {
-     if (change.type === 'added') {
-          console.log('added: ', change.doc.data());
-        }
-    if (change.type === 'removed') {
-          console.log('removed: ', change.doc.data());
-        }
-    });
-  });
-}
-
+ 
 function addSizeToGoogleProfilePic(url) {
   if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
     return url + '?sz=150';
@@ -183,26 +136,11 @@ const MESSAGE_TEMPLATE =
        '<div class="name"></div>'+
     '</div>';
 
-const GUEST_TEMPLATE =
-    '<div class="guest-container">' +
-      '<div class="spacing"><div class="pic"></div></div>' +
-       '<div class="name"></div>'+
-    '</div>';
-
-
 function deleteMessage(id) {
   const div = document.getElementById(id);
   if (div) {
     div.parentNode.removeChild(div);
   }
-}
-
-// deletes anonymous user at sign out
-function deleteUser() {
-  const user = firebase.auth().currentUser;
-  user.delete().catch(function(error) {
-    console.error('Error deleting guest', error);
-  });
 }
 
 function createAndInsertMessage(id, timestamp) {
@@ -239,7 +177,8 @@ function createAndInsertMessage(id, timestamp) {
   return div;
 }
 
-function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+
+function displayMessage(id, timestamp, name, text, picUrl) {
   const div =
   document.getElementById(id) || createAndInsertMessage(id, timestamp);
   if (picUrl) {
@@ -267,6 +206,86 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
+// Inputting guest list in database
+function saveGuestList() {
+    return firebase.firestore().collection('rooms').doc(roomParam).collection('guests').add({
+    name: getUserName(),
+    profilePicUrl: getProfilePicUrl(),
+    timestamp: getTimestamp(),
+    }).catch(function(error) {
+    console.error('Error adding guest to database', error);
+    });
+  }
+
+  const GUEST_TEMPLATE =
+    '<div class="guest-container">' +
+      '<div class="spacing"><div class="pic"></div></div>' +
+       '<div class="name"></div>'+
+    '</div>';
+
+function createAndInsertGuest(id, timestamp) {
+  const container = document.createElement('div');
+  container.innerHTML = GUEST_TEMPLATE;
+  const div = container.firstChild;
+  div.setAttribute('id', id);
+
+  timestamp = timestamp ? timestamp.toMillis() : Date.now();
+  div.setAttribute('timestamp', timestamp);
+
+  const existingGuests = guestListElement.children;
+  if (existingGuests.length === 0) {
+    guestListElement.appendChild(div);
+  } else {
+    let guestListNode = existingGuests[0];
+
+    while (guestListNode) {
+      const guestListNodeTime = guestListNode.getAttribute('timestamp');
+
+      if (!guestListNodeTime) {
+        throw new Error(
+            `Child ${guestListNode.id} has no 'timestamp' attribute`,
+        );
+      }
+      if (guestListNodeTime > timestamp) {
+        break;
+      }
+      guestListNode = guestListNode.nextSibling;
+    }
+    guestListElement.insertBefore(div, guestListNode);
+  }
+  return div;
+}
+
+function displayGuest(id, timestamp, name, picUrl) {
+  const div =
+  document.getElementById(id) || createAndInsertGuest(id, timestamp);
+  if (picUrl) {
+    div.querySelector('.pic').style.backgroundImage =
+    'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+  }
+  div.querySelector('.name').textContent = name;
+  setTimeout(function() {
+    div.classList.add('visible');
+  }, 1);
+  guestListElement.scrollTop = guestListElement.scrollHeight;
+}
+
+function loadGuests() {
+  const query =
+  firebase.firestore().collection('rooms').doc(roomParam).collection('guests').orderBy('timestamp', 'desc');
+  query.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        deleteMessage(change.doc.id);
+      } else {
+        const message = change.doc.data();
+        displayGuest(change.doc.id, message.timestamp, message.name,
+          message.profilePicUrl);
+      }
+    });
+  });
+}
+
 // Enables or disables the submit button
 function toggleButton() {
   if (messageInputElement.value) {
@@ -276,6 +295,13 @@ function toggleButton() {
   }
 }
 
+// deletes anonymous user at sign out
+function deleteUser() {
+  const user = firebase.auth().currentUser;
+  user.delete().catch(function(error) {
+    console.error('Error deleting guest', error);
+  });
+}
 
 const messageListElement = document.getElementById('messages');
 const messageFormElement = document.getElementById('message-form');
@@ -294,11 +320,13 @@ messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
   deleteUser();
+  removeGuest(id);
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
+  saveGuestList();
 });
 
 // when window closes or is refreshed
@@ -317,3 +345,4 @@ messageInputElement.addEventListener('change', toggleButton);
 initFirebaseAuth();
 
 loadMessages();
+loadGuests();

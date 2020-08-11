@@ -38,21 +38,21 @@ function isUserSignedIn() {
 // Add a new message entry to the database.
 function saveMessage(messageText) {
   return firebase.firestore().collection('rooms')
-  .doc(roomParam).collection('messages').add({
-    name: getUserName(),
-    text: messageText,
-    profilePicUrl: getProfilePicUrl(),
-    timestamp: getTimestamp(),
-  }).catch(function(error) {
-    console.error('Error writing new message to database', error);
-  });
+      .doc(roomParam).collection('messages').add({
+        name: getUserName(),
+        text: messageText,
+        profilePicUrl: getProfilePicUrl(),
+        timestamp: getTimestamp(),
+      }).catch(function(error) {
+        console.error('Error writing new message to database', error);
+      });
 }
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   const query =
   firebase.firestore().collection('rooms').doc(roomParam)
-  .collection('messages').orderBy('timestamp', 'desc');
+      .collection('messages').orderBy('timestamp', 'desc');
   query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {
@@ -209,16 +209,16 @@ function displayMessage(id, timestamp, name, text, picUrl) {
 }
 
 // Saves a new guest signed in on the Cloud Firestore
-//added entry to the Firebase database
+// added entry to the Firebase database
 function saveGuestList() {
   return firebase.firestore().collection('rooms')
-  .doc(roomParam).collection('guests').add({
-    name: getUserName(),
-    profilePicUrl: getProfilePicUrl(),
-    timestamp: getTimestamp(),
-  }).catch(function(error) {
-    console.error('Error adding guest to database', error);
-  });
+      .doc(roomParam).collection('guests').add({
+        name: getUserName(),
+        profilePicUrl: getProfilePicUrl(),
+        timestamp: getTimestamp(),
+      }).catch(function(error) {
+        console.error('Error adding guest to database', error);
+      });
 }
 
 const GUEST_TEMPLATE =
@@ -279,7 +279,7 @@ function displayGuest(id, timestamp, name, picUrl) {
 function loadGuests() {
   const query =
   firebase.firestore().collection('rooms').doc(roomParam)
-  .collection('guests').orderBy('timestamp', 'desc');
+      .collection('guests').orderBy('timestamp', 'desc');
   query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {
@@ -287,7 +287,7 @@ function loadGuests() {
       } else {
         const message = change.doc.data();
         displayGuest(change.doc.id, message.timestamp, message.name,
-        message.profilePicUrl);
+            message.profilePicUrl);
       }
     });
   });
@@ -295,7 +295,7 @@ function loadGuests() {
 
 function removeGuest(guest) {
   const viewer = firebase.firestore().collection('rooms')
-  .doc(roomParam).collection('guests').doc(guest);
+      .doc(roomParam).collection('guests').doc(guest);
   viewer.delete();
 }
 
@@ -330,7 +330,7 @@ const displayName = document.getElementById('userName');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
 const guestListElement = document.getElementById('guests');
 const guestArray = firebase.firestore().collection('rooms')
-.doc(roomParam).collection('guests').orderBy('timestamp', 'desc').get();
+    .doc(roomParam).collection('guests').orderBy('timestamp', 'desc').get();
 const guestCount = guestListElement.childElementCount;
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);

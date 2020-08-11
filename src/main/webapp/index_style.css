@@ -122,12 +122,9 @@ border-bottom: none;
     font-size: 15px;
 }
 
-#loungeLink {
-    display: none;
-}
-
 #share {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }

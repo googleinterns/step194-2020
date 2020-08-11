@@ -1,4 +1,5 @@
 /* eslint-disable */
+// retrieve specific room id a user is in
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const roomParam = urlParams.get('room_id');
@@ -11,6 +12,7 @@ function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
+// selection from list presented in dialog box
 function getProfilePicUrl() {
   const profilePic = document.getElementsByName('profile');
   for (i = 0; i < profilePic.length; i++) {
@@ -38,20 +40,22 @@ function isUserSignedIn() {
 // Saves a new message to Cloud Firestore database.
 // Add a new message entry to the database.
 function saveMessage(messageText) {
-  return firebase.firestore().collection('rooms').doc(roomParam).collection('messages').add({
-    name: getUserName(),
-    text: messageText,
-    profilePicUrl: getProfilePicUrl(),
-    timestamp: getTimestamp(),
-  }).catch(function(error) {
-    console.error('Error writing new message to database', error);
-  });
+  return firebase.firestore().collection('rooms')
+      .doc(roomParam).collection('messages').add({
+        name: getUserName(),
+        text: messageText,
+        profilePicUrl: getProfilePicUrl(),
+        timestamp: getTimestamp(),
+      }).catch(function(error) {
+        console.error('Error writing new message to database', error);
+      });
 }
 
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   const query =
-  firebase.firestore().collection('rooms').doc(roomParam).collection('messages').orderBy('timestamp', 'desc');
+  firebase.firestore().collection('rooms').doc(roomParam)
+      .collection('messages').orderBy('timestamp', 'desc');
   query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
       if (change.type === 'removed') {
@@ -64,6 +68,7 @@ function loadMessages() {
     });
   });
 }
+
 
 // Check that the user entered a message and is signed in.
 function onMessageFormSubmit(e) {
@@ -80,25 +85,17 @@ function onMessageFormSubmit(e) {
 // Triggers when the auth state change for
 // instance when the user signs-in or signs-out.
 function authStateObserver(user) {
-  const container = document.createElement('div');
-  container.innerHTML = GUEST_TEMPLATE;
-  const div = container.firstChild;
   if (user) {
     const profilePicUrl = getProfilePicUrl();
     const userName = getUserName();
 
     userPicElement.style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
+    'url(' + addSizeToProfilePic(profilePicUrl) + ')';
     userNameElement.textContent = userName;
 
     userNameElement.removeAttribute('hidden');
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
-
-    div.querySelector('.pic').style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(profilePicUrl) + ')';
-    div.querySelector('.name').textContent = userName;
-    guestListElement.appendChild(div);
     dialog.close();
   } else {
     userNameElement.setAttribute('hidden', 'true');
@@ -108,13 +105,14 @@ function authStateObserver(user) {
   }
 }
 
-function addSizeToGoogleProfilePic(url) {
+function addSizeToProfilePic(url) {
   if (url.indexOf('googleusercontent.com') !== -1 && url.indexOf('?') === -1) {
     return url + '?sz=150';
   }
   return url;
 }
 
+// Returns true if user is signed-in. Otherwise false and displays a message.
 function checkSignedInWithMessage() {
   if (isUserSignedIn()) {
     return true;
@@ -142,28 +140,11 @@ const MESSAGE_TEMPLATE =
        '<div class="name"></div>'+
     '</div>';
 
-const GUEST_TEMPLATE =
-    '<div class="guest-container">' +
-      '<div class="spacing"><div class="pic"></div></div>' +
-       '<div class="name"></div>'+
-    '</div>';
-
-
 function deleteMessage(id) {
   const div = document.getElementById(id);
   if (div) {
     div.parentNode.removeChild(div);
   }
-}
-
-// deletes anonymous user at sign out
-function deleteUser() {
-  const user = firebase.auth().currentUser;
-  user.delete().then(function() {
-    console.log('deleted guest');
-  }).catch(function(error) {
-    console.error('Error deleting guest', error);
-  });
 }
 
 function createAndInsertMessage(id, timestamp) {
@@ -172,6 +153,7 @@ function createAndInsertMessage(id, timestamp) {
   const div = container.firstChild;
   div.setAttribute('id', id);
 
+  // If timestamp is null, assume we've gotten a brand new message.
   timestamp = timestamp ? timestamp.toMillis() : Date.now();
   div.setAttribute('timestamp', timestamp);
 
@@ -200,12 +182,13 @@ function createAndInsertMessage(id, timestamp) {
   return div;
 }
 
-function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
+// shows all stored messages in the UI.
+function displayMessage(id, timestamp, name, text, picUrl) {
   const div =
   document.getElementById(id) || createAndInsertMessage(id, timestamp);
   if (picUrl) {
     div.querySelector('.pic').style.backgroundImage =
-    'url(' + addSizeToGoogleProfilePic(picUrl) + ')';
+    'url(' + addSizeToProfilePic(picUrl) + ')';
   }
   const date = new Date(timestamp * 1000);
   const hours = date.getHours();
@@ -228,7 +211,99 @@ function displayMessage(id, timestamp, name, text, picUrl, imageUrl) {
   messageInputElement.focus();
 }
 
-// Enables or disables the submit button
+// Saves a new guest signed in on the Cloud Firestore
+// added entry to the Firebase database
+function saveGuestList() {
+  return firebase.firestore().collection('rooms')
+      .doc(roomParam).collection('guests').add({
+        name: getUserName(),
+        profilePicUrl: getProfilePicUrl(),
+        timestamp: getTimestamp(),
+      }).catch(function(error) {
+        console.error('Error adding guest to database', error);
+      });
+}
+
+const GUEST_TEMPLATE =
+  '<div class="guest-container">' +
+    '<div class="spacing"><div class="pic"></div></div>' +
+    '<div class="name"></div>'+
+  '</div>';
+
+function createAndInsertGuest(id, timestamp) {
+  const container = document.createElement('div');
+  container.innerHTML = GUEST_TEMPLATE;
+  const div = container.firstChild;
+  div.setAttribute('id', id);
+
+  timestamp = timestamp ? timestamp.toMillis() : Date.now();
+  div.setAttribute('timestamp', timestamp);
+
+  const existingGuests = guestListElement.children;
+  if (existingGuests.length === 0) {
+    guestListElement.appendChild(div);
+    return div;
+  }
+  let guestListNode = existingGuests[0];
+
+  while (guestListNode) {
+    const guestListNodeTime = guestListNode.getAttribute('timestamp');
+
+    if (!guestListNodeTime) {
+      throw new Error(
+          `Child ${guestListNode.id} has no 'timestamp' attribute`,
+      );
+    }
+    if (guestListNodeTime > timestamp) {
+      break;
+    }
+    guestListNode = guestListNode.nextSibling;
+  }
+  guestListElement.insertBefore(div, guestListNode);
+  return div;
+}
+
+// Displays the guests in room in the UI.
+function displayGuest(id, timestamp, name, picUrl) {
+  const div =
+  document.getElementById(id) || createAndInsertGuest(id, timestamp);
+  if (picUrl) {
+    div.querySelector('.pic').style.backgroundImage =
+    'url(' + addSizeToProfilePic(picUrl) + ')';
+  }
+  div.querySelector('.name').textContent = name;
+  setTimeout(function() {
+    div.classList.add('visible');
+  }, 1);
+  guestListElement.scrollTop = guestListElement.scrollHeight;
+}
+
+// Loads guests recently signed-in and listens for new guests.
+function loadGuests() {
+  const query =
+  firebase.firestore().collection('rooms').doc(roomParam)
+      .collection('guests').orderBy('timestamp', 'desc');
+  query.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        deleteMessage(change.doc.id);
+      } else {
+        const message = change.doc.data();
+        displayGuest(change.doc.id, message.timestamp, message.name,
+            message.profilePicUrl);
+      }
+    });
+  });
+}
+
+function removeGuest(guest) {
+  const viewer = firebase.firestore().collection('rooms')
+      .doc(roomParam).collection('guests').doc(guest);
+  viewer.delete();
+}
+
+// Enables or disables the submit button depending on
+// the values of the inputfields.
 function toggleButton() {
   if (messageInputElement.value) {
     submitButtonElement.removeAttribute('disabled');
@@ -237,6 +312,13 @@ function toggleButton() {
   }
 }
 
+// deletes anonymous user at sign out
+function deleteAnonymousUser() {
+  const user = firebase.auth().currentUser;
+  user.delete().catch(function(error) {
+    console.error('Error deleting guest', error);
+  });
+}
 
 const messageListElement = document.getElementById('messages');
 const messageFormElement = document.getElementById('message-form');
@@ -250,17 +332,30 @@ const dialog = document.getElementById('dialog');
 const displayName = document.getElementById('userName');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
 const guestListElement = document.getElementById('guests');
+const guestArray = firebase.firestore().collection('rooms')
+    .doc(roomParam).collection('guests').orderBy('timestamp', 'desc').get();
+const guestCount = guestListElement.childElementCount;
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
-  deleteUser();
+  deleteAnonymousUser();
+  for (let i = guestCount; i < guestArray.length; i++) {
+    removeGuest(guestArray.docs[i].id);
+  }
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
+  saveGuestList();
 });
+
+// when window closes or is refreshed
+window.addEventListener('beforeunload', function(e) {
+  firebase.auth().signOut();
+  deleteAnonymousUser();
+}, false);
 
 firebase.auth().onAuthStateChanged((firebaseUser) => {
   console.log(firebaseUser);
@@ -278,3 +373,4 @@ messageInputElement.addEventListener('change', toggleButton);
 initFirebaseAuth();
 
 loadMessages();
+loadGuests();

@@ -33,7 +33,7 @@ body, html {
   vertical-align:top;
   padding:6px 6px 6px 6px;
   align-self:start;
-  top:6px;
+  top:5px;
   justify-self:start;
   color:var(--co-text-light, #FFFFFF);
   letter-spacing:normal

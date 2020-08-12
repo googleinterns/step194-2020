@@ -243,7 +243,9 @@ function updateInfo(goal) {
       console.log(goal + ' request sent');
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
-        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo('auto');
+        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) {
+          updateInfo('auto');
+        }
       }, SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
@@ -257,7 +259,6 @@ let pauseInterval;
 function setPauseInterval() {
   lastTime = player.getCurrentTime();
   pauseInterval = setInterval(function() {
-    console.log('last time ' + lastTime);
     if (player.getCurrentTime() !== lastTime && videoUpdating === false) {
       updateInfo('Update on Pause Seek');
       lastTime = player.getCurrentTime();

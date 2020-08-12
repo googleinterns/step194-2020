@@ -152,6 +152,11 @@
   color:white;
 }
 
+#sign-out{
+ background-color:rgba(158,158,158,.2);
+ top: 0px;
+}
+
 /* Sign-in display box */
 #dialog{
     width:600px;

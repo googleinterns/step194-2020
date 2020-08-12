@@ -44,6 +44,7 @@ public class RetrieveQueue extends HttpServlet {
     } catch (Exception e) {
       response.getWriter().println(gson.toJson("error: DocSnap error"));
     }
+    System.out.println("room: " + room);
     if (room.exists()) {
       ApiFuture<QuerySnapshot> queueFuture =
           db.collection("rooms")

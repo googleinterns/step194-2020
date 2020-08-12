@@ -13,4 +13,20 @@ public class Video {
     this.videoURL = videoURL;
     this.duration = duration;
   }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getThumbnailURL() {
+    return thumbnailURL;
+  }
+
+  public String getVideoURL() {
+    return videoURL;
+  }
+
+  public long getDuration() {
+    return duration;
+  }
 }

@@ -176,7 +176,7 @@ public class SingleVideoSearch extends HttpServlet {
    *
    * @return a long for the number of seconds in encodedTime
    */
-  private long parseDuration(String encodedTime) {
+  public long parseDuration(String encodedTime) {
     String shortenedTime = encodedTime.substring(2);
     long hours = 0;
     long minutes = 0;
@@ -189,8 +189,7 @@ public class SingleVideoSearch extends HttpServlet {
     if (shortenedTime.contains("M")) {
       minutes = Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("M")));
       seconds += (minutes * 60);
-      shortenedTime =
-          shortenedTime.substring(shortenedTime.indexOf("M") + 1, shortenedTime.length() - 1);
+      shortenedTime = shortenedTime.substring(shortenedTime.indexOf("M") + 1);
     }
     if (shortenedTime.contains("S")) {
       seconds += Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("S")));

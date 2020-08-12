@@ -303,6 +303,7 @@ function onPlayerStateChange() {
         vidOver = true;
         vidDataRef.update({
           timestamp: player.getDuration(),
+          isPlaying: true,
         }).then(function() {
           console.log('end request sent');
         }).catch(function(error) {

@@ -19,7 +19,7 @@ const SYNC_WINDOW = 5; // max time diff between client and Firestore
 // for Firestore has to be accounted for or a call must be made
 // faster on one client than others.
 const SLOW_UPDATE_FACTOR = 0.85;
-const FAST_UPDATE_FACTOR = 0.75;
+const FAST_UPDATE_FACTOR = 0.7;
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
 
@@ -234,7 +234,7 @@ function isVideoPlaying() {
 // Sends new info to Firestore and then repeatedly calls itself
 // until stopped by user or Firestore.
 function updateInfo(goal) {
-  if (!stopUpdating) {
+  if (!stopUpdating && !videoUpdating) {
     vidDataRef.update({
       isPlaying: isVideoPlaying(),
       timestamp: player.getCurrentTime(),
@@ -243,7 +243,7 @@ function updateInfo(goal) {
       console.log(goal + ' request sent');
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
-        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo();
+        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo('auto');
       }, SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
@@ -257,11 +257,13 @@ let pauseInterval;
 function setPauseInterval() {
   lastTime = player.getCurrentTime();
   pauseInterval = setInterval(function() {
-    if (player.getCurrentTime() != lastTime) {
-      lastTime = player.getCurrentTime();
+    console.log('last time ' + lastTime);
+    if (player.getCurrentTime() !== lastTime && videoUpdating === false) {
       updateInfo('Update on Pause Seek');
+      lastTime = player.getCurrentTime();
     }
-  }, 1000);
+    videoUpdating = false;
+  }, 2000);
 }
 
 let pauseTimeout; // Differentiates pause from seek
@@ -287,8 +289,8 @@ function onPlayerStateChange() {
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
           pauseTimeout = setTimeout(updateInfo, 100, 'pause');
-          setPauseInterval();
         }
+        setPauseInterval();
         break;
       case 3: // Buffering
         bufferTimeout = setTimeout(function() {
@@ -301,6 +303,7 @@ function onPlayerStateChange() {
         switchDisplay();
         removeOneViewer();
     }
+    videoUpdating = false;
   }
 }
 
@@ -324,7 +327,7 @@ function catchUserUp() {
   }).then(function() {
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
+          SYNC_WINDOW * 1000 * SLOW_UPDATE_FACTOR);
     }
   });
 }
@@ -332,19 +335,20 @@ function catchUserUp() {
 function getRealtimeUpdates() {
   vidDataRef.onSnapshot(function(doc) {
     clearTimeout(autoUpdate);
-    videoUpdating = true;
     if (doc && doc.exists) {
       const vidData = doc.data();
       if (!stopUpdating) {
         if (player.getPlaybackRate() != vidData.videoSpeed) {
+          videoUpdating = true;
           player.setPlaybackRate(vidData.videoSpeed);
-          console.log('new speed: ' + player.getPlaybackRate());
         }
         if (!timesInRange(vidData.timestamp)) {
+          videoUpdating = true;
           player.seekTo(vidData.timestamp, true);
-          console.log('new time: ' + player.getCurrentTime());
+          lastTime = vidData.timestamp;
         }
         if (differentStates(vidData.isPlaying)) {
+          videoUpdating = true;
           switch (vidData.isPlaying) {
             case true:
               player.playVideo();
@@ -353,22 +357,19 @@ function getRealtimeUpdates() {
               player.pauseVideo();
               player.seekTo(vidData.timestamp, true);
           }
-          console.log('new state: ' + player.getPlayerState());
         }
       }
       if (vidOver) waitForOthers(vidData);
     }
-    videoUpdating = false;
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW * 1000 * SLOW_UPDATE_FACTOR);
+          SYNC_WINDOW * 1000 * SLOW_UPDATE_FACTOR, 'auto');
     }
   });
 }
 
 window.onbeforeunload = function() {
   clearTimeouts();
-  if (!vidOver && thumbnail.style.display !== 'block') removeOneViewer();
-  alert('Sync ended, refresh to continue');
+  if (!vidOver && thumbnail.style.display === 'none') removeOneViewer();
   return 'end of viewing';
 };

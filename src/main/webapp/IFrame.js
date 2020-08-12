@@ -15,6 +15,11 @@
 let videoUpdating; // is video currently updating to match Firestore info?
 let autoUpdate; // max time between updates
 const SYNC_WINDOW = 5; // max time diff between client and Firestore
+// These factors shorten the sync window variable in cases where time
+// for Firestore has to be accounted for or a call must be made
+// faster on one client than others.
+const SLOW_UPDATE_FACTOR = 0.85;
+const FAST_UPDATE_FACTOR = 0.75;
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
 
@@ -28,23 +33,23 @@ const vidDataRef = firestore.collection('rooms').doc(roomId)
 const queueDataRef = firestore.collection('rooms').doc(roomId)
     .collection('queue');
 
-let videoIds;
-let thumbnails;
-let docIds;
+let nextVidID;
+let nextThumbnail;
+let nextDocID;
 function updateQueue() {
-  videoIds = [];
-  thumbnails = [];
-  docIds = [];
-  queueDataRef.orderBy('requestTime', 'asc').get()
+  nextVidID = '';
+  nextThumbnail = '';
+  nextDocID = '';
+  queueDataRef.orderBy('requestTime', 'asc').limit(1).get()
       .then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
           const queueData = doc.data();
-          docIds.push(doc.id);
-          videoIds.push(queueData.videoID);
+          nextDocID = doc.id;
+          nextVidID = queueData.videoID;
           const thumbnailString = queueData.thumbnailURL;
           const thumbnailURL = thumbnailString.substring(1,
               thumbnailString.length - 1);
-          thumbnails.push(thumbnailURL);
+          nextThumbnail = thumbnailURL;
         });
       })
       .catch(function(error) {
@@ -73,18 +78,20 @@ function getCurrentVideo() {
 }
 
 function getFirstVidFromQueue() {
-  if (videoIds.length === 0) {
+  if (nextVidID === '') {
     console.log('add videos to the queue!');
     setTimeout(getCurrentVideo, 2000);
   } else {
-    const firstVid = videoIds[0];
-    const firstVidDocId = docIds[0];
-    updateVidPlaying(firstVid);
+    const firstVid = nextVidID;
+    const firstVidDocId = nextDocID;
     player.loadVideoById({videoId: firstVid});
     switchDisplay();
     addOneViewer();
     stopUpdating = false;
-    queueDataRef.doc(firstVidDocId).delete();
+    setTimeout(function() {
+      updateVidPlaying(firstVid);
+      queueDataRef.doc(firstVidDocId).delete();
+    }, 1000);
   }
 }
 
@@ -109,7 +116,7 @@ function onPlayerReady() {
 // Move playhead slightly ahead of updated timestamp when needed
 function seek(vidData) {
   if (vidData.isPlaying) {
-    const seekAhead = vidData.timestamp + SYNC_WINDOW*0.75;
+    const seekAhead = vidData.timestamp + SYNC_WINDOW * SLOW_UPDATE_FACTOR;
     player.seekTo(seekAhead, true);
   } else {
     player.seekTo(vidData.timestamp, true);
@@ -130,7 +137,7 @@ function switchDisplay() {
   }
 
   if (thumbnail.style.display === 'none') {
-    if (thumbnails.length > 0) thumbnail.src = thumbnails[0];
+    if (nextThumbnail !== '') thumbnail.src = nextThumbnail;
     else thumbnail.src = '/images/LoungeLogo.png';
     thumbnail.style.display = 'block';
   } else {
@@ -195,7 +202,7 @@ function waitForOthers(vidData) {
   if (vidData.numPeopleWatching === 0) {
     vidOver = false;
     resetPlaybackInfo();
-    setTimeout(getCurrentVideo, 1000);
+    getCurrentVideo();
   }
 }
 
@@ -237,7 +244,7 @@ function updateInfo(goal) {
       clearTimeout(autoUpdate);
       autoUpdate = setTimeout(function() {
         if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) updateInfo();
-      }, SYNC_WINDOW*1000*0.66);
+      }, SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
     }).catch(function(error) {
       console.log(goal + ' caused an error: ', error);
     });
@@ -317,7 +324,7 @@ function catchUserUp() {
   }).then(function() {
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW*1000*0.75);
+          SYNC_WINDOW * 1000 * FAST_UPDATE_FACTOR);
     }
   });
 }
@@ -354,7 +361,7 @@ function getRealtimeUpdates() {
     videoUpdating = false;
     if (isVideoPlaying()) {
       autoUpdate = setTimeout(updateInfo,
-          SYNC_WINDOW*1000*0.75);
+          SYNC_WINDOW * 1000 * SLOW_UPDATE_FACTOR);
     }
   });
 }

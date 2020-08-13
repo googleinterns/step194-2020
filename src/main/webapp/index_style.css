@@ -136,9 +136,6 @@ border-bottom: none;
 
 #skipImg {
     color: white;
-    background-color: #33322e;
-    width: 50px;
-    height: auto;
 }
 
 #copyBtn {
@@ -149,13 +146,8 @@ border-bottom: none;
 }
 
 #skipBtn {
-    padding: 0;
     background-color: #33322e;
-    border: none;
-    margin-top: 1%;
-    height: 50px;
-    width: 50px;
-    padding-bottom: 15px;
+    margin-left: 15px;
 }
 
 #skipBtn[disabled] {
@@ -163,8 +155,14 @@ border-bottom: none;
 }
 
 #skipCounter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 2px;
     color: white;
-    padding: 0;
+    text-align: left;
+    font: 500 20px/30px Roboto;
+    font-size: 15px;
 }
 
 #skipContainer {
@@ -176,7 +174,6 @@ border-bottom: none;
     float: left;
     text-align: left;
     font: 500 20px/30px Roboto;
-    padding: 12px 20px 0px 0px;
     text-decoration: none;
     font-size: 15px;
 }

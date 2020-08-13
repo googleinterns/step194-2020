@@ -29,7 +29,7 @@ db.collection('rooms') // eslint-disable-line no-undef
       document.getElementById('skipCounter').innerHTML =
           'Votes to skip video: ' + snapshot.get('skipVotes');
       if (snapshot.get('skipVotes') >= snapshot.get('numPeopleWatching')/2 &&
-          snapshot.get('videoId') != '' && 
+          snapshot.get('videoId') != '' &&
           snapshot.get('numPeopleWatching') > 0) { // if legit majority vote
         console.log('Votes to skip acquired, skipping current video');
         resetSkips();

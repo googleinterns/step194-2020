@@ -130,7 +130,7 @@
              </div>
           </div>
           <div class = "mdl-tabs__panel" id = "queue-panel">
-            <div id="queue-card-container" class="mdl-cell mdl-cell--12-col">
+            <div id="queue-card-container">
                 <div id="queue-card" class="mdl-card mdl-cell mdl-cell--12-col">
                     <div class="mdl-card__supporting-text mdl-color-text--white" id="bigQueueContainer">
                         <div id="videoContainer"></div>
@@ -140,7 +140,7 @@
                                         <label class="mdl-textfield__label" for="linkArea">Enter a YouTube video link...</label>
                                     </div>
                                     <button class="submitBtn" id="queueBtn" type="submit" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
-                                        <img id="removeFromQueueIMG" src="../images/add-to-queue.svg"/>
+                                        <span class="material-icons">add_to_queue</span>
                                     </button>    
                             </div>
                     </div>
@@ -153,7 +153,7 @@
           <div class = "mdl-tabs__panel" id = "guests-panel">
             <div id = "guests">
             </div>
-            <p style="color:white;"> Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> 
+            <p id="flaticon" style="color:white;"> Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> 
              from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></p>
           </div>
 

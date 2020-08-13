@@ -96,6 +96,12 @@
           <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
             <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/?enablejsapi=1" allowfullscreen></iframe>
             <img id="thumbnailDisplay" width="100%" height="100%" src=""></img>
+            <div id="skipContainer">
+                <p id="skipCounter">Votes to skip video: 0</p>
+                <button id="skipBtn" onclick="voteToSkip()" class="mdl-button mdl-js-button mdl-button-raised mdl-js-ripple-effect">
+                    <span id="skipImg" class="material-icons">skip_next </span>
+                </button>
+            </div>
           </div>
       </div>
 

@@ -73,8 +73,8 @@ function voteToSkip() {
         .collection('CurrentVideo')
         .doc('PlaybackData')
         .update({
-          skipVotes: firebase.firestore.FieldValue // eslint-disable-line no-undef
-              .increment(1),
+          skipVotes: firebase // eslint-disable-line no-undef
+              .firestore.FieldValue.increment(1), 
         }).then(function() {
           console.log('votes incremented');
         }).catch(function(error) {
@@ -86,7 +86,8 @@ function voteToSkip() {
         .collection('CurrentVideo')
         .doc('PlaybackData')
         .update({
-          skipVotes : firebase.firestore.FieldValue.increment(-1),
+          skipVotes: firebase // eslint-disable-line no-undef
+              .firestore.FieldValue.increment(-1),
         }).then(function() {
           console.log('votes decremented');
         }).catch(function(error) {
@@ -105,6 +106,7 @@ function resetSkips() { // eslint-disable-line no-undef
       .update({
         skipVotes: 0,
         videoId: '',
+        timestamp: 0,
       }).then(function() {
         switchDisplay(); // eslint-disable-line no-undef
         getCurrentVideo(); // eslint-disable-line no-undef

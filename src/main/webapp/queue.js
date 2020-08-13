@@ -97,9 +97,9 @@ function voteToSkip() {
   setTimeout(2000);
 }
 
-function resetSkips() { // eslint-disable-line no-undef
+function resetSkips() {
   voteBtnCount = 0;
-  player.seekTo(player.getDuration(), true);
+  player.seekTo(player.getDuration(), true); // eslint-disable-line no-undef
 }
 
 /* exported verifyURLStructure */

@@ -152,7 +152,7 @@ async function getRoomQueue(roomid) {
               i +
               '" onclick="removeVideo(\'' + roomParameters + '\',\'' +
               videosArray.docs[i].id + '\')">' +
-              '<img src="../images/remove-from-queue.svg"/>'+ 
+              '<img src="../images/remove-from-queue.svg"/>' +
               ' REMOVE' + '</button>' + '</div></div>';
           }
         }

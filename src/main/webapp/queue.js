@@ -64,7 +64,8 @@ function updateShareTab() {
       'lounge.html/?room_id='+ roomParameters +'" type="text" readonly</input>';
 }
 
-function voteToSkip() { // eslint-disable-line no-undef
+/* exported voteToSkip */
+function voteToSkip() {
   voteBtnCount++;
   if (voteBtnCount % 2 == 1) {
     db.collection('rooms') // eslint-disable-line no-undef
@@ -72,7 +73,8 @@ function voteToSkip() { // eslint-disable-line no-undef
         .collection('CurrentVideo')
         .doc('PlaybackData')
         .update({
-          skipVotes: firebase.firestore.FieldValue.increment(1), // eslint-disable-line no-undef
+          skipVotes: firebase.firestore.FieldValue // eslint-disable-line no-undef
+              .increment(1),
         }).then(function() {
           console.log('votes incremented');
         }).catch(function(error) {
@@ -104,9 +106,9 @@ function resetSkips() { // eslint-disable-line no-undef
         skipVotes: 0,
         videoId: '',
       }).then(function() {
-        switchDisplay();
-        getCurrentVideo();
-        console.log("resetting skip counter");
+        switchDisplay(); // eslint-disable-line no-undef
+        getCurrentVideo(); // eslint-disable-line no-undef
+        console.log('resetting skip counter');
       }).catch(function(error) {
         console.log('skips could not be reset: ', error);
       });

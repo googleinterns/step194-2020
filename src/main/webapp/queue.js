@@ -74,7 +74,7 @@ function voteToSkip() {
         .doc('PlaybackData')
         .update({
           skipVotes: firebase // eslint-disable-line no-undef
-              .firestore.FieldValue.increment(1), 
+              .firestore.FieldValue.increment(1),
         }).then(function() {
           console.log('votes incremented');
         }).catch(function(error) {
@@ -99,21 +99,7 @@ function voteToSkip() {
 
 function resetSkips() { // eslint-disable-line no-undef
   voteBtnCount = 0;
-  db.collection('rooms') // eslint-disable-line no-undef
-      .doc(roomParameters)
-      .collection('CurrentVideo')
-      .doc('PlaybackData')
-      .update({
-        skipVotes: 0,
-        videoId: '',
-        timestamp: 0,
-      }).then(function() {
-        switchDisplay(); // eslint-disable-line no-undef
-        getCurrentVideo(); // eslint-disable-line no-undef
-        console.log('resetting skip counter');
-      }).catch(function(error) {
-        console.log('skips could not be reset: ', error);
-      });
+  player.seekTo(player.getDuration(), true);
 }
 
 /* exported verifyURLStructure */

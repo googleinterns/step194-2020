@@ -84,20 +84,20 @@ function changeVotesToSkipCount(change) {
       .doc(roomParameters)
       .collection('CurrentVideo')
       .doc('PlaybackData');
-  return db
-      .runTransaction(function(transaction) { // eslint-disable-line no-undef
-    return transaction.get(playbackRef).then(function(docRef) {
-      if (!docRef.exists) {
-        throw new Error('Document doesn\'t exist!');
-      }
-      const newVoteCount = docRef.data().votesToSkipVideo + change;
-      transaction.update(playbackRef, {votesToSkipVideo: newVoteCount});
-    });
-  }).then(function() {
-    console.log('Vote transaction successful!');
-  }).catch(function(error) {
-    console.log('Transaction failed: ', error);
-  });
+  return db // eslint-disable-line no-undef
+      .runTransaction(function(transaction) {
+        return transaction.get(playbackRef).then(function(docRef) {
+          if (!docRef.exists) {
+            throw new Error('Document doesn\'t exist!');
+          }
+          const newVoteCount = docRef.data().votesToSkipVideo + change;
+          transaction.update(playbackRef, {votesToSkipVideo: newVoteCount});
+        });
+      }).then(function() {
+        console.log('Vote transaction successful!');
+      }).catch(function(error) {
+        console.log('Transaction failed: ', error);
+      });
 }
 
 function resetSkips() {

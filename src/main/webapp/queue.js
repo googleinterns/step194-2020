@@ -29,7 +29,7 @@ db.collection('rooms') // eslint-disable-line no-undef
       }
       document.getElementById('skipCounter').innerHTML =
           'Votes to skip video: ' + snapshot.get('votesToSkipVideo');
-      if (snapshot.get('votesToSkipVideo') >= 
+      if (snapshot.get('votesToSkipVideo') >=
           snapshot.get('numPeopleWatching')/2 &&
           snapshot.get('videoId') != '' &&
           snapshot.get('numPeopleWatching') > 0) { // if legit majority vote
@@ -80,20 +80,20 @@ function voteToSkip() {
 }
 
 function changeVotesToSkipCount(change) {
-  const playbackRef = db.collection('rooms')
+  const playbackRef = db.collection('rooms') // eslint-disable-line no-undef
       .doc(roomParameters)
       .collection('CurrentVideo')
       .doc('PlaybackData');
-  return db.runTransaction(function(transaction) {
+  return db.runTransaction(function(transaction) { // eslint-disable-line no-undef
     return transaction.get(playbackRef).then(function(docRef) {
       if (!docRef.exists) {
-        throw 'Document doesn\'t exist!';
+        throw new Error('Document doesn\'t exist!');
       }
-      var newVoteCount = docRef.data().votesToSkipVideo + change;
+      let newVoteCount = docRef.data().votesToSkipVideo + change;
       transaction.update(playbackRef, {votesToSkipVideo: newVoteCount});
     });
   }).then(function() {
-    console.log("Vote transaction successful!");
+    console.log('Vote transaction successful!');
   }).catch(function(error) {
     console.log('Transaction failed: ', error);
   });

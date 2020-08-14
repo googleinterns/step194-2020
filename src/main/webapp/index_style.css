@@ -140,3 +140,9 @@ border-bottom: none;
     border: none;
     margin-top: 1%;
 }
+
+#flaticon{
+    font-size: 12px;
+    position: absolute;
+    bottom: 0px;
+}

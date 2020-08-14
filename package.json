@@ -3,9 +3,26 @@
   "version": "0.0.1",
   "devDependencies": {
     "eslint": "^7.3.1",
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^0.2.1",
+    "mocha": "^8.1.1"
   },
   "dependencies": {
     "firebase": "^7.17.1"
-  }
+  },
+  "description": "This repository contains the capstone project for a pod of interns (step194-2020) in Google's Student Training in Engineering program.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive src/test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googleinterns/step194-2020.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/googleinterns/step194-2020/issues"
+  },
+  "homepage": "https://github.com/googleinterns/step194-2020#readme"
 }

@@ -84,12 +84,13 @@ function changeVotesToSkipCount(change) {
       .doc(roomParameters)
       .collection('CurrentVideo')
       .doc('PlaybackData');
-  return db.runTransaction(function(transaction) { // eslint-disable-line no-undef
+  return db
+      .runTransaction(function(transaction) { // eslint-disable-line no-undef
     return transaction.get(playbackRef).then(function(docRef) {
       if (!docRef.exists) {
         throw new Error('Document doesn\'t exist!');
       }
-      let newVoteCount = docRef.data().votesToSkipVideo + change;
+      const newVoteCount = docRef.data().votesToSkipVideo + change;
       transaction.update(playbackRef, {votesToSkipVideo: newVoteCount});
     });
   }).then(function() {

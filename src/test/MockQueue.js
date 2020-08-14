@@ -32,7 +32,7 @@ function parseTime(duration) {
   return result + minutes + ':' + seconds;
 }
 
-module.exports = {
+module.exports = { // eslint-disable-line no-undef
   verifyURLStructure: verifyURLStructure,
   parseTime: parseTime,
 };

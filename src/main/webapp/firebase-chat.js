@@ -1,3 +1,4 @@
+/* eslint-disable */
 // retrieve specific room id a user is in
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -301,11 +302,9 @@ function loadGuests() {
 //removes user's guest document from firestore 
 function removeGuest() {
   const uid = firebase.auth().currentUser.uid;
-  if (firebase.auth().signOut()){
   const viewer = firebase.firestore().collection('rooms')
       .doc(roomParam).collection('guests').doc(uid);
   viewer.delete();
-  }
 }
 
 // Enables or disables the submit button depending on

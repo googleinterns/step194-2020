@@ -357,6 +357,12 @@ window.addEventListener('beforeunload', function(e) {
   deleteAnonymousUser();
 }, false);
 
+document.querySelector("dialog").addEventListener("keydown",function(e){
+  const charCode = e.charCode || e.keyCode || e.which;
+  if (charCode == 27){
+    anonymousSignIn();
+  }
+});
 
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);

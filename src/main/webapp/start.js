@@ -17,7 +17,7 @@ async function startRoom() {
                 videoSpeed: 1,
                 videoId: '',
                 timestamp: 0,
-                skipVotes: 0,
+                votesToSkipVideo: 0,
               }).then(function() {
                 console.log('Playback successfully written!');
               }).catch(function(error) {

@@ -151,7 +151,7 @@ function resetPlaybackInfo() {
     timestamp: 0,
     videoSpeed: 1,
     videoId: '',
-    skipVotes: 0,
+    votesToSkipVideo: 0,
   }).then(function() {
     console.log('reset request sent');
   }).catch(function(error) {

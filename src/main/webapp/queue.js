@@ -2,6 +2,7 @@ db = firebase.firestore(); // eslint-disable-line no-undef
 const queryValue = window.location.search;
 const urlParameters = new URLSearchParams(queryValue);
 const roomParameters = urlParameters.get('room_id');
+const WAIT_MILLI_SECONDS = 2000;
 let voteBtnCount = 0;
 validateRoom();
 updateShareTab();
@@ -27,8 +28,9 @@ db.collection('rooms') // eslint-disable-line no-undef
         document.getElementById('skipBtn').disabled = false;
       }
       document.getElementById('skipCounter').innerHTML =
-          'Votes to skip video: ' + snapshot.get('skipVotes');
-      if (snapshot.get('skipVotes') >= snapshot.get('numPeopleWatching')/2 &&
+          'Votes to skip video: ' + snapshot.get('votesToSkipVideo');
+      if (snapshot.get('votesToSkipVideo') >= 
+          snapshot.get('numPeopleWatching')/2 &&
           snapshot.get('videoId') != '' &&
           snapshot.get('numPeopleWatching') > 0) { // if legit majority vote
         console.log('Votes to skip acquired, skipping current video');
@@ -70,33 +72,31 @@ function updateShareTab() {
 function voteToSkip() {
   voteBtnCount++;
   if (voteBtnCount % 2 == 1) {
-    db.collection('rooms') // eslint-disable-line no-undef
-        .doc(roomParameters)
-        .collection('CurrentVideo')
-        .doc('PlaybackData')
-        .update({
-          skipVotes: firebase // eslint-disable-line no-undef
-              .firestore.FieldValue.increment(1),
-        }).then(function() {
-          console.log('votes incremented');
-        }).catch(function(error) {
-          console.log('voting caused an error: ', error);
-        });
-  } else if (voteBtnCount % 2 == 0) {
-    db.collection('rooms') // eslint-disable-line no-undef
-        .doc(roomParameters)
-        .collection('CurrentVideo')
-        .doc('PlaybackData')
-        .update({
-          skipVotes: firebase // eslint-disable-line no-undef
-              .firestore.FieldValue.increment(-1),
-        }).then(function() {
-          console.log('votes decremented');
-        }).catch(function(error) {
-          console.log('voting caused an error: ', error);
-        });
+    changeVotesToSkipCount(1);
+  } else {
+    changeVotesToSkipCount(-1);
   }
-  setTimeout(2000);
+  setTimeout(WAIT_MILLI_SECONDS);
+}
+
+function changeVotesToSkipCount(change) {
+  const playbackRef = db.collection('rooms')
+      .doc(roomParameters)
+      .collection('CurrentVideo')
+      .doc('PlaybackData');
+  return db.runTransaction(function(transaction) {
+    return transaction.get(playbackRef).then(function(docRef) {
+      if (!docRef.exists) {
+        throw 'Document doesn\'t exist!';
+      }
+      var newVoteCount = docRef.data().votesToSkipVideo + change;
+      transaction.update(playbackRef, {votesToSkipVideo: newVoteCount});
+    });
+  }).then(function() {
+    console.log("Vote transaction successful!");
+  }).catch(function(error) {
+    console.log('Transaction failed: ', error);
+  });
 }
 
 function resetSkips() {

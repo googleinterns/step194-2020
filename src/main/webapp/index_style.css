@@ -177,3 +177,10 @@ border-bottom: none;
     text-decoration: none;
     font-size: 15px;
 }
+
+#flaticon{
+    font-size: 12px;
+    position: absolute;
+    bottom: 0px;
+
+}

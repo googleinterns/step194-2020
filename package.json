@@ -13,7 +13,7 @@
   "description": "This repository contains the capstone project for a pod of interns (step194-2020) in Google's Student Training in Engineering program.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive src/test"
+    "test": "mocha --reporter spec --recursive src/test"
   },
   "repository": {
     "type": "git",

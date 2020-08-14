@@ -302,6 +302,14 @@ function onPlayerStateChange() {
       case 0: // Ended
         stopUpdating = true;
         vidOver = true;
+        vidDataRef.update({
+          timestamp: player.getDuration(),
+          isPlaying: true,
+        }).then(function() {
+          console.log('end request sent');
+        }).catch(function(error) {
+          console.log('end caused an error: ', error);
+        });
         switchDisplay();
         removeOneViewer();
     }

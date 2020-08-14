@@ -53,7 +53,6 @@
 .message-container {
   display: block;
   margin-top: 10px;
-  border-top: 1px solid #f3f3f3;
   padding-top: 10px;
 }
 .message-container .pic {

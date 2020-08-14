@@ -10,6 +10,7 @@ function anonymousSignIn() {
 
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
+  firebase.auth().onAuthStateChanged(saveGuestList);
 }
 
 // selection from list presented in dialog box
@@ -212,10 +213,12 @@ function displayMessage(id, timestamp, name, text, picUrl) {
 }
 
 // Saves a new guest signed in on the Cloud Firestore
-// added entry to the Firebase database
-function saveGuestList() {
+// Added document to the Firebase data with
+// anonymous user uid created at authentication
+function saveGuestList(user) {
+  const uid = user.uid;
   return firebase.firestore().collection('rooms')
-      .doc(roomParam).collection('guests').add({
+      .doc(roomParam).collection('guests').doc(uid).set({
         name: getUserName(),
         profilePicUrl: getProfilePicUrl(),
         timestamp: getTimestamp(),
@@ -296,9 +299,11 @@ function loadGuests() {
   });
 }
 
-function removeGuest(guest) {
+//removes user's guest document from firestore 
+function removeGuest() {
+  const uid = firebase.auth().currentUser.uid;
   const viewer = firebase.firestore().collection('rooms')
-      .doc(roomParam).collection('guests').doc(guest);
+      .doc(roomParam).collection('guests').doc(uid);
   viewer.delete();
 }
 
@@ -332,40 +337,32 @@ const dialog = document.getElementById('dialog');
 const displayName = document.getElementById('userName');
 const anonymousSignInElement = document.getElementById('anonymous-signin');
 const guestListElement = document.getElementById('guests');
-const guestArray = firebase.firestore().collection('rooms')
-    .doc(roomParam).collection('guests').orderBy('timestamp', 'desc').get();
-const guestCount = guestListElement.childElementCount;
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
+  removeGuest();
   deleteAnonymousUser();
-  for (let i = guestCount; i < guestArray.length; i++) {
-    removeGuest(guestArray.docs[i].id);
-  }
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
-  saveGuestList();
 });
 
 // when window closes or is refreshed
 window.addEventListener('beforeunload', function(e) {
   firebase.auth().signOut();
+  removeGuest();
   deleteAnonymousUser();
 }, false);
 
-firebase.auth().onAuthStateChanged((firebaseUser) => {
-  console.log(firebaseUser);
+document.querySelector("dialog").addEventListener("keydown",function(e){
+  const charCode = e.charCode || e.keyCode || e.which;
+  if (charCode == 27){
+    anonymousSignIn();
+  }
 });
-
-// when window closes or is refreshed
-window.addEventListener("beforeunload", function(e){
-  firebase.auth().signOut();
-  deleteUser();
-}, false);
 
 messageInputElement.addEventListener('keyup', toggleButton);
 messageInputElement.addEventListener('change', toggleButton);

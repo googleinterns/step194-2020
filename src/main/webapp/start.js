@@ -4,7 +4,7 @@ let startButtonCount = 0;
 // Takes the user to the lounge page when the start button is pressed
 async function startRoom() {
   if (startButtonCount < 1) {
-    db.collection('rooms').add({ // eslint-disable-line no-undef
+    await db.collection('rooms').add({ // eslint-disable-line no-undef
       duration: '0',
       elapsedTime: '0',
     })
@@ -23,7 +23,7 @@ async function startRoom() {
               }).catch(function(error) {
                 console.error('Error writing Playback: ', error);
               });
-          window.location.href = 'lounge.html/?room_id=' + docRef.id;
+          window.location.href = 'lounge.html?room_id=' + docRef.id;
         });
     startButtonCount++;
   }

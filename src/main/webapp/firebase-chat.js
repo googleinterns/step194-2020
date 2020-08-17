@@ -10,7 +10,6 @@ function anonymousSignIn() {
 
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
-  firebase.auth().onAuthStateChanged(saveGuestList);
 }
 
 // selection from list presented in dialog box
@@ -98,6 +97,7 @@ function authStateObserver(user) {
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
     dialog.close();
+    saveGuestList();
   } else {
     userNameElement.setAttribute('hidden', 'true');
     userPicElement.setAttribute('hidden', 'true');
@@ -215,8 +215,8 @@ function displayMessage(id, timestamp, name, text, picUrl) {
 // Saves a new guest signed in on the Cloud Firestore
 // Added document to the Firebase data with
 // anonymous user uid created at authentication
-function saveGuestList(user) {
-  const uid = user.uid;
+function saveGuestList() {
+  const uid = firebase.auth().currentUser.uid;;
   return firebase.firestore().collection('rooms')
       .doc(roomParam).collection('guests').doc(uid).set({
         name: getUserName(),
@@ -340,8 +340,8 @@ const guestListElement = document.getElementById('guests');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
-  firebase.auth().signOut();
   removeGuest();
+  firebase.auth().signOut();
   deleteAnonymousUser();
 });
 

@@ -171,9 +171,9 @@ async function getSearchQuery(keywords) {
       .then((response) => response.json())
       .then((videos) => {
         console.log(videos);
-        let items = videos.items;
+        const items = videos.items;
         document.getElementById('searchContainer').innerHTML = '';
-        for (var i = 0; i < items.length; i++) {
+        for (let i = 0; i < items.length; i++) {
           document.getElementById('searchContainer').innerHTML +=
               '<div id="' + items[i].id.videoId +
               '" class="searchVideo" onclick="getVideoData(\'' +
@@ -183,7 +183,7 @@ async function getSearchQuery(keywords) {
               '"/><div class="searchInfo">' +
               '<p class="searchTitle">' +
               items[i].snippet.title + '</p>' +
-              '<p class="channelTitle searchTitle">' + 
+              '<p class="channelTitle searchTitle">' +
               items[i].snippet.channelTitle + '</p>' +
               '</div></div>';
         }
@@ -283,7 +283,7 @@ function parseTime(duration) {
   return result + minutes + ':' + seconds;
 }
 
-document.getElementById('searchArea').addEventListener('keydown',function(e){
+document.getElementById('searchArea').addEventListener('keydown', function(e) {
   const charCode = e.charCode || e.keyCode || e.which;
   if (charCode == 13) {
     getSearchQuery(document.getElementById('searchArea').value);

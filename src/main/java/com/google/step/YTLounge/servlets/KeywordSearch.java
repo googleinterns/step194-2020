@@ -52,21 +52,18 @@ public class KeywordSearch extends HttpServlet {
     response.setContentType("application/json");
     String keywords = RequestParameter.getParameter(request, "words", "");
     YouTube youtubeService = null;
-    try{
-        youtubeService = getService();
-    } catch(Exception e) {
-        e.printStackTrace();
+    try {
+      youtubeService = getService();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     if (youtubeService == null) {
-        return;
+      return;
     }
     // Define and execute the API request
-    YouTube.Search.List vidRequest = youtubeService.search()
-        .list("snippet");
-    SearchListResponse vidResponse = vidRequest.setMaxResults(15L)
-        .setQ(keywords)
-        .setType("video")
-        .execute();
+    YouTube.Search.List vidRequest = youtubeService.search().list("snippet");
+    SearchListResponse vidResponse =
+        vidRequest.setMaxResults(15L).setQ(keywords).setType("video").execute();
     response.getWriter().println(gson.toJson(vidResponse));
   }
 

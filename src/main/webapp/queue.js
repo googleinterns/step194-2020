@@ -161,6 +161,7 @@ async function getVideoData(id) {
   getRoomQueue(roomParameters);
 }
 
+// Retrieves search data from servlet and formats results in HTML
 async function getSearchQuery(keywords) {
   if (keywords == '') {
     console.log('NO KEYWORDS');
@@ -173,7 +174,7 @@ async function getSearchQuery(keywords) {
         let items = videos.items;
         document.getElementById('searchContainer').innerHTML = '';
         for (var i = 0; i < items.length; i++) {
-            document.getElementById('searchContainer').innerHTML +=
+          document.getElementById('searchContainer').innerHTML +=
               '<div id="' + items[i].id.videoId +
               '" class="searchVideo" onclick="getVideoData(\'' +
               items[i].id.videoId+'\')">' +
@@ -182,7 +183,8 @@ async function getSearchQuery(keywords) {
               '"/><div class="searchInfo">' +
               '<p class="searchTitle">' +
               items[i].snippet.title + '</p>' +
-              '<p class="channelTitle searchTitle">' + items[i].snippet.channelTitle + '</p>' +
+              '<p class="channelTitle searchTitle">' + 
+              items[i].snippet.channelTitle + '</p>' +
               '</div></div>';
         }
       });
@@ -282,8 +284,8 @@ function parseTime(duration) {
 }
 
 document.getElementById('searchArea').addEventListener('keydown',function(e){
-    const charCode = e.charCode || e.keyCode || e.which;
-    if (charCode == 13) {
-        getSearchQuery(document.getElementById('searchArea').value);
-    }
-})
+  const charCode = e.charCode || e.keyCode || e.which;
+  if (charCode == 13) {
+    getSearchQuery(document.getElementById('searchArea').value);
+  }
+});

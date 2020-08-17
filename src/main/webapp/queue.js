@@ -79,6 +79,12 @@ function voteToSkip() {
   setTimeout(WAIT_MILLI_SECONDS);
 }
 
+/*
+  Create a transaction to ensure that race conditions aren't created.
+  Reads the lounge's skip count and updates the count based on the 
+  given change, then printing to the console whether the transaction
+  was successful or not.
+*/
 function changeVotesToSkipCount(change) {
   const playbackRef = db.collection('rooms') // eslint-disable-line no-undef
       .doc(roomParameters)
@@ -100,6 +106,11 @@ function changeVotesToSkipCount(change) {
       });
 }
 
+/*
+  When a video should be skipped, reset all the internal information
+  of the skip counter to 0 while moving the player to the end of the
+  current video, thus skipping based on the iFrame implementation
+*/
 function resetSkips() {
   voteBtnCount = 0;
   player.seekTo(player.getDuration(), true); // eslint-disable-line no-undef

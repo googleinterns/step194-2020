@@ -343,18 +343,21 @@ signOutButtonElement.addEventListener('click', function() {
   removeGuest();
   firebase.auth().signOut();
   deleteAnonymousUser();
+  anonymousSignInElement.disabled = false;
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
-});
+  anonymousSignInElement.disabled = true;
+  });
 
 // when window closes or is refreshed
 window.addEventListener('beforeunload', function(e) {
   firebase.auth().signOut();
   removeGuest();
   deleteAnonymousUser();
+  anonymousSignInElement.disabled = false;
 }, false);
 
 document.querySelector("dialog").addEventListener("keydown",function(e){

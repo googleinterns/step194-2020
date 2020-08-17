@@ -134,6 +134,10 @@ border-bottom: none;
     background-color:#111;
 }
 
+#skipImg {
+    color: white;
+}
+
 #copyBtn {
     padding: 0;
     background: none;
@@ -141,8 +145,42 @@ border-bottom: none;
     margin-top: 1%;
 }
 
+#skipBtn {
+    background-color: #33322e;
+    margin-left: 15px;
+}
+
+#skipBtn[disabled] {
+ background:rgba(158,158,158,.3);
+}
+
+#skipCounter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 2px;
+    color: white;
+    text-align: left;
+    font: 500 20px/30px Roboto;
+    font-size: 15px;
+}
+
+#skipContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: space-between;
+    justify-content: center;
+    color: white;
+    float: left;
+    text-align: left;
+    font: 500 20px/30px Roboto;
+    text-decoration: none;
+    font-size: 15px;
+}
+
 #flaticon{
     font-size: 12px;
     position: absolute;
     bottom: 0px;
+
 }

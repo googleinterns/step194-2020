@@ -81,7 +81,7 @@ function voteToSkip() {
 
 /*
   Create a transaction to ensure that race conditions aren't created.
-  Reads the lounge's skip count and updates the count based on the 
+  Reads the lounge's skip count and updates the count based on the
   given change, then printing to the console whether the transaction
   was successful or not.
 */

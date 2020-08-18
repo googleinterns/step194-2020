@@ -11,82 +11,82 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+/* eslint-disable */
 
 var assert = require('assert');
 var User = require('../test/LoginMock.js');
-const { DeleteUser } = require('../test/LoginMock.js');
+const { deleteUser } = require('../test/LoginMock.js');
 
 
 const user1Credentials = {
-  displayName: 'John', 
-  photoURL: ' '
-}
+  displayName: 'John',
+  photoURL: ' ',
+};
 
 const user2Credentials = {
-  displayName: 'Caroline', 
-  photoURL: 'dog.png'
-}
+  displayName: 'Caroline',
+  photoURL: 'dog.png',
+};
 
 const user3Credentials = {
-  displayName: ' ', 
-  photoURL: 'duck.png'
-}
+  displayName: ' ',
+  photoURL: 'duck.png',
+};
 
 describe('User Sign In', function () {
-  describe('#CreateGuestList()', function () {
+  describe('#createGuestList()', function () {
     this.timeout(15000);
     it('should save onto guest list without error at login', function (done) {
       const user1 = User.MockFirebaseUser(user1Credentials);
-      const guest = User.CreateGuestList(user1Credentials);
+      const guest = User.createGuestList(user1Credentials);
       assert.equal(true, guest);
-     done();    
+     done();
     });
   });
 });
 
 describe('User Sign Out', function() {
-    describe('#DeleteUser', function() {
+    describe('#deleteUser', function() {
       it('should delete user if logout button selected', function() {
-        const guest1 = User.CreateGuestList(user1Credentials);
-        const guest2 = User.CreateGuestList(user2Credentials);
-        const guest3 = User.CreateGuestList(user3Credentials);
-        assert.equal(false, User.DeleteUser(guest2, 'logout'));
+        const guest1 = User.createGuestList(user1Credentials);
+        const guest2 = User.createGuestList(user2Credentials);
+        const guest3 = User.createGuestList(user3Credentials);
+        assert.equal(false, User.deleteUser(guest2, 'logout'));
       });
       it('should delete user if page is refreshed', function() {
-        const guest1 = User.CreateGuestList(user1Credentials);
-        const guest2 = User.CreateGuestList(user2Credentials);
-        const guest3 = User.CreateGuestList(user3Credentials);
-        assert.equal(false, User.DeleteUser(guest3, 'refresh'));
+        const guest1 = User.createGuestList(user1Credentials);
+        const guest2 = User.createGuestList(user2Credentials);
+        const guest3 = User.createGuestList(user3Credentials);
+        assert.equal(false, User.deleteUser(guest3, 'refresh'));
       });
     describe('#EmptyRoom', function() {
       it('should show that room is empty and all users left', function() {
         const guests = new Map();
-        const guest1 = User.CreateGuestList(user1Credentials);
-        const guest2 = User.CreateGuestList(user2Credentials);
-        DeleteUser(guest1, 'logout');
-        DeleteUser(guest2, 'logout')
-        assert.equal(true, User.EmptyRoom(guests));
+        const guest1 = User.createGuestList(user1Credentials);
+        const guest2 = User.createGuestList(user2Credentials);
+        deleteUser(guest1, 'logout');
+        deleteUser(guest2, 'logout')
+        assert.equal(true, User.emptyRoom(guests));
       });
     });
   });
 });
 
 
-  describe('#UpdateName', function() {
+  describe('updateName', function() {
     it('should show user inputted display name', function() {
-      assert.equal('John', User.UpdateName(user1Credentials));
+      assert.equal('John', User.updateName(user1Credentials));
     });
      it('should show default display name due to no input', function() {
-      assert.equal('Lounge Viewer', User.UpdateName(user3Credentials));
+      assert.equal('Lounge Viewer', User.updateName(user3Credentials));
     });
   });
 
-  describe('#UpdatePhoto', function() {
+  describe('#updatePhoto', function() {
     it('should show user selected display image', function() {
-      assert.equal('dog.png', User.UpdatePhoto(user2Credentials));
+      assert.equal('dog.png', User.updatePhoto(user2Credentials));
     });
      it('should show default display image due to no input', function() {
-      assert.equal('hat.png', User.UpdatePhoto(user1Credentials));
+      assert.equal('hat.png', User.updatePhoto(user1Credentials));
     });
   });

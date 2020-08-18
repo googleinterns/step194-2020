@@ -6,50 +6,50 @@ function MockFirebaseUser(data) {
   this.photoURL = data.photoURL;
 }
 
-function CreateGuestList(user) {
+function createGuestList(user) {
   guests.set(idtoken, user);
   return guests.has(idtoken);
-};
+}
 
-function DeleteUser(idtoken, guestState) {
- if (guestState == 'logout'){
-  guests.delete(idtoken);
-  return guests.has(idtoken);
+function deleteUser(idtoken, guestState) {
+  if (guestState == 'logout') {
+    guests.delete(idtoken);
+    return guests.has(idtoken);
  }
- if (guestState == 'refresh'){
-  guests.delete(this.idtoken);
-  return guests.has(idtoken);
+  if (guestState == 'refresh') {
+    guests.delete(this.idtoken);
+    return guests.has(idtoken);
  }
-};
+}
 
-function EmptyRoom(guests) {
+function emptyRoom(guests) {
   if (guests.size === 0) {
     return true;
   }
-};
+}
 
-function UpdateName(data) {  
+function updateName(data) {
   if (data.displayName == ' ') {
-    return 'Lounge Viewer'
-  } else{
+    return 'Lounge Viewer';
+  } else {
     return data.displayName;
   }
-};
+}
 
-function UpdatePhoto(data) {  
+function updatePhoto(data) {
   if (data.photoURL == ' ') {
-    return 'hat.png'
-   } else{
+    return 'hat.png';
+  } else {
     return data.photoURL;
   }
-};
+}
 
 
 module.exports = {
   MockFirebaseUser: MockFirebaseUser,
-  CreateGuestList: CreateGuestList,
-  EmptyRoom: EmptyRoom,
-  DeleteUser: DeleteUser,
-  UpdateName: UpdateName,
-  UpdatePhoto: UpdatePhoto,
+  createGuestList: createGuestList,
+  emptyRoom: emptyRoom,
+  deleteUser: deleteUser,
+  updateName: updateName,
+  updatePhoto: updatePhoto,
 };

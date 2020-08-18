@@ -1,4 +1,4 @@
-let assert = require('assert'); // eslint-disable-line no-undef
+const assert = require('assert'); // eslint-disable-line no-undef
 let autoUpdateTriggered = false;
 
 // Resets all mocks
@@ -11,7 +11,6 @@ function reset() {
   justJoined = true;
   nextVidID = '';
   nextThumbnail = '';
-  nextDocID = '';
 }
 
 // player mock
@@ -110,8 +109,8 @@ const doc = {
       isPlaying: false,
       videoSpeed: 1,
       videoId: '',
-      numPeopleWatching: 0
-    }
+      numPeopleWatching: 0,
+    };
   },
 };
 
@@ -142,9 +141,10 @@ function catchUpAsserts(time, speed, state) {
   assert.equal(doc.data().numPeopleWatching, 1);
 }
 
-describe('Catch Up on Start', function() { // eslint-disable-line no-undef
+/* eslint-disable no-undef*/
+describe('Catch Up on Start', function() {
   it('should catch up to paused firestore when first played',
-      function() { // eslint-disable-line no-undef
+      function() {
     doc.changeFirestore(10, 1.5, false); // timestamp, videoSpeed, isPlaying
     queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
     updateQueue();
@@ -158,7 +158,7 @@ describe('Catch Up on Start', function() { // eslint-disable-line no-undef
   });
 
   it('should move a bit ahead of playing firestore when first played',
-      function() { // eslint-disable-line no-undef
+      function() {
     reset();
     doc.changeFirestore(20, 0.5, true); // playing at 20 sec, half speed
     queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
@@ -173,12 +173,10 @@ describe('Catch Up on Start', function() { // eslint-disable-line no-undef
   });
 });
 
-describe('Sending Information To Firestore',
-    function() { // eslint-disable-line no-undef
-  describe('Sending on Play',
-      function() { // eslint-disable-line no-undef
+describe('Sending Information To Firestore', function() {
+  describe('Sending on Play', function() {
     it('should send info when pressing play on a paused video',
-        function() { // eslint-disable-line no-undef
+        function() {
       doc.changeFirestore(15, 1, false); // paused at 15 sec, default speed
       player.timestamp = 15;
       player.playVideo();
@@ -189,7 +187,7 @@ describe('Sending Information To Firestore',
       autoUpdateTriggered = false;
     });
 
-    it('should send info on seek', function() { // eslint-disable-line no-undef
+    it('should send info on seek', function() {
       doc.changeFirestore(15, 1, true);
       player.timestamp = 30;
       player.playVideo();
@@ -201,9 +199,8 @@ describe('Sending Information To Firestore',
     });
   });
 
-  describe('Sending on pause', function () { // eslint-disable-line no-undef
-    it('should send info to Firestore on pause',
-        function() { // eslint-disable-line no-undef
+  describe('Sending on pause', function () {
+    it('should send info to Firestore on pause', function() {
       doc.changeFirestore(20, 1, true);
       player.timestamp = 40;
       player.pauseVideo();
@@ -215,10 +212,9 @@ describe('Sending Information To Firestore',
     });
   });
 
-  describe('Sending new info while paused',
-       function() { // eslint-disable-line no-undef
+  describe('Sending new info while paused', function() {
     it('should send info to Firestore when seeking while paused',
-        function() { // eslint-disable-line no-undef
+        function() {
       setTimeout(function() {
         reset();
         doc.changeFirestore(10, 1.5, false);
@@ -243,10 +239,9 @@ describe('Sending Information To Firestore',
   // Note: runs after all other tests and checks both that the buffering
   // client does not send new information and that it catches up to the
   // Firestore information.
-  describe('Not Sending While Behind',
-      function() { // eslint-disable-line no-undef
+  describe('Not Sending While Behind', function() {
     it('shouldn\'t send updates after buffering for 5 seconds',
-        function() { // eslint-disable-line no-undef
+        function() {
       setTimeout(function() {
         reset();
         doc.changeFirestore(20, 0.5, true);
@@ -273,10 +268,8 @@ describe('Sending Information To Firestore',
     });
   });
 
-  describe('Sending Info on End',
-      function() { // eslint-disable-line no-undef
-    it('should start by displaying YTLounge logo',
-        function() { // eslint-disable-line no-undef
+  describe('Sending Info on End', function() {
+    it('should start by displaying YTLounge logo', function() {
       reset();
       onPlayerReady();
       assert.equal(thumbnailDisplay, '/images/LoungeLogo.png');
@@ -284,7 +277,7 @@ describe('Sending Information To Firestore',
     });
 
     it('should display the first video once queue updates',
-        function() { // eslint-disable-line no-undef
+        function() {
       doc.addViewer(); // add another viewer who adds two videos
       doc.changeFirestore(0, 1, true);
       queueCollection.addToQueue('Video1', '"Thumbnail1"');
@@ -297,21 +290,19 @@ describe('Sending Information To Firestore',
       assert.equal(vidDisplay, 'block');
     });
 
-    it('should send an update when it ends',
-        function() { // eslint-disable-line no-undef
+    it('should send an update when it ends', function() {
       player.seekTo(player.getDuration(), true);
       onPlayerStateChange(); // end state change
       assert.equal(doc.data().timestamp, 60);
     });
 
-    it('should display the next video thumbnail',
-        function() { // eslint-disable-line no-undef
+    it('should display the next video thumbnail', function() {
       assert.equal(thumbnailDisplay, 'Thumbnail2');
       assert.equal(vidDisplay, 'none');
     });
 
     it('should move on to the next video once every viewer is ready',
-        function() { // eslint-disable-line no-undef
+        function() {
       getRealtimeUpdates(); // don't go when not everyone's ready
       assert.notEqual(doc.data().videoId, 'Video2');
       doc.removeViewer();
@@ -323,19 +314,16 @@ describe('Sending Information To Firestore',
       autoUpdateTriggered = false;
     });
 
-    it('should display the next video',
-        function() { // eslint-disable-line no-undef
+    it('should display the next video', function() {
       assert.equal(thumbnailDisplay, 'none');
       assert.equal(vidDisplay, 'block');
     });
   });
 });
 
-describe('Retrieving Information from Firestore',
-    function() { // eslint-disable-line no-undef
-  describe('Update on Play', function() { // eslint-disable-line no-undef
-    it('should begin playing when paused',
-        function() { // eslint-disable-line no-undef
+describe('Retrieving Information from Firestore', function() {
+  describe('Update on Play', function() {
+    it('should begin playing when paused', function() {
       reset();
       doc.changeFirestore(0, 1, false); // timestamp, videoSpeed, isPlaying
       player.timestamp = 0;
@@ -353,8 +341,7 @@ describe('Retrieving Information from Firestore',
       autoUpdateTriggered = false;
     });
 
-    it('should continue playing on playing seek',
-        function() { // eslint-disable-line no-undef
+    it('should continue playing on playing seek', function() {
       doc.changeFirestore(40, 0.5, true);
       getRealtimeUpdates();
       onPlayerStateChange(); // play state change
@@ -365,10 +352,8 @@ describe('Retrieving Information from Firestore',
     });
   });
 
-  describe('Update on Pause',
-      function() { // eslint-disable-line no-undef
-    it('should pause when playing',
-        function() { // eslint-disable-line no-undef
+  describe('Update on Pause', function() {
+    it('should pause when playing', function() {
       doc.changeFirestore(10, 1, false);
       getRealtimeUpdates();
       onPlayerStateChange(); // pause state change
@@ -378,8 +363,7 @@ describe('Retrieving Information from Firestore',
       assert(!autoUpdateTriggered);
     });
 
-    it('should remain paused on seek while paused',
-        function() { // eslint-disable-line no-undef
+    it('should remain paused on seek while paused', function() {
       doc.changeFirestore(30, 1, false);
       getRealtimeUpdates();
       onPlayerStateChange(); // pause state change
@@ -390,10 +374,9 @@ describe('Retrieving Information from Firestore',
     });
   });
 
-  describe('Playing Seek Boundaries',
-      function() { // eslint-disable-line no-undef
+  describe('Playing Seek Boundaries', function() {
     it('should not seek for less than 5 second time difference' +
-        'when playing', function() { // eslint-disable-line no-undef
+        'when playing', function() {
       doc.changeFirestore(31, 1, true);
       getRealtimeUpdates();
       onPlayerStateChange();
@@ -401,7 +384,7 @@ describe('Retrieving Information from Firestore',
     });
 
     it('should not seek for 5 second time difference when playing',
-        function() { // eslint-disable-line no-undef
+        function() {
       doc.changeFirestore(35, 1, true);
       getRealtimeUpdates();
       onPlayerStateChange();
@@ -409,7 +392,7 @@ describe('Retrieving Information from Firestore',
     });
 
     it('should halve sync window when playing at half speed',
-        function() { // eslint-disable-line no-undef
+        function() {
       doc.changeFirestore(33, 0.5, true); // add only 3 seconds (> 2.5)
       getRealtimeUpdates();
       onPlayerStateChange();
@@ -419,7 +402,7 @@ describe('Retrieving Information from Firestore',
     });
 
     it('should double sync widnow when playing at double speed',
-        function() { // eslint-disable-line no-undef
+        function() {
       doc.changeFirestore(40, 2, true); // add 7 seconds (< 10 seconds)
       getRealtimeUpdates();
       onPlayerStateChange();
@@ -432,6 +415,7 @@ describe('Retrieving Information from Firestore',
     // how often auto updates are sent).
   });
 });
+/* eslint-enable no-undef*/
 
 // ATTENTION!!!
 

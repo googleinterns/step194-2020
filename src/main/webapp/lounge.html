@@ -139,16 +139,19 @@
             <div id="queue-card-container">
                 <div id="queue-card" class="mdl-card mdl-cell mdl-cell--12-col">
                     <div class="mdl-card__supporting-text mdl-color-text--white" id="bigQueueContainer">
-                        <div id="videoContainer"></div>
-                            <div id="video-form" >
-                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                        <input class="mdl-textfield__input" id="linkArea" type="text" autocomplete="off" spellcheck>
-                                        <label class="mdl-textfield__label" for="linkArea">Enter a YouTube video link...</label>
-                                    </div>
-                                    <button class="submitBtn" id="queueBtn" type="submit" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
-                                        <span class="material-icons">add_to_queue</span>
-                                    </button>    
+                        <h5 class="queueHeader">Search Results:</h5>
+                        <div id="searchContainer"></div>
+                        <div id="video-form" >
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" id="searchArea" type="text" autocomplete="off" spellcheck>
+                                <label class="mdl-textfield__label" for="searchArea">Search:</label>
                             </div>
+                            <button class="submitBtn" id="queueBtn" type="submit" onclick="getSearchQuery(document.getElementById('searchArea').value)">
+                                <span class="material-icons">search</span>
+                            </button>  
+                        </div>
+                        <h5 class="queueHeader">Queue:</h5>
+                        <div id="videoContainer"></div>
                     </div>
                 </div>
             </div>

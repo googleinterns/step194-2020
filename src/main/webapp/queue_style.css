@@ -17,12 +17,43 @@
 
 #bigQueueContainer {
     background-color: #111;
+    display: flex;
+    flex-direction: column;
+}
+
+#searchContainer {
+    overflow-x: auto;
+    margin-bottom: 10px;
+    height: 235px;
+    display: flex;
+    flex-direction: row;
+}
+
+.searchInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchVideo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5%;
+    padding: 1%;
+    max-height: 200px;
+    max-width: 200px;
+    background: #414141;
+    border-radius: 3pt;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
 #videoContainer {
     overflow-y: auto;
     margin-bottom: 10px;
-    height: 81vh;
+    height: 28vh;
     display: flex;
     flex-direction: column;
 }
@@ -61,7 +92,6 @@
     position:relative;
 }
 
-
 .queueVideo {
     display: flex;
     flex-direction: row;
@@ -76,6 +106,7 @@
 
 .videoThumbnail {
     height: 120px;
+    /* width: 160px; */
     width: auto;
     padding: 0.1%;
     margin-right: 2%;
@@ -90,6 +121,17 @@
 
 .videoInfo {
     padding-left: 0.75%;
+}
+
+.searchTitle {
+    color: white;
+    font-weight: bold;
+    margin: 0px 0px 4px;
+    font-size: 16px;
+    width: 175px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .videoTitle {

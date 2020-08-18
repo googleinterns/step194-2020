@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/* eslint-disable */
 
 
 var assert = require('assert');
@@ -60,10 +61,10 @@ describe('Chat Box', function () {
       assert.equal('Caroline', User.checkName(chatMessage2));  
     });
   it('should show correct image for message input', function () {
-      assert.equal('dog.png', User.checkPhoto(chatMessage2));  
+      assert.equal('dog.png', User.checkPhoto(chatMessage2)); 
   });
   it('should reject message with no text input', function () {
-      assert.equal(false, User.checkMessageText(chatMessage3));  
+      assert.equal(false, User.checkMessageText(chatMessage3)); 
   });
   it('should accept message with text input', function () {
       assert.equal(true, User.checkMessageText(chatMessage4));  

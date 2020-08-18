@@ -206,24 +206,25 @@ function waitForOthers(vidData) {
   }
 }
 
-// return true if player time is within 5 seconds of Firestore time
+// return true if player timestamp is within 5 realtime
+// seconds of firestore
 function timesInRange(firestoreVidTime) {
-  return Math.abs(player.getCurrentTime() - firestoreVidTime) <
+  return Math.abs(player.getCurrentTime() - firestoreVidTime) <=
       SYNC_WINDOW * player.getPlaybackRate();
 }
 
 // return true if player state is different than Firestore state
 function differentStates(firestoreVidIsPlaying) {
-  if (player.getPlayerState() != 1) { // player paused
-    if (firestoreVidIsPlaying) { // Firestore playing
-      return true;
+  if (isVideoPlaying()) {
+    if (firestoreVidIsPlaying) {
+      return false;
     }
-    return false;
-  }
-  if (!firestoreVidIsPlaying) {
     return true;
   }
-  return false;
+  if (!firestoreVidIsPlaying) {
+    return false;
+  }
+  return true;
 }
 
 // Return true if player is not paused
@@ -356,7 +357,7 @@ function getRealtimeUpdates() {
           player.seekTo(vidData.timestamp, true);
           lastTime = vidData.timestamp;
         }
-        if (differentStates(vidData.isPlaying)) {
+        if (differentStates(vidData.isPlaying, isVideoPlaying())) {
           videoUpdating = true;
           switch (vidData.isPlaying) {
             case true:

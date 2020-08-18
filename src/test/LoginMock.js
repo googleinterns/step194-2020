@@ -1,54 +1,54 @@
-var guests = new Map();
+const guests = new Map();
+const idtoken = Math.random().toString();
 
-function MockFirebaseUser(idtoken, data) {
-  this.idtoken = Math.random().toString();
+function MockFirebaseUser(data) {
   this.displayName = data.displayName;
   this.photoURL = data.photoURL;
 }
 
-function CreateGuestList() {
-  var user = new MockFirebaseUser(this.idtoken, this);
-  guests.set(user.idtoken, {displayName: user.displayName, photoURL: user.photoURL });
-  return guests;
+function CreateGuestList(user) {
+  guests.set(idtoken, user);
+  return guests.has(idtoken);
 };
 
-function DeleteUser() {
+function DeleteUser(idtoken, guestState) {
  if (guestState == 'logout'){
-  guests.delete(this.idtoken);
-  return guests;
+  guests.delete(idtoken);
+  return guests.has(idtoken);
  }
  if (guestState == 'refresh'){
   guests.delete(this.idtoken);
-  return guests;
-
+  return guests.has(idtoken);
  }
 };
 
-function UpdateName () {  
-  if (this.displayName == ' ') {
+function EmptyRoom(guests) {
+  if (guests.size === 0) {
+    return true;
+  }
+};
+
+function UpdateName(data) {  
+  if (data.displayName == ' ') {
     return 'Lounge Viewer'
+  } else{
+    return data.displayName;
   }
-  else{
-    this.displayName = displayName;
-    user.displayName = displayName;
-  }
-  
 };
 
-function UpdatePhoto() {  
- if (this.photoURL == ' ') {
-     return 'hat.png'
- }
- else{
-    this.photoURL = photoURL;
-    user.photoURL = photoURL;
+function UpdatePhoto(data) {  
+  if (data.photoURL == ' ') {
+    return 'hat.png'
+   } else{
+    return data.photoURL;
   }
 };
 
 
 module.exports = {
   MockFirebaseUser: MockFirebaseUser,
-  CreateGuestList: CreateUser,
+  CreateGuestList: CreateGuestList,
+  EmptyRoom: EmptyRoom,
   DeleteUser: DeleteUser,
   UpdateName: UpdateName,
   UpdatePhoto: UpdatePhoto,

@@ -171,7 +171,7 @@ async function getSearchQuery(query) {
     console.log('NO QUERY');
     return;
   }
-  await fetch('/keywordSearch?words=' + query)
+  await fetch('/keywordSearch?query=' + query)
       .then((response) => response.json())
       .then((videos) => {
         console.log(videos);

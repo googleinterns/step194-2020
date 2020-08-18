@@ -22,7 +22,7 @@ public class KeywordSearch extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     response.setContentType("application/json");
-    String query = RequestParameter.getParameter(request, "words", "");
+    String query = RequestParameter.getParameter(request, "query", "");
     if (query.equals("")) return;
     YouTube youtubeService = null;
     try {

@@ -1,12 +1,7 @@
 package com.google.step.YTLounge.servlets;
 
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.core.ApiFuture;
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
@@ -16,12 +11,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.step.YTLounge.data.FirestoreAuth;
 import com.google.step.YTLounge.data.RequestParameter;
-import java.io.File;
+import com.google.step.YTLounge.data.YoutubeService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,24 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 /** Returns a YouTube video based on a user's inputted YouTube URL */
 @WebServlet("/vSearch")
 public class SingleVideoSearch extends HttpServlet {
-  private static final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-
-  /**
-   * Build and return an authorized API client service.
-   *
-   * @return an authorized API client service
-   * @throws GeneralSecurityException, IOException
-   */
-  public YouTube getService() throws GeneralSecurityException, IOException {
-    String key = readSecrets();
-    final YouTubeRequestInitializer keyInitializer = new YouTubeRequestInitializer(key);
-    final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-    return new YouTube.Builder(httpTransport, jsonFactory, null)
-        .setApplicationName("YouTube Lounge")
-        .setYouTubeRequestInitializer(keyInitializer)
-        .build();
-  }
-
   /**
    * Retrieve query parameters, extract the video if video exists, and create new Lounge if
    * necessary based on query request. Prints video response when complete.
@@ -68,7 +44,7 @@ public class SingleVideoSearch extends HttpServlet {
 
     YouTube youtubeService = null;
     try {
-      youtubeService = getService();
+      youtubeService = YoutubeService.getService();
     } catch (GeneralSecurityException e) {
       response.getWriter().println("");
       return;
@@ -195,22 +171,5 @@ public class SingleVideoSearch extends HttpServlet {
       seconds += Integer.parseInt(shortenedTime.substring(0, shortenedTime.indexOf("S")));
     }
     return seconds;
-  }
-
-  /** Locate the necessary API key to access needed data */
-  private String readSecrets() {
-    try {
-      File secretFile = new File("dataSecret.txt");
-      Scanner myReader = new Scanner(secretFile);
-      if (myReader.hasNextLine()) {
-        String data = myReader.nextLine();
-        return data;
-      }
-      myReader.close();
-    } catch (Exception e) {
-      System.out.println("An error occurred.");
-      e.printStackTrace();
-    }
-    return "";
   }
 }

@@ -387,10 +387,10 @@ describe('Retrieving Information from Firestore', function() {
   describe('Playing Seek Boundaries', function() {
     it('should not seek for less than 5 second time difference' +
         'when playing', function() {
-          doc.changeFirestore(31, 1, true);
-          getRealtimeUpdates();
-          onPlayerStateChange();
-          assert.equal(player.timestamp, 30);
+      doc.changeFirestore(31, 1, true);
+      getRealtimeUpdates();
+      onPlayerStateChange();
+      assert.equal(player.timestamp, 30);
     });
 
     it('should not seek for 5 second time difference when playing',
@@ -399,7 +399,7 @@ describe('Retrieving Information from Firestore', function() {
           getRealtimeUpdates();
           onPlayerStateChange();
           assert.equal(player.timestamp, 30);
-    });
+        });
 
     it('should halve sync window when playing at half speed',
         function() {
@@ -409,7 +409,7 @@ describe('Retrieving Information from Firestore', function() {
           assert.equal(player.timestamp, 33);
           // still updates because at halfspeed
           // 5 realtime seconds is 2.5 video seconds
-    });
+        });
 
     it('should double sync widnow when playing at double speed',
         function() {
@@ -689,31 +689,31 @@ function catchUserUp() {
 
 function getRealtimeUpdates() {
   clearTimeout(autoUpdate);
-    const vidData = doc.data();
-    if (!stopUpdating) {
-      if (player.getPlaybackRate() != vidData.videoSpeed) {
-        videoUpdating = true;
-        player.setPlaybackRate(vidData.videoSpeed);
-      }
-      if (!timesInRange(vidData.timestamp)) {
-        videoUpdating = true;
-        player.seekTo(vidData.timestamp, true);
-        lastTime = vidData.timestamp;
-      }
-      if (differentStates(vidData.isPlaying, isVideoPlaying())) {
-        videoUpdating = true;
-        switch (vidData.isPlaying) {
-          case true:
-            player.playVideo();
-            break;
-          case false:
-            player.pauseVideo();
-            player.seekTo(vidData.timestamp, true);
-        }
+  const vidData = doc.data();
+  if (!stopUpdating) {
+    if (player.getPlaybackRate() != vidData.videoSpeed) {
+      videoUpdating = true;
+      player.setPlaybackRate(vidData.videoSpeed);
+    }
+    if (!timesInRange(vidData.timestamp)) {
+      videoUpdating = true;
+      player.seekTo(vidData.timestamp, true);
+      lastTime = vidData.timestamp;
+    }
+    if (differentStates(vidData.isPlaying, isVideoPlaying())) {
+      videoUpdating = true;
+      switch (vidData.isPlaying) {
+        case true:
+          player.playVideo();
+          break;
+        case false:
+          player.pauseVideo();
+          player.seekTo(vidData.timestamp, true);
       }
     }
-    if (vidOver) waitForOthers(vidData);
-    if (isVideoPlaying()) {
-      autoUpdateTriggered;
-    }
+  }
+  if (vidOver) waitForOthers(vidData);
+  if (isVideoPlaying()) {
+    autoUpdateTriggered;
+  }
 }

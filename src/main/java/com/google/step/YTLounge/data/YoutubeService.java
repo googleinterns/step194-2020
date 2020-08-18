@@ -8,13 +8,13 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequestInitializer;
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 import java.security.GeneralSecurityException;
+import java.util.Scanner;
 
 public class YoutubeService {
   private static final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
-  public YoutubeService(){}
+  public YoutubeService() {}
 
   /**
    * Build and return an authorized API client service.

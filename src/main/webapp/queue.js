@@ -164,8 +164,8 @@ async function getVideoData(id) {
 // Retrieves search data from servlet and formats results in HTML
 async function getSearchQuery(query) {
   if (typeof query != 'string') {
-      console.log('INVALID QUERY');
-      return;
+    console.log('INVALID QUERY');
+    return;
   }
   if (query == '') {
     console.log('NO QUERY');

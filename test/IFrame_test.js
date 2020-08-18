@@ -145,47 +145,47 @@ function catchUpAsserts(time, speed, state) {
 describe('Catch Up on Start', function() {
   it('should catch up to paused firestore when first played',
       function() {
-    doc.changeFirestore(10, 1.5, false); // timestamp, videoSpeed, isPlaying
-    queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
-    updateQueue();
-    onPlayerReady();
-    player.playVideo();
-    onPlayerStateChange(); // Play state change
-    onPlayerStateChange(); // Pause state change
-    catchUpAsserts(10, 1.5, 2);
-    assert(!autoUpdateTriggered);
-    clearInterval(pauseInterval);
-  });
+        doc.changeFirestore(10, 1.5, false); // timestamp, vidSpeed, isPlaying
+        queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
+        updateQueue();
+        onPlayerReady();
+        player.playVideo();
+        onPlayerStateChange(); // Play state change
+        onPlayerStateChange(); // Pause state change
+        catchUpAsserts(10, 1.5, 2);
+        assert(!autoUpdateTriggered);
+        clearInterval(pauseInterval);
+      });
 
   it('should move a bit ahead of playing firestore when first played',
       function() {
-    reset();
-    doc.changeFirestore(20, 0.5, true); // playing at 20 sec, half speed
-    queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
-    updateQueue();
-    onPlayerReady();
-    player.playVideo();
-    onPlayerStateChange(); // play state change
-    const seekAhead = 20 + SYNC_WINDOW * SLOW_UPDATE_FACTOR;
-    catchUpAsserts(seekAhead, 0.5, 1);
-    assert(autoUpdateTriggered);
-    autoUpdateTriggered = false;
-  });
+        reset();
+        doc.changeFirestore(20, 0.5, true); // playing at 20 sec, half speed
+        queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
+        updateQueue();
+        onPlayerReady();
+        player.playVideo();
+        onPlayerStateChange(); // play state change
+        const seekAhead = 20 + SYNC_WINDOW * SLOW_UPDATE_FACTOR;
+        catchUpAsserts(seekAhead, 0.5, 1);
+        assert(autoUpdateTriggered);
+        autoUpdateTriggered = false;
+      });
 });
 
 describe('Sending Information To Firestore', function() {
   describe('Sending on Play', function() {
     it('should send info when pressing play on a paused video',
         function() {
-      doc.changeFirestore(15, 1, false); // paused at 15 sec, default speed
-      player.timestamp = 15;
-      player.playVideo();
-      onPlayerStateChange(); // play state change
-      assert.equal(doc.data().timestamp, 15);
-      assert.equal(doc.data().isPlaying, true);
-      assert(autoUpdateTriggered);
-      autoUpdateTriggered = false;
-    });
+          doc.changeFirestore(15, 1, false); // paused at 15 sec, default speed
+          player.timestamp = 15;
+          player.playVideo();
+          onPlayerStateChange(); // play state change
+          assert.equal(doc.data().timestamp, 15);
+          assert.equal(doc.data().isPlaying, true);
+          assert(autoUpdateTriggered);
+          autoUpdateTriggered = false;
+        });
 
     it('should send info on seek', function() {
       doc.changeFirestore(15, 1, true);
@@ -199,7 +199,7 @@ describe('Sending Information To Firestore', function() {
     });
   });
 
-  describe('Sending on pause', function () {
+  describe('Sending on pause', function() {
     it('should send info to Firestore on pause', function() {
       doc.changeFirestore(20, 1, true);
       player.timestamp = 40;
@@ -212,28 +212,38 @@ describe('Sending Information To Firestore', function() {
     });
   });
 
+  describe('Sending on rate change', function() {
+    it('should send info to Firestore on new speed', function() {
+      player.timestamp = 40;
+      player.playbackRate = 0.5;
+      onPlayerPlaybackRateChange();
+      assert.equal(doc.data().videoSpeed, 0.5);
+      assert(!autoUpdateTriggered);
+    });
+  });
+
   describe('Sending new info while paused', function() {
     it('should send info to Firestore when seeking while paused',
         function() {
-      setTimeout(function() {
-        reset();
-        doc.changeFirestore(10, 1.5, false);
-        queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
-        updateQueue();
-        onPlayerReady();
-        player.playVideo();
-        onPlayerStateChange(); // play state change
-        onPlayerStateChange(); // pause state change
-        assert(!autoUpdateTriggered);
-        player.seekTo(11, true);
-        setTimeout(function() {
-          assert.equal(doc.data().timestamp, 11);
-          assert.equal(doc.data().isPlaying, false);
-          assert(!autoUpdateTriggered);
-          clearInterval(pauseInterval);
-        }, 3000);
-      }, 3000);
-    });
+          setTimeout(function() {
+            reset();
+            doc.changeFirestore(10, 1.5, false);
+            queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
+            updateQueue();
+            onPlayerReady();
+            player.playVideo();
+            onPlayerStateChange(); // play state change
+            onPlayerStateChange(); // pause state change
+            assert(!autoUpdateTriggered);
+            player.seekTo(11, true);
+            setTimeout(function() {
+              assert.equal(doc.data().timestamp, 11);
+              assert.equal(doc.data().isPlaying, false);
+              assert(!autoUpdateTriggered);
+              clearInterval(pauseInterval);
+            }, 3000);
+          }, 3000);
+        });
   });
 
   // Note: runs after all other tests and checks both that the buffering
@@ -242,30 +252,30 @@ describe('Sending Information To Firestore', function() {
   describe('Not Sending While Behind', function() {
     it('shouldn\'t send updates after buffering for 5 seconds',
         function() {
-      setTimeout(function() {
-        reset();
-        doc.changeFirestore(20, 0.5, true);
-        queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
-        updateQueue();
-        onPlayerReady();
-        player.playVideo();
-        onPlayerStateChange(); // play state change
-        player.bufferVideo();
-        onPlayerStateChange(); // buffer state change
-        doc.changeFirestore(55, 1, false);
-        setTimeout(function() {
-          player.seekTo(40, true);
-          player.playVideo();
-          onPlayerStateChange(); // play state change
-          assert.equal(doc.data().timestamp, 55);
-          assert.equal(doc.data().isPlaying, false);
-          assert.equal(doc.data().videoSpeed, 1);
-          assert.equal(player.timestamp, 55);
-          assert.equal(player.playerState, 2);
-          assert.equal(player.playbackRate, 1);
-        }, 5000);
-      }, 8000);
-    });
+          setTimeout(function() {
+            reset();
+            doc.changeFirestore(20, 0.5, true);
+            queueCollection.addToQueue('ExampleVideo', '"ExampleThumbnail"');
+            updateQueue();
+            onPlayerReady();
+            player.playVideo();
+            onPlayerStateChange(); // play state change
+            player.bufferVideo();
+            onPlayerStateChange(); // buffer state change
+            doc.changeFirestore(55, 1, false);
+            setTimeout(function() {
+              player.seekTo(40, true);
+              player.playVideo();
+              onPlayerStateChange(); // play state change
+              assert.equal(doc.data().timestamp, 55);
+              assert.equal(doc.data().isPlaying, false);
+              assert.equal(doc.data().videoSpeed, 1);
+              assert.equal(player.timestamp, 55);
+              assert.equal(player.playerState, 2);
+              assert.equal(player.playbackRate, 1);
+            }, 5000);
+          }, 8000);
+        });
   });
 
   describe('Sending Info on End', function() {
@@ -278,17 +288,17 @@ describe('Sending Information To Firestore', function() {
 
     it('should display the first video once queue updates',
         function() {
-      doc.addViewer(); // add another viewer who adds two videos
-      doc.changeFirestore(0, 1, true);
-      queueCollection.addToQueue('Video1', '"Thumbnail1"');
-      queueCollection.addToQueue('Video2', '"Thumbnail2"');
-      updateQueue();
-      getCurrentVideo(); // would've been called on timeout in real code
-      player.playVideo();
-      onPlayerStateChange(); // play state change
-      assert.equal(thumbnailDisplay, 'none');
-      assert.equal(vidDisplay, 'block');
-    });
+          doc.addViewer(); // add another viewer who adds two videos
+          doc.changeFirestore(0, 1, true);
+          queueCollection.addToQueue('Video1', '"Thumbnail1"');
+          queueCollection.addToQueue('Video2', '"Thumbnail2"');
+          updateQueue();
+          getCurrentVideo(); // would've been called on timeout in real code
+          player.playVideo();
+          onPlayerStateChange(); // play state change
+          assert.equal(thumbnailDisplay, 'none');
+          assert.equal(vidDisplay, 'block');
+        });
 
     it('should send an update when it ends', function() {
       player.seekTo(player.getDuration(), true);
@@ -303,16 +313,16 @@ describe('Sending Information To Firestore', function() {
 
     it('should move on to the next video once every viewer is ready',
         function() {
-      getRealtimeUpdates(); // don't go when not everyone's ready
-      assert.notEqual(doc.data().videoId, 'Video2');
-      doc.removeViewer();
-      getRealtimeUpdates();
-      assert.equal(doc.data().numPeopleWatching, 1);
-      assert.equal(doc.data().timestamp, 0);
-      assert.equal(doc.data().videoId, 'Video2');
-      assert(autoUpdateTriggered);
-      autoUpdateTriggered = false;
-    });
+          getRealtimeUpdates(); // don't go when not everyone's ready
+          assert.notEqual(doc.data().videoId, 'Video2');
+          doc.removeViewer();
+          getRealtimeUpdates();
+          assert.equal(doc.data().numPeopleWatching, 1);
+          assert.equal(doc.data().timestamp, 0);
+          assert.equal(doc.data().videoId, 'Video2');
+          assert(autoUpdateTriggered);
+          autoUpdateTriggered = false;
+        });
 
     it('should display the next video', function() {
       assert.equal(thumbnailDisplay, 'none');
@@ -377,38 +387,38 @@ describe('Retrieving Information from Firestore', function() {
   describe('Playing Seek Boundaries', function() {
     it('should not seek for less than 5 second time difference' +
         'when playing', function() {
-      doc.changeFirestore(31, 1, true);
-      getRealtimeUpdates();
-      onPlayerStateChange();
-      assert.equal(player.timestamp, 30);
+          doc.changeFirestore(31, 1, true);
+          getRealtimeUpdates();
+          onPlayerStateChange();
+          assert.equal(player.timestamp, 30);
     });
 
     it('should not seek for 5 second time difference when playing',
         function() {
-      doc.changeFirestore(35, 1, true);
-      getRealtimeUpdates();
-      onPlayerStateChange();
-      assert.equal(player.timestamp, 30);
+          doc.changeFirestore(35, 1, true);
+          getRealtimeUpdates();
+          onPlayerStateChange();
+          assert.equal(player.timestamp, 30);
     });
 
     it('should halve sync window when playing at half speed',
         function() {
-      doc.changeFirestore(33, 0.5, true); // add only 3 seconds (> 2.5)
-      getRealtimeUpdates();
-      onPlayerStateChange();
-      assert.equal(player.timestamp, 33);
-      // still updates because at halfspeed
-      // 5 realtime seconds is 2.5 video seconds
+          doc.changeFirestore(33, 0.5, true); // add only 3 seconds (> 2.5)
+          getRealtimeUpdates();
+          onPlayerStateChange();
+          assert.equal(player.timestamp, 33);
+          // still updates because at halfspeed
+          // 5 realtime seconds is 2.5 video seconds
     });
 
     it('should double sync widnow when playing at double speed',
         function() {
-      doc.changeFirestore(40, 2, true); // add 7 seconds (< 10 seconds)
-      getRealtimeUpdates();
-      onPlayerStateChange();
-      assert.equal(player.timestamp, 33);
-      autoUpdateTriggered = false;
-    });
+          doc.changeFirestore(40, 2, true); // add 7 seconds (< 10 seconds)
+          getRealtimeUpdates();
+          onPlayerStateChange();
+          assert.equal(player.timestamp, 33);
+          autoUpdateTriggered = false;
+        });
     // Note that when I say double or halve sync window, I mean solely
     // in the case of deciding whether or not to move the user's playhead.
     // Playback speed has no effect on other uses for sync window (i.e.
@@ -440,7 +450,7 @@ function updateQueue() {
   nextVidID = '';
   nextThumbnail = '';
   const queueData = queueCollection.data();
-  if (!!queueData) {
+  if (queueData !== null) {
     nextVidID = queueData.videoId;
     const thumbnailString = queueData.videoThumbnail;
     const thumbnailURL = thumbnailString.substring(1,
@@ -591,16 +601,14 @@ function isVideoPlaying() {
 // Sends new info to Firestore and then repeatedly calls itself
 // until stopped by user or Firestore.
 function updateInfo(goal) {
-  // if (!stopUpdating && !videoUpdating) {
-     doc.update({
-      isPlaying: isVideoPlaying(),
-      timestamp: player.getCurrentTime(),
-      videoSpeed: player.getPlaybackRate(),
-    });
-        if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) {
-          // updateInfo('auto');
-          autoUpdateTriggered = true;
-        }
+  doc.update({
+    isPlaying: isVideoPlaying(),
+    timestamp: player.getCurrentTime(),
+    videoSpeed: player.getPlaybackRate(),
+  });
+  if (!stopUpdating && !aboutToEnd() && isVideoPlaying()) {
+    autoUpdateTriggered = true;
+  }
 }
 
 // keeps firestore updated on pause
@@ -669,42 +677,42 @@ function onPlayerPlaybackRateChange() {
 }
 
 function catchUserUp() {
-      const vidData = doc.data();
-      seek(vidData);
-      player.setPlaybackRate(vidData.videoSpeed);
-      if (vidData.isPlaying) player.playVideo();
-      else player.pauseVideo();
-    if (isVideoPlaying()) {
-      autoUpdateTriggered = true;
-    }
+  const vidData = doc.data();
+  seek(vidData);
+  player.setPlaybackRate(vidData.videoSpeed);
+  if (vidData.isPlaying) player.playVideo();
+  else player.pauseVideo();
+  if (isVideoPlaying()) {
+    autoUpdateTriggered = true;
+  }
 }
 
 function getRealtimeUpdates() {
-    clearTimeout(autoUpdate);
-      const vidData = doc.data();
-      if (!stopUpdating) {
-        if (player.getPlaybackRate() != vidData.videoSpeed) {
-          videoUpdating = true;
-          player.setPlaybackRate(vidData.videoSpeed);
-        }
-        if (!timesInRange(vidData.timestamp)) {
-          videoUpdating = true;
-          player.seekTo(vidData.timestamp, true);
-          lastTime = vidData.timestamp;
-        }
-        if (differentStates(vidData.isPlaying, isVideoPlaying())) {
-          videoUpdating = true;
-          switch (vidData.isPlaying) {
-            case true:
-              player.playVideo();
-              break;
-            case false:
-              player.pauseVideo();
-              player.seekTo(vidData.timestamp, true);
-          }
+  clearTimeout(autoUpdate);
+    const vidData = doc.data();
+    if (!stopUpdating) {
+      if (player.getPlaybackRate() != vidData.videoSpeed) {
+        videoUpdating = true;
+        player.setPlaybackRate(vidData.videoSpeed);
+      }
+      if (!timesInRange(vidData.timestamp)) {
+        videoUpdating = true;
+        player.seekTo(vidData.timestamp, true);
+        lastTime = vidData.timestamp;
+      }
+      if (differentStates(vidData.isPlaying, isVideoPlaying())) {
+        videoUpdating = true;
+        switch (vidData.isPlaying) {
+          case true:
+            player.playVideo();
+            break;
+          case false:
+            player.pauseVideo();
+            player.seekTo(vidData.timestamp, true);
         }
       }
-      if (vidOver) waitForOthers(vidData);
+    }
+    if (vidOver) waitForOthers(vidData);
     if (isVideoPlaying()) {
       autoUpdateTriggered;
     }

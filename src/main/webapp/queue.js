@@ -2,6 +2,8 @@ db = firebase.firestore(); // eslint-disable-line no-undef
 const queryValue = window.location.search;
 const urlParameters = new URLSearchParams(queryValue);
 const roomParameters = urlParameters.get('room_id');
+const WAIT_MILLI_SECONDS = 2000;
+let voteBtnCount = 0;
 validateRoom();
 updateShareTab();
 
@@ -13,6 +15,27 @@ db.collection('rooms') // eslint-disable-line no-undef
     .collection('queue')
     .onSnapshot(function(snapshot) {
       getRoomQueue(roomParameters);
+    });
+
+db.collection('rooms') // eslint-disable-line no-undef
+    .doc(roomParameters)
+    .collection('CurrentVideo')
+    .doc('PlaybackData')
+    .onSnapshot(function(snapshot) {
+      if (snapshot.get('videoId') == '') {
+        document.getElementById('skipBtn').disabled = true;
+      } else {
+        document.getElementById('skipBtn').disabled = false;
+      }
+      document.getElementById('skipCounter').innerHTML =
+          'Votes to skip video: ' + snapshot.get('votesToSkipVideo');
+      if (snapshot.get('votesToSkipVideo') >=
+          snapshot.get('numPeopleWatching')/2 &&
+          snapshot.get('videoId') != '' &&
+          snapshot.get('numPeopleWatching') > 0) { // if legit majority vote
+        console.log('Votes to skip acquired, skipping current video');
+        resetSkips();
+      }
     });
 
 // Find the roomid in the url query parameters and send to error page if the
@@ -41,9 +64,57 @@ function updateShareTab() {
       '</button>' +
       '</div>' +
       '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
-      'lounge.html/?room_id='+ roomParameters +'" type="text" readonly</input>';
+      'lounge.html?room_id='+ roomParameters +'" type="text" readonly</input>';
 }
 
+/* exported voteToSkip */
+// Tracks the user's choice to skip a video and alters firestore as needed
+function voteToSkip() {
+  voteBtnCount++;
+  if (voteBtnCount % 2 == 1) {
+    changeVotesToSkipCount(1);
+  } else {
+    changeVotesToSkipCount(-1);
+  }
+  setTimeout(WAIT_MILLI_SECONDS);
+}
+
+/*
+  Create a transaction to ensure that race conditions aren't created.
+  Reads the lounge's skip count and updates the count based on the
+  given change, then printing to the console whether the transaction
+  was successful or not.
+*/
+function changeVotesToSkipCount(change) {
+  const playbackRef = db.collection('rooms') // eslint-disable-line no-undef
+      .doc(roomParameters)
+      .collection('CurrentVideo')
+      .doc('PlaybackData');
+  return db // eslint-disable-line no-undef
+      .runTransaction(function(transaction) {
+        return transaction.get(playbackRef).then(function(docRef) {
+          if (!docRef.exists) {
+            throw new Error('Document doesn\'t exist!');
+          }
+          const newVoteCount = docRef.data().votesToSkipVideo + change;
+          transaction.update(playbackRef, {votesToSkipVideo: newVoteCount});
+        });
+      }).then(function() {
+        console.log('Vote transaction successful!');
+      }).catch(function(error) {
+        console.log('Transaction failed: ', error);
+      });
+}
+
+/*
+  When a video should be skipped, reset all the internal information
+  of the skip counter to 0 while moving the player to the end of the
+  current video, thus skipping based on the iFrame implementation
+*/
+function resetSkips() {
+  voteBtnCount = 0;
+  player.seekTo(player.getDuration(), true); // eslint-disable-line no-undef
+}
 
 /* exported verifyURLStructure */
 /*
@@ -152,8 +223,8 @@ async function getRoomQueue(roomid) {
               i +
               '" onclick="removeVideo(\'' + roomParameters + '\',\'' +
               videosArray.docs[i].id + '\')">' +
-              '<img src="../images/remove-from-queue.svg"/>' +'</button>' +
-              '</div></div>';
+              '<img src="../images/remove-from-queue.svg"/>' +
+              ' REMOVE' + '</button>' + '</div></div>';
           }
         }
       });

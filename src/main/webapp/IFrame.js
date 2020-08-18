@@ -357,7 +357,7 @@ function getRealtimeUpdates() {
           player.seekTo(vidData.timestamp, true);
           lastTime = vidData.timestamp;
         }
-        if (differentStates(vidData.isPlaying, isVideoPlaying())) {
+        if (differentStates(vidData.isPlaying)) {
           videoUpdating = true;
           switch (vidData.isPlaying) {
             case true:

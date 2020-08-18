@@ -147,3 +147,11 @@ border-bottom: none;
     position: absolute;
     bottom: 0px;
 }
+
+#notice{
+    color: orange;
+    padding: 22px;
+    font-size: 16px;
+    font:Roboto;
+    text-align:center;
+}

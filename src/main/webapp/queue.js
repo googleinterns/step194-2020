@@ -159,7 +159,39 @@ async function getVideoData(id) {
         console.log(video);
       });
   getRoomQueue(roomParameters);
-  document.getElementById('linkArea').value = '';
+}
+
+// Retrieves search data from servlet and formats results in HTML
+async function getSearchQuery(query) {
+  if (typeof query != 'string') {
+    console.log('INVALID QUERY');
+    return;
+  }
+  if (query == '') {
+    console.log('NO QUERY');
+    return;
+  }
+  await fetch('/keywordSearch?query=' + query)
+      .then((response) => response.json())
+      .then((videos) => {
+        console.log(videos);
+        const items = videos.items;
+        document.getElementById('searchContainer').innerHTML = '';
+        for (let i = 0; i < items.length; i++) {
+          document.getElementById('searchContainer').innerHTML +=
+              '<div id="' + items[i].id.videoId +
+              '" class="searchVideo" onclick="getVideoData(\'' +
+              items[i].id.videoId+'\')">' +
+              '<img class="videoThumbnail" src="' +
+              items[i].snippet.thumbnails.default.url +
+              '"/><div class="searchInfo">' +
+              '<p class="searchTitle">' +
+              items[i].snippet.title + '</p>' +
+              '<p class="channelTitle searchTitle">' +
+              items[i].snippet.channelTitle + '</p>' +
+              '</div></div>';
+        }
+      });
 }
 
 /* exported removeVideo */
@@ -254,3 +286,10 @@ function parseTime(duration) {
   }
   return result + minutes + ':' + seconds;
 }
+
+document.getElementById('searchArea').addEventListener('keydown', function(e) {
+  const charCode = e.charCode || e.keyCode || e.which;
+  if (charCode == 13) { // determine if keypress was the 'enter' key
+    getSearchQuery(document.getElementById('searchArea').value);
+  }
+});

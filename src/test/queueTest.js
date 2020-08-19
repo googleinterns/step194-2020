@@ -1,6 +1,5 @@
 /* eslint-disable */
 let assert = require('assert');
-// const config = require('')
 let mockQueue = require('../test/MockQueue.js');
 
 const queueVid1 = {

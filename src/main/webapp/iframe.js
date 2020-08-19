@@ -115,7 +115,7 @@ function onPlayerError(event) {
       errorMessage = 'Video ID incorrect';
       break;
     case 5:
-    errorMessage = 'HTML 5 playyer issue';
+      errorMessage = 'HTML 5 playyer issue';
       break;
     case 100:
       errorMessage = 'video not found (removed or private)';
@@ -128,11 +128,11 @@ function onPlayerError(event) {
   }
   console.log(errorMessage);
   setTimeout(function() {
-   stopUpdating = true;
-   switchDisplay();
-   resetPlaybackInfo();
-   removeOneViewer();
-   getCurrentVideo(); 
+    stopUpdating = true;
+    switchDisplay();
+    resetPlaybackInfo();
+    removeOneViewer();
+    getCurrentVideo();
   }, 4000); // give users time to read player error
 }
 

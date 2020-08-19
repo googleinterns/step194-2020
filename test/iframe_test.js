@@ -20,41 +20,41 @@ const player = {
   timestamp: 0,
   duration: 60,
   videoPlaying: '',
-  getPlaybackRate: function() {
+  getPlaybackRate() {
     return this.playbackRate;
   },
-  setPlaybackRate: function(newRate) {
+  setPlaybackRate(newRate) {
     this.playbackRate = newRate;
   },
-  getPlayerState: function() {
+  getPlayerState() {
     return this.playerState;
   },
-  playVideo: function() {
+  playVideo() {
     this.playerState = 1;
   },
-  pauseVideo: function() {
+  pauseVideo() {
     this.playerState = 2;
   },
-  bufferVideo: function() {
+  bufferVideo() {
     this.playerState = 3;
   },
-  endVideo: function() {
+  endVideo() {
     this.playerState = 0;
   },
-  seekTo: function(newTime, x) {
+  seekTo(newTime, x) {
     this.timestamp = newTime;
     if (this.timestamp >= this.duration) {
       this.endVideo();
       this.timestamp = 0;
     }
   },
-  getCurrentTime: function() {
+  getCurrentTime() {
     return this.timestamp;
   },
-  getDuration: function() {
+  getDuration() {
     return this.duration;
   },
-  reset: function() {
+  reset() {
     this.playerState = 5;
     this.playbackRate = 1;
     this.timestamp = 0;
@@ -72,16 +72,16 @@ const doc = {
     videoId: '',
     numPeopleWatching: 0,
   },
-  data: function() {
+  data() {
     return this.docData;
   },
-  addViewer: function() {
+  addViewer() {
     this.docData.numPeopleWatching++;
   },
-  removeViewer: function() {
+  removeViewer() {
     this.docData.numPeopleWatching--;
   },
-  update: function(x) {
+  update(x) {
     if (x.timestamp || x.timestamp === 0) {
       doc.docData.timestamp = x.timestamp;
     }
@@ -98,12 +98,12 @@ const doc = {
       doc.docData.videoId = x.videoId;
     }
   },
-  changeFirestore: function(timestamp, videoSpeed, isPlaying) {
+  changeFirestore(timestamp, videoSpeed, isPlaying) {
     doc.docData.timestamp = timestamp;
     doc.docData.videoSpeed = videoSpeed;
     doc.docData.isPlaying = isPlaying;
   },
-  reset: function() {
+  reset() {
     this.docData = {
       timestamp: 0,
       isPlaying: false,
@@ -117,18 +117,18 @@ const doc = {
 // queue firestore mock
 const queueCollection = {
   queueDocs: [],
-  addToQueue: function(iD, thumbnail) {
+  addToQueue(iD, thumbnail) {
     const vidToAdd = {videoId: iD, videoThumbnail: thumbnail};
     this.queueDocs.push(vidToAdd);
   },
-  delete: function() {
+  delete() {
     this.queueDocs.shift();
   },
-  data: function() {
+  data() {
     if (this.queueDocs.length === 0) return null;
     return this.queueDocs[0];
   },
-  reset: function() {
+  reset() {
     this.queueDocs = [];
   },
 };

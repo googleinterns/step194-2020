@@ -15,7 +15,7 @@
 
 
 var assert = require('assert');
-var User = require('../test/ChatMock.js');
+var Chat = require('../test/ChatMock.js');
 
 const chatMessage1 = {
   displayName: 'John', 
@@ -47,35 +47,51 @@ const  chatMessage4 = {
 
 describe('Chat Box', function () {
   describe('check Message List', function () {
-    it('should save inputted messages onto list ', function () {
-      const messages = User.createMessageList(chatMessage1);
+    it('should have one inputted messages saved onto list ', function () {
+      const messages = Chat.createMessageList(chatMessage1);
       assert.equal(true, messages.includes(chatMessage1)); 
+      Chat.clearMessages();
     });
   it('should tell that there are no messages currently', function () {
       const messages = new Array();
-      assert.equal(true, User.emptyChat(messages));  
+      assert.equal(true, Chat.isChatEmpty(messages));  
   });
  });
  describe('check individual Messages', function () {
-    it('should show correct name for message input', function () {
-      assert.equal('Caroline', User.checkName(chatMessage2));  
+    it('should show correct user display name for message input', function () {
+      assert.equal('Caroline', Chat.checkName(chatMessage2));  
     });
-  it('should show correct image for message input', function () {
-      assert.equal('dog.png', User.checkPhoto(chatMessage2)); 
+  it('should show correct profile image for message input', function () {
+      assert.equal('dog.png', Chat.checkPhoto(chatMessage2)); 
   });
-  it('should reject message with no text input', function () {
-      assert.equal(false, User.checkMessageText(chatMessage3)); 
+  it('should reject message when the text input is blank', function () {
+      assert.equal(false, Chat.checkMessageText(chatMessage3)); 
   });
   it('should accept message with text input', function () {
-      assert.equal(true, User.checkMessageText(chatMessage4));  
+      assert.equal(true, Chat.checkMessageText(chatMessage4));  
+  });
+  it('should return the correct timestamp for sent message in proper format', function () {
+      assert.equal('10:15:20', Chat.checkTimestamp(chatMessage4).toString());  
+  });
+  it('should return false for a message saved without a timestamp', function () {
+      assert.equal(false, Chat.checkTimestamp(chatMessage3));  
   });
  });
   describe('#orderedMessages()', function () {
-    it('should save inputted messages in a list ordered by timestamp', function () {
-      const messages = new Array();
-      messages.push(chatMessage4);
-      messages.push(chatMessage1);
-      assert.equal(true, User.orderedMessages(messages)); 
+    it('should save 2 inputted messages in a list ordered by timestamp', function () {
+      const messageList = new Array();
+      messageList.push(chatMessage4);
+      messageList.push(chatMessage1);
+      assert.equal(true, Chat.orderedMessages(messageList)); 
+      Chat.clearMessages();
+    });
+    it('should save 3 inputted messages in a list ordered by timestamp', function () {
+      const messageList = new Array();
+      messageList.push(chatMessage4);
+      messageList.push(chatMessage1);
+      messageList.push(chatMessage2);
+      assert.equal(true, Chat.orderedMessages(messageList)); 
+      Chat.clearMessages();
     });
   });
 });

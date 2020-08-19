@@ -5,10 +5,11 @@ const idtoken = Math.random().toString();
 function MockFirebaseUser(data) {
   this.displayName = data.displayName;
   this.photoURL = data.photoURL;
+  this.timestamp = data.timestamp;
 }
 
-function createGuestList(user) {
-  guests.set(idtoken, user);
+function createGuestList(userData) {
+  guests.set(idtoken, userData);
   return guests.has(idtoken);
 }
 
@@ -26,6 +27,8 @@ function deleteUser(idtoken, guestState) {
 function emptyRoom(guests) {
   if (guests.size === 0) {
     return true;
+  } else {
+    return false;
   }
 }
 
@@ -45,6 +48,14 @@ function updatePhoto(data) {
   }
 }
 
+function sortGuests(guestlist) {  
+  const guestSort = guestlist.sort((a, b) => a.timestamp - b.timestamp);
+  for (let i = 0; i < guestSort.length; i++) {
+    return guestSort[i].timestamp <  guestSort[i+1].timestamp;
+  }
+}
+
+
 
 module.exports = {
   MockFirebaseUser: MockFirebaseUser,
@@ -53,4 +64,5 @@ module.exports = {
   deleteUser: deleteUser,
   updateName: updateName,
   updatePhoto: updatePhoto,
+  sortGuests: sortGuests,
 };

@@ -21,16 +21,19 @@ const { deleteUser } = require('../test/LoginMock.js');
 const user1Credentials = {
   displayName: 'John',
   photoURL: ' ',
+  timestamp: 1462361249720
 };
 
 const user2Credentials = {
   displayName: 'Caroline',
   photoURL: 'dog.png',
+  timestamp: 1462361249709
 };
 
 const user3Credentials = {
   displayName: ' ',
   photoURL: 'duck.png',
+  timestamp: 1462361249708
 };
 
 describe('User Sign In', function () {
@@ -88,5 +91,15 @@ describe('User Sign Out', function() {
     });
      it('should show default display image due to no input', function() {
       assert.equal('hat.png', User.updatePhoto(user1Credentials));
+    });
+  });
+
+  describe('#sortGuests', function() {
+    it('should show user selected display image', function() {
+        const guests = new Array();
+        guests.push(user1Credentials);
+        guests.push(user2Credentials);
+        guests.push(user3Credentials);
+        assert.equal(true, User.sortGuests(guests)); 
     });
   });

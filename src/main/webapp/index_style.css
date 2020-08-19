@@ -178,6 +178,30 @@ border-bottom: none;
     font-size: 15px;
 }
 
+#playerErrorMessage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 2px;
+    color: white;
+    text-align: left;
+    font: 500 20px/30px Roboto;
+    font-size: 15px;
+}
+
+#playerErrorContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: space-between;
+    justify-content: center;
+    color: white;
+    float: left;
+    text-align: left;
+    font: 500 20px/30px Roboto;
+    text-decoration: none;
+    font-size: 15px;
+}
+
 #flaticon{
     font-size: 12px;
     position: absolute;

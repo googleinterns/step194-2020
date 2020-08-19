@@ -22,6 +22,10 @@ const SLOW_UPDATE_FACTOR = 0.85;
 const FAST_UPDATE_FACTOR = 0.7;
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
+const errorTag = document.getElementById('playerErrorContainer');
+errorTag.style.display = 'none';
+const skipVoteTag = document.getElementById('skipContainer');
+
 
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
@@ -109,6 +113,9 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
 
 let errorMessage;
 function onPlayerError(event) {
+  resetPlaybackInfo();
+  errorTag.style.display = 'block';
+  skipVoteTag.style.display = 'none';
   const error = event.data;
   switch (error) {
     case 2:
@@ -130,7 +137,8 @@ function onPlayerError(event) {
   setTimeout(function() {
     stopUpdating = true;
     switchDisplay();
-    resetPlaybackInfo();
+    errorTag.style.display = 'none';
+    skipVoteTag.style.display = 'block';
     removeOneViewer();
     getCurrentVideo();
   }, 4000); // give users time to read player error
@@ -323,7 +331,7 @@ function onPlayerStateChange() {
         break;
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
-          pauseTimeout = setTimeout(updateInfo, 100, 'pause');
+          pauseTimeout = setTimeout(updateInfo, 500, 'pause');
         }
         setPauseInterval();
         break;

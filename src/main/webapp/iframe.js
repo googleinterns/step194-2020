@@ -102,8 +102,38 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange,
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
+      'onError': onPlayerError,
     },
   });
+}
+
+let errorMessage;
+function onPlayerError(event) {
+  const error = event.data;
+  switch (error) {
+    case 2:
+      errorMessage = 'Video ID incorrect';
+      break;
+    case 5:
+    errorMessage = 'HTML 5 playyer issue';
+      break;
+    case 100:
+      errorMessage = 'video not found (removed or private)';
+      break;
+    case 101:
+      errorMessage = 'video owner blocks embed';
+      break;
+    case 150:
+      errorMessage = 'video owner blocks embed';
+  }
+  console.log(errorMessage);
+  setTimeout(function() {
+   stopUpdating = true;
+   switchDisplay();
+   resetPlaybackInfo();
+   removeOneViewer();
+   getCurrentVideo(); 
+  }, 4000); // give users time to read player error
 }
 
 let catchingUp; // Does this vid need to catch up to Firestore?

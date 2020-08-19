@@ -42,7 +42,6 @@ body, html {
 #main {
   transition: margin-right .5s;
   height: 100%;
-  margin-right: 25%;
 }
 
 .videoplayer {
@@ -60,7 +59,7 @@ body, html {
 
 .sidebar {
   height: 100%;
-  width: 25%;
+  width: 0%;
   position: fixed;
   z-index:2;
   top: 0;

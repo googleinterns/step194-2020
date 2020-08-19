@@ -1,7 +1,7 @@
-var queue = {
-  videos: new Array(),
-  validRooms: new Array(),
-  validVideoIds: new Array(),
+const queue = {
+  videos: [],
+  validRooms: [],
+  validVideoIds: [],
 
   initialize() {
     this.validRooms.push('1');
@@ -29,11 +29,11 @@ var queue = {
   clearQueue() {
     this.videos = [];
   },
-  
+
   addToQueue(video) {
     if (this.validVideoIds.indexOf(video.id) === -1) {
       return false;
-    };
+    }
     this.videos.push(video);
     return this.videos;
   },
@@ -55,7 +55,7 @@ var queue = {
   },
 
   isQueueEmpty() {
-    if (videos.length === 0) {
+    if (this.videos.length === 0) {
       return true;
     }
     return false;
@@ -91,8 +91,8 @@ var queue = {
       seconds = '0' + seconds;
     }
     return result + minutes + ':' + seconds;
-  }
-}
+  },
+};
 
 module.exports = { // eslint-disable-line no-undef
   queue: queue,

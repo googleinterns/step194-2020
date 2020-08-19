@@ -55,8 +55,6 @@ function sortGuests(guestlist) {
   }
 }
 
-
-
 module.exports = {
   MockFirebaseUser: MockFirebaseUser,
   createGuestList: createGuestList,

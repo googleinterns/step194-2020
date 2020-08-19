@@ -2,7 +2,8 @@
 // test:
 // - no blank messages can be sent
 // - messages are ordered by time stamp
-// - correct name and image for each message
+// - check for accurate timestamp of sent message
+// - check for correct name and image for each message
 // - make sure messages are being added to list
 
 const messages = [];

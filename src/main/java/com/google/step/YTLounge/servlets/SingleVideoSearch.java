@@ -72,6 +72,11 @@ public class SingleVideoSearch extends HttpServlet {
   /**
    * Iterates through the given items and locates specific values to create a new Video and upload
    * the video to Firestore
+   *
+   * @param items the json contents taken from YouTube's API
+   * @param videoID the ID of the video that YouTube uses in their hyperlinks/storage
+   * @param roomID the room the user is in
+   * @throws Exception
    */
   private void extractVideo(JsonArray items, String videoID, String roomID) throws Exception {
     Firestore db = null;
@@ -94,6 +99,11 @@ public class SingleVideoSearch extends HttpServlet {
    * Iterates through the given items and adds the relevant information to the given map, eventually
    * adding the video to the database and notifying the console of when the item was successfully
    * added
+   *
+   * @param items the json contents taken from YouTube's API
+   * @param videoData the wrapper to place values and properties into
+   * @param videoID the ID of the video that YouTube uses in their hyperlinks/storage
+   * @return a map of properties to their respective values to be put in firestore
    */
   private Map<String, Object> getVideoInformation(
       JsonArray items, Map<String, Object> videoData, String videoID) {
@@ -150,6 +160,7 @@ public class SingleVideoSearch extends HttpServlet {
    * Takes the given string and converts it into pure seconds. String must be either in the format
    * of "PT#H#M#S" or "PT#M#S" to be properly parsed.
    *
+   * @param encodedTime a time signature in the form "PT1H15M45S" or "PT3M1S"
    * @return a long for the number of seconds in encodedTime
    */
   public long parseDuration(String encodedTime) {

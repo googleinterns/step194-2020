@@ -65,9 +65,9 @@ describe('Remove', function() {
       mockQueue.queue.addToQueue(queueVid1);
       assert.equal(new Array().toString(), mockQueue.queue.removeVideo(queueVid1).toString());
       mockQueue.queue.clearQueue();
-    })
-  })
-})
+    });
+  });
+});
 
 describe('GetData', function() {
   describe('#getVideoData(id)', function() {

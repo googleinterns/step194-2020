@@ -145,7 +145,7 @@ function onPlayerError(event) {
 }
 
 let catchingUp; // Does this vid need to catch up to Firestore?
-function onPlayerReady(event) {
+function onPlayerReady() {
   switchDisplay();
   getCurrentVideo();
   catchingUp = true;

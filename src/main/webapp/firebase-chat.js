@@ -10,7 +10,6 @@ function anonymousSignIn() {
 
 function initFirebaseAuth() {
   firebase.auth().onAuthStateChanged(authStateObserver);
-  firebase.auth().onAuthStateChanged(saveGuestList);
 }
 
 // selection from list presented in dialog box
@@ -98,6 +97,7 @@ function authStateObserver(user) {
     userPicElement.removeAttribute('hidden');
     signOutButtonElement.removeAttribute('hidden');
     dialog.close();
+    saveGuestList();
   } else {
     userNameElement.setAttribute('hidden', 'true');
     userPicElement.setAttribute('hidden', 'true');
@@ -215,8 +215,8 @@ function displayMessage(id, timestamp, name, text, picUrl) {
 // Saves a new guest signed in on the Cloud Firestore
 // Added document to the Firebase data with
 // anonymous user uid created at authentication
-function saveGuestList(user) {
-  const uid = user.uid;
+function saveGuestList() {
+  const uid = firebase.auth().currentUser.uid;;
   return firebase.firestore().collection('rooms')
       .doc(roomParam).collection('guests').doc(uid).set({
         name: getUserName(),
@@ -340,14 +340,20 @@ const guestListElement = document.getElementById('guests');
 
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
-  firebase.auth().signOut();
   removeGuest();
+  firebase.auth().signOut();
   deleteAnonymousUser();
+  anonymousSignInElement.disabled = false;
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
+  anonymousSignInElement.disabled = true;
+  document.getElementById('mySidebar').style.width = '25%';
+  document.getElementById('main').style.marginRight = '25%';
 });
 
 // when window closes or is refreshed
@@ -355,6 +361,9 @@ window.addEventListener('beforeunload', function(e) {
   firebase.auth().signOut();
   removeGuest();
   deleteAnonymousUser();
+  anonymousSignInElement.disabled = false;
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
 }, false);
 
 document.querySelector("dialog").addEventListener("keydown",function(e){

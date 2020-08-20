@@ -77,7 +77,7 @@
       
       <!-- content that resizes when side bar opens -->
       <div id = "main">
-          <button id="sidebarBtn" onclick="openSidebar()"> <span class="material-icons">chevron_left</span></button> 
+          <button id="sidebarBtn" onclick="openSidebar()"> <span class="material-icons">chevron_right</span></button> 
            <div class= "header" >
                 <div id="user-container">
                  <div hidden id="user-pic"></div>
@@ -96,19 +96,25 @@
           <div class = "videoplayer" class="embed-responsive embed-responsive-16by9">
             <iframe id="ytplayer" class="embed-responsive-item" src="https://www.youtube.com/embed/?enablejsapi=1" allowfullscreen></iframe>
             <img id="thumbnailDisplay" width="100%" height="100%" src=""></img>
+            <div id="skipContainer">
+                <p id="skipCounter">Votes to skip video: 0</p>
+                <button id="skipBtn" onclick="voteToSkip()" class="mdl-button mdl-js-button mdl-button-raised mdl-js-ripple-effect">
+                    <span id="skipImg" class="material-icons">skip_next </span>
+                </button>
+            </div>
           </div>
       </div>
 
       <div id="mySidebar" class="sidebar">
         <div class = "mdl-tabs mdl-js-tabs">
                <div class = "mdl-tabs__tab-bar" id= 'tabsbar'>
-                  <a href = "#chat-panel" class = "mdl-tabs__tab is-active"><span class="material-icons"> chat</span> Chat</a>
+                  <a href = "#chat-panel" class = "mdl-tabs__tab"><span class="material-icons"> chat</span> Chat</a>
                   <a href = "#queue-panel" class = "mdl-tabs__tab"><span class="material-icons">queue</span> Queue</a>
                   <a href = "#guests-panel" class = "mdl-tabs__tab"><span class="material-icons">people</span> Guests</a>
-                  <a href = "#share-panel" class = "mdl-tabs__tab"><span class="material-icons">share</span> Share</a>
+                  <a href = "#share-panel" class = "mdl-tabs__tab is-active"><span class="material-icons">share</span> Share</a>
                </div>
   
-           <div class = "mdl-tabs__panel is-active" id = "chat-panel">
+           <div class = "mdl-tabs__panel" id = "chat-panel">
             <div id="messages-card-container">
 
       <!-- Messages container -->
@@ -133,16 +139,19 @@
             <div id="queue-card-container">
                 <div id="queue-card" class="mdl-card mdl-cell mdl-cell--12-col">
                     <div class="mdl-card__supporting-text mdl-color-text--white" id="bigQueueContainer">
-                        <div id="videoContainer"></div>
-                            <div id="video-form" >
-                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                        <input class="mdl-textfield__input" id="linkArea" type="text" autocomplete="off" spellcheck>
-                                        <label class="mdl-textfield__label" for="linkArea">Enter a YouTube video link...</label>
-                                    </div>
-                                    <button class="submitBtn" id="queueBtn" type="submit" onclick="verifyURLStructure(document.getElementById('linkArea').value)">
-                                        <span class="material-icons">add_to_queue</span>
-                                    </button>    
+                        <h5 class="queueHeader">Search Results:</h5>
+                        <div id="searchContainer"></div>
+                        <div id="video-form" >
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" id="searchArea" type="text" autocomplete="off" spellcheck>
+                                <label class="mdl-textfield__label" for="searchArea">Search:</label>
                             </div>
+                            <button class="submitBtn" id="queueBtn" type="submit" onclick="getSearchQuery(document.getElementById('searchArea').value)">
+                                <span class="material-icons">search</span>
+                            </button>  
+                        </div>
+                        <h5 class="queueHeader">Queue:</h5>
+                        <div id="videoContainer"></div>
                     </div>
                 </div>
             </div>
@@ -157,9 +166,12 @@
              from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a></p>
           </div>
 
-          <div class="mdl-tabs__panel" id = "share-panel">
+          <div class="mdl-tabs__panel is-active" id = "share-panel">
             <div id = "share">
             </div>
+           <div id = "notice">
+               <h7> After sharing the link click the queue tab and start adding videos!</h7>
+           </div> 
           </div>
         </div>
     </div>

@@ -118,19 +118,19 @@ function onPlayerError(event) {
   skipVoteTag.style.display = 'none';
   const error = event.data;
   switch (error) {
-    case 2:
+    case 2: // request contains invalid parameter value
       errorMessage = 'Video ID incorrect';
       break;
-    case 5:
-      errorMessage = 'HTML 5 playyer issue';
+    case 5: // Any error related to the HTML5 player
+      errorMessage = 'HTML 5 player issue';
       break;
-    case 100:
+    case 100: // The requested video was not found
       errorMessage = 'video not found (removed or private)';
       break;
-    case 101:
+    case 101: // // Requested video owner blocks embeds
       errorMessage = 'video owner blocks embed';
       break;
-    case 150:
+    case 150: // "It's just a 101 error in disguise"
       errorMessage = 'video owner blocks embed';
   }
   console.log(errorMessage);
@@ -145,7 +145,7 @@ function onPlayerError(event) {
 }
 
 let catchingUp; // Does this vid need to catch up to Firestore?
-function onPlayerReady() {
+function onPlayerReady(event) {
   switchDisplay();
   getCurrentVideo();
   catchingUp = true;

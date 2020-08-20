@@ -167,8 +167,8 @@ function updateVidPlaying(currentVid) {
 
 function removeOneViewer() {
   vidDataRef.update({
-    numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
-        FieldValue.increment(-1),
+    numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
+        .FieldValue.increment(-1),
   }).then(function() {
     console.log('removed one viewer');
   });
@@ -176,8 +176,8 @@ function removeOneViewer() {
 
 function addOneViewer() {
   vidDataRef.update({
-    numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
-        FieldValue.increment(1),
+    numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
+        .FieldValue.increment(1),
   }).then(function() {
     console.log('added one viewer');
   });
@@ -286,7 +286,9 @@ function onPlayerStateChange() {
   if (!stopUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
-        if (!videoUpdating && !catchingUp) updateInfo('play');
+        if (!videoUpdating && !catchingUp) {
+          updateInfo('play');
+        }
         alignWithFirestore();
         break;
       case 2: // paused
@@ -381,6 +383,8 @@ function getRealtimeUpdates() {
 
 window.onbeforeunload = function() {
   clearTimeouts();
-  if (!vidOver && thumbnail.style.display === 'none') removeOneViewer();
+  if (!vidOver && thumbnail.style.display === 'none') {
+    removeOneViewer();
+  }
   return 'end of viewing';
 };

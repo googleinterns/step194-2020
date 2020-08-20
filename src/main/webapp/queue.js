@@ -131,12 +131,14 @@ async function verifyURLStructure(url) {
   if (!url.match(validator)) { // signal bad link to user
     document.getElementById('linkError').style.display = 'block';
     document.getElementById('videoError').style.display = 'none';
+    return false;
   } else if (document.getElementById('ytplayer') != null) {
     const urlQuery = url.substring(url.indexOf('?'));
     const videoParams = new URLSearchParams(urlQuery);
     const videoParam = videoParams.get('v');
     await getVideoData(videoParam);
     await getRoomQueue(roomParameters);
+    return true;
   }
 }
 

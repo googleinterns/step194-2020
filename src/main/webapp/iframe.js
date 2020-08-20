@@ -22,6 +22,10 @@ const SLOW_UPDATE_FACTOR = 0.85;
 const FAST_UPDATE_FACTOR = 0.7;
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
+const errorTag = document.getElementById('playerErrorContainer');
+errorTag.style.display = 'none';
+const skipVoteTag = document.getElementById('skipContainer');
+
 
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
@@ -102,12 +106,46 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange,
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
+      'onError': onPlayerError,
     },
   });
 }
 
+let errorMessage;
+function onPlayerError(event) {
+  resetPlaybackInfo();
+  errorTag.style.display = 'block';
+  skipVoteTag.style.display = 'none';
+  const error = event.data;
+  switch (error) {
+    case 2: // request contains invalid parameter value
+      errorMessage = 'Video ID incorrect';
+      break;
+    case 5: // Any error related to the HTML5 player
+      errorMessage = 'HTML 5 player issue';
+      break;
+    case 100: // The requested video was not found
+      errorMessage = 'video not found (removed or private)';
+      break;
+    case 101: // // Requested video owner blocks embeds
+      errorMessage = 'video owner blocks embed';
+      break;
+    case 150: // "It's just a 101 error in disguise"
+      errorMessage = 'video owner blocks embed';
+  }
+  console.log(errorMessage);
+  setTimeout(function() {
+    stopUpdating = true;
+    switchDisplay();
+    errorTag.style.display = 'none';
+    skipVoteTag.style.display = 'block';
+    removeOneViewer();
+    getCurrentVideo();
+  }, 4000); // give users time to read player error
+}
+
 let catchingUp; // Does this vid need to catch up to Firestore?
-function onPlayerReady() {
+function onPlayerReady(event) {
   switchDisplay();
   getCurrentVideo();
   catchingUp = true;
@@ -293,7 +331,7 @@ function onPlayerStateChange() {
         break;
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
-          pauseTimeout = setTimeout(updateInfo, 100, 'pause');
+          pauseTimeout = setTimeout(updateInfo, 500, 'pause');
         }
         setPauseInterval();
         break;

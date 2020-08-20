@@ -81,6 +81,7 @@ function getCurrentVideo() {
   });
 }
 
+let errorMessage = '';
 function getFirstVidFromQueue() {
   if (nextVidID === '') {
     console.log('add videos to the queue!');
@@ -93,7 +94,9 @@ function getFirstVidFromQueue() {
     addOneViewer();
     stopUpdating = false;
     setTimeout(function() {
-      updateVidPlaying(firstVid);
+      if (errorMessage === '') {
+        updateVidPlaying(firstVid);
+      }
       queueDataRef.doc(firstVidDocId).delete();
     }, 1000);
   }
@@ -111,7 +114,6 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
   });
 }
 
-let errorMessage;
 function onPlayerError(event) {
   resetPlaybackInfo();
   errorTag.style.display = 'block';
@@ -135,6 +137,7 @@ function onPlayerError(event) {
   }
   console.log(errorMessage);
   setTimeout(function() {
+    errorMessage = '';
     stopUpdating = true;
     switchDisplay();
     errorTag.style.display = 'none';
@@ -331,7 +334,7 @@ function onPlayerStateChange() {
         break;
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
-          pauseTimeout = setTimeout(updateInfo, 500, 'pause');
+          pauseTimeout = setTimeout(updateInfo, 250, 'pause');
         }
         setPauseInterval();
         break;

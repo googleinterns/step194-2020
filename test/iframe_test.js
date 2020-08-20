@@ -1,7 +1,7 @@
 const assert = require('assert'); // eslint-disable-line no-undef
 let autoUpdateTriggered = false;
 
-// Resets all mocks
+// Resets all fakes
 function reset() {
   player.reset();
   doc.reset();
@@ -13,7 +13,7 @@ function reset() {
   nextThumbnail = '';
 }
 
-// player mock
+// player fake
 const player = {
   playerState: 5,
   playbackRate: 1,
@@ -63,7 +63,7 @@ const player = {
   },
 };
 
-// playback firestore mock
+// playback firestore fake
 const doc = {
   docData: {
     timestamp: 0,
@@ -114,7 +114,7 @@ const doc = {
   },
 };
 
-// queue firestore mock
+// queue firestore fake
 const queueCollection = {
   queueDocs: [],
   addToQueue(iD, thumbnail) {
@@ -429,7 +429,7 @@ describe('Retrieving Information from Firestore', function() {
 
 // ATTENTION!!!
 
-// Below is modified version of code to work with mocks
+// Below is modified version of code to work with fakes
 // I have a version which includes commented out lines
 // to help see more of the difference between this and the
 // real code, but this PR was already too long,

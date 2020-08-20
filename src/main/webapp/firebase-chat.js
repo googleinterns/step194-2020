@@ -344,13 +344,17 @@ signOutButtonElement.addEventListener('click', function() {
   firebase.auth().signOut();
   deleteAnonymousUser();
   anonymousSignInElement.disabled = false;
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
 });
 
 anonymousSignInElement.addEventListener('click', function(e) {
   e.preventDefault();
   anonymousSignIn();
   anonymousSignInElement.disabled = true;
-  });
+  document.getElementById('mySidebar').style.width = '25%';
+  document.getElementById('main').style.marginRight = '25%';
+});
 
 // when window closes or is refreshed
 window.addEventListener('beforeunload', function(e) {
@@ -358,6 +362,8 @@ window.addEventListener('beforeunload', function(e) {
   removeGuest();
   deleteAnonymousUser();
   anonymousSignInElement.disabled = false;
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
 }, false);
 
 document.querySelector("dialog").addEventListener("keydown",function(e){

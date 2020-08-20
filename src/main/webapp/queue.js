@@ -251,7 +251,8 @@ async function getRoomQueue(roomid) {
                   queue[i].thumbnailURL.length - 1) +
               '"/><div id="video' + i + 'Info" class="videoInfo">' +
               '<p class="videoTitle">' +
-              queue[i].title.substring(1, queue[i].title.length - 1) + '</p>' +
+              queue[i].title.substring(1, queue[i].title.length - 1)
+                  .replace(/\\"/g, '"') + '</p>' +
               '<p class="duration">' + parseTime(queue[i].duration)+ '</p>' +
               '<button class="removeVideoBtn" id="removeVideoBtn' +
               i +

@@ -12,8 +12,6 @@ exports.addWelcomeMessages = functions.firestore
 .document('rooms/{roomId}/guests/{guestId}').onCreate((snap, context) => {
 
   const roomID = context.params.roomId;
-  console.log('A new user signed in for the first time.');
-
   const newValue = snap.data();
   const userName = newValue.name;
 
@@ -33,15 +31,13 @@ exports.addLeaveMessages = functions.firestore
 .document('rooms/{roomId}/guests/{guestId}').onDelete((snap, context) => {
 
   const roomID = context.params.roomId;
-  console.log('A user left the room');
-
   const deletedValue = snap.data();
   const userName = deletedValue.name;
 
   admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',
-    text: `${userName} left the room!`,
+    text: `${userName} left the room`,
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
   });
   console.log('Leave message written to database.');
@@ -125,4 +121,5 @@ exports.addToQueue = functions.firestore
     text: `${videoTitle} was added to the queue`,
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
   });
+    console.log('Queue message written to database.');
 });

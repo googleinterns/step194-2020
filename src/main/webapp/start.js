@@ -69,7 +69,7 @@ async function deleteRooms() {
 }
 
 async function deleteQueue(doc) {
-  db.collection('rooms') // eslint-disable-line no-undef
+  await db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id).collection('queue').get()
       .then(function(queueShot) {
         queueShot.forEach(function(qDoc) {
@@ -80,7 +80,7 @@ async function deleteQueue(doc) {
 }
 
 async function deleteMessages(doc) {
-  db.collection('rooms') // eslint-disable-line no-undef
+  await db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id).collection('messages').get()
       .then(function(messagesShot) {
         messagesShot.forEach(function(mDoc) {
@@ -91,7 +91,7 @@ async function deleteMessages(doc) {
 }
 
 async function deleteCurrentVideo(doc) {
-  db.collection('rooms') // eslint-disable-line no-undef
+  await db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id)
       .collection('CurrentVideo')
       .get()

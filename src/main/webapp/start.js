@@ -6,7 +6,8 @@ async function startRoom() {
   if (startButtonCount < 1) {
     await deleteRooms();
     await db.collection('rooms').add({ // eslint-disable-line no-undef
-      created: firebase.firestore.Timestamp.fromDate(new Date()),
+      created: firebase // eslint-disable-line no-undef
+          .firestore.Timestamp.fromDate(new Date()), 
     })
         .then(function(docRef) {
           db.collection('rooms').doc(docRef.id) // eslint-disable-line no-undef
@@ -30,31 +31,37 @@ async function startRoom() {
 }
 
 async function deleteRooms() {
-  await db.collection('rooms').get()
+  await db.collection('rooms').get() // eslint-disable-line no-undef
       .then(function(querySnapshot) {
         console.log('querySnapshot length' + querySnapshot.size);
         querySnapshot.forEach(function(doc) {
-          console.log("doc: " + doc.id);
+          console.log('doc: ' + doc.id);
           let docTime = 0;
-          db.collection('rooms').doc('i291JRSktIHOoZgjStIL').get().then((snapshot) => {
-            docTime = snapshot.data().created.seconds; 
+          db.collection('rooms') // eslint-disable-line no-undef
+              .doc('i291JRSktIHOoZgjStIL')
+              .get()
+              .then((snapshot) => {
+            docTime = snapshot.data().created.seconds;
           });
-          db.collection('rooms').doc(doc.id).collection('guests').get()
+          db.collection('rooms') // eslint-disable-line no-undef
+              .doc(doc.id).collection('guests').get()
               .then(function(guestShot) {
                 console.log('guestShot length: ' + guestShot.size);
+                // if no guests in room and 30 minutes since room start
                 if ((guestShot.size == 0 || guestShot.size == undefined) &&
-                    Math.floor(Date.now()/1000) - docTime >= 900) { // no guests in room and 30 minutes since room start
+                    Math.floor(Date.now()/1000) - docTime >= 900) {
                   deleteCurrentVideo(doc);
                   deleteMessages(doc);
                   deleteQueue(doc);
                   guestShot.forEach(function(gDoc) {
-                    db.collection('rooms')
+                    db.collection('rooms') // eslint-disable-line no-undef
                         .doc(doc.id)
                         .collection('guests')
                         .doc(gDoc.id)
                         .delete();
                   });
-                  db.collection('rooms').doc(doc.id).delete();
+                  db.collection('rooms') // eslint-disable-line no-undef
+                      .doc(doc.id).delete(); 
                 }
               });
         });
@@ -62,35 +69,39 @@ async function deleteRooms() {
 }
 
 async function deleteQueue(doc) {
-  db.collection('rooms').doc(doc.id).collection('queue').get()
+  db.collection('rooms') // eslint-disable-line no-undef
+      .doc(doc.id).collection('queue').get()
       .then(function(queueShot) {
         queueShot.forEach(function(qDoc) {
-          db.collection('rooms').doc(doc.id).collection('queue').doc(qDoc.id).delete();
-        }); 
+          db.collection('rooms') // eslint-disable-line no-undef
+              .doc(doc.id).collection('queue').doc(qDoc.id).delete();
+        });
       });
 }
 
 async function deleteMessages(doc) {
-  db.collection('rooms').doc(doc.id).collection('messages').get()
+  db.collection('rooms') // eslint-disable-line no-undef
+      .doc(doc.id).collection('messages').get()
       .then(function(messagesShot) {
         messagesShot.forEach(function(mDoc) {
-          db.collection('rooms').doc(doc.id).collection('messages').doc(mDoc.id).delete();
-        }); 
+          db.collection('rooms') // eslint-disable-line no-undef
+              .doc(doc.id).collection('messages').doc(mDoc.id).delete();
+        });
       });
 }
 
 async function deleteCurrentVideo(doc) {
-  db.collection('rooms')
+  db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id)
       .collection('CurrentVideo')
       .get()
       .then(function(videoSnapshot) {
         videoSnapshot.forEach(function(vDoc) {
-          db.collection('rooms')
+          db.collection('rooms') // eslint-disable-line no-undef
               .doc(doc.id)
               .collection('CurrentVideo')
               .doc(vDoc.id)
               .delete();
-        }); 
+        });
       });
 }

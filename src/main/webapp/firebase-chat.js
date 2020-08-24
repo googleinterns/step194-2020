@@ -357,7 +357,7 @@ anonymousSignInElement.addEventListener('click', function(e) {
 });
 
 // when window closes or is refreshed
-window.addEventListener('beforeunload', async function(e) {
+window.addEventListener('beforeunload', function(e) {
   removeGuest();
   firebase.auth().signOut();
   deleteAnonymousUser();

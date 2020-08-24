@@ -63,7 +63,7 @@ function updateShareTab() {
       '<span id="shareImg" class="material-icons">content_copy</span>' +
       '</button>' +
       '</div>' +
-      '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
+      '<input id="loungeLink" value="http://www.youtube-lounge.appspot.com/' +
       'lounge.html?room_id='+ roomParameters +'" type="text" readonly</input>';
 }
 

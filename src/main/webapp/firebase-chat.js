@@ -357,9 +357,9 @@ anonymousSignInElement.addEventListener('click', function(e) {
 });
 
 // when window closes or is refreshed
-window.addEventListener('beforeunload', function(e) {
-  firebase.auth().signOut();
+window.addEventListener('beforeunload', async function(e) {
   removeGuest();
+  firebase.auth().signOut();
   deleteAnonymousUser();
   anonymousSignInElement.disabled = false;
   document.getElementById('mySidebar').style.width = '0';

@@ -46,17 +46,44 @@ exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVid
   const roomID = context.params.roomId;
   console.log('video change state');
   // Get an object representing the document
+ const previousValue = change.before.data();
   const changeValue = change.after.data();
 
   // access a particular field 
   const isPlaying = changeValue.isPlaying;
-  const timestamp = changeValue.timestamp;
+  const timestampNow = changeValue.timestamp;
+  const timestampBefore = previousValue.timestamp;
 
-  if (isPlaying == false && timestamp !== 0){
+  if (isPlaying == false && timestampNow !== 0){
   admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',
     text: `Video paused`,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+   if (Math.abs(timestampNow - timestampBefore) > 5){
+    let minutes = 0;
+    let seconds = 0;
+    let hours = 0;
+    let result = '';
+    hours = (timestampNow / 3600) | 0;
+    minutes = ((timestampNow - (hours * 3600)) / 60) | 0;
+    seconds = timestampNow - (hours * 3600) - (minutes * 60);
+    if (hours > 0) {
+    result += hours + ':';
+    }
+    if (minutes < 10) {
+    minutes = '0' + minutes;
+    }
+    if (seconds < 10) {
+    seconds = '0' + Math.trunc(seconds);
+    }
+  const formattedTime =  result + minutes + ':' + seconds;
+  admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
+    name: 'Lounge Bot',
+    profilePicUrl: '/images/LoungeLogo.png',
+    text: `Video moved to ${formattedTime}`,
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
   }

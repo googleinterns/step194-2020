@@ -7,7 +7,7 @@ async function startRoom() {
     await deleteRooms();
     await db.collection('rooms').add({ // eslint-disable-line no-undef
       created: firebase // eslint-disable-line no-undef
-          .firestore.Timestamp.fromDate(new Date()), 
+          .firestore.Timestamp.fromDate(new Date()),
     })
         .then(function(docRef) {
           db.collection('rooms').doc(docRef.id) // eslint-disable-line no-undef
@@ -41,8 +41,8 @@ async function deleteRooms() {
               .doc('i291JRSktIHOoZgjStIL')
               .get()
               .then((snapshot) => {
-            docTime = snapshot.data().created.seconds;
-          });
+                docTime = snapshot.data().created.seconds;
+              });
           db.collection('rooms') // eslint-disable-line no-undef
               .doc(doc.id).collection('guests').get()
               .then(function(guestShot) {
@@ -61,7 +61,7 @@ async function deleteRooms() {
                         .delete();
                   });
                   db.collection('rooms') // eslint-disable-line no-undef
-                      .doc(doc.id).delete(); 
+                      .doc(doc.id).delete();
                 }
               });
         });

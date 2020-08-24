@@ -6,47 +6,49 @@ admin.initializeApp();
 
 
 // Adds a message that welcomes new users into the chat.
-exports.addWelcomeMessages = functions.auth.user().onCreate(async (user) => {
+exports.addWelcomeMessages = functions.firestore.document('rooms/{roomId}/guests/{guestId}').onCreate((snap, context) => {
   console.log('A new user signed in for the first time.');
-  const fullName = user.name || 'Anonymous';
+  const newValue = snap.data();
+
+  const userName = newValue.name;
+  console.log(userName);
 
   // Saves the new welcome message into the database
-  // which then displays it in the FriendlyChat clients.
-  await admin.firestore().collection('rooms').doc(roomId)
-      .collection('messages').add({
+  admin.firestore().collection('rooms').doc(roomId).collection('messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',
-    text: `${fullName} joined the room! Welcome!`,
+    text: `${userName} joined the room! Welcome!`,
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
   });
   console.log('Welcome message written to database.');
 });
 
-exports.addLeaveMessages = functions.auth.user().onDelete(async (user) => {
-  console.log('A new user signed in for the first time.');
-  const fullName = user.name || 'Anonymous';
+exports.addLeaveMessages = functions.firestore.document('rooms/{roomId}/guests/{guestId}').onDelete((snap, context) => {
+  console.log('A user left the room');
+  const deletedValue = snap.data();
 
-  // Saves the new welcome message into the database
-  // which then displays it in the FriendlyChat clients.
-  await admin.firestore().collection('rooms').doc(docRef.id)
-      .collection('messages').add({
+  const userName = deletedValue.name;
+
+  // Saves the leave message into the database
+  admin.firestore().doc('rooms/roomId/messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',
-    text: `${fullName} left the room!`,
+    text: `${userName} left the room!`,
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
   });
-  console.log('Welcome message written to database.');
+  console.log('Leave message written to database.');
 });
 
 
 exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
+     console.log('video change state');
       // Get an object representing the document
-      const newValue = change.after.data();
+      const changeValue = change.after.data();
 
       // access a particular field 
-      const isPlaying = newValue.isPlaying;
+      const isPlaying = changeValue.isPlaying;
         if (isPlaying == true) {
-            admin.firestore().collection('rooms').doc(roomId).collection('messages').add({
+            admin.firestore().document('rooms/{roomId}/messages').add({
             name: 'Lounge Bot',
             profilePicUrl: '/images/LoungeLogo.png',
             text: `Video is playing`,

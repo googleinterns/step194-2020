@@ -61,6 +61,7 @@ exports.updatePlayBack = functions.firestore
 
   // access a particular field
   const isPlaying = changeValue.isPlaying;
+  const previousVideoState = previousValue.isPlaying;
   const timestampNow = changeValue.timestamp;
   const timestampBefore = previousValue.timestamp;
 
@@ -69,6 +70,15 @@ exports.updatePlayBack = functions.firestore
       name: 'Lounge Bot',
       profilePicUrl: '/images/LoungeLogo.png',
       text: `Video paused`,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+  // notifies user if video is playing after prevously being paused 
+  if (previousVideoState == false && timestampNow !== 0) {
+    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
+      name: 'Lounge Bot',
+      profilePicUrl: '/images/LoungeLogo.png',
+      text: `Video is playing`,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
   }

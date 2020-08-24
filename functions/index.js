@@ -1,3 +1,4 @@
+/* eslint-disable */
 const functions = require('firebase-functions');
 
 // Import and initialize the Firebase Admin SDK.
@@ -5,9 +6,11 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 
-// Adds a message that welcomes new users into the chat 
+// Adds a message that welcomes new users into the chat
 // when a document is created on the guest list.
-exports.addWelcomeMessages = functions.firestore.document('rooms/{roomId}/guests/{guestId}').onCreate((snap, context) => {
+exports.addWelcomeMessages = functions.firestore
+.document('rooms/{roomId}/guests/{guestId}').onCreate((snap, context) => {
+
   const roomID = context.params.roomId;
   console.log('A new user signed in for the first time.');
 
@@ -26,7 +29,9 @@ exports.addWelcomeMessages = functions.firestore.document('rooms/{roomId}/guests
 
 // when a user is deleted off the guest list  or signs out
 // a leave message is inputted into the chat
-exports.addLeaveMessages = functions.firestore.document('rooms/{roomId}/guests/{guestId}').onDelete((snap, context) => {
+exports.addLeaveMessages = functions.firestore
+.document('rooms/{roomId}/guests/{guestId}').onDelete((snap, context) => {
+
   const roomID = context.params.roomId;
   console.log('A user left the room');
 
@@ -42,9 +47,11 @@ exports.addLeaveMessages = functions.firestore.document('rooms/{roomId}/guests/{
   console.log('Leave message written to database.');
 });
 
-// on update of the video playback data the chat is notified 
+// on update of the video playback data the chat is notified
 // when the video is paused and when the timestamp of the video is moved
-exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
+exports.updatePlayBack = functions.firestore
+.document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
+
   const roomID = context.params.roomId;
   console.log('video change state');
 
@@ -52,21 +59,21 @@ exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVid
   const previousValue = change.before.data();
   const changeValue = change.after.data();
 
-  // access a particular field 
+  // access a particular field
   const isPlaying = changeValue.isPlaying;
   const timestampNow = changeValue.timestamp;
   const timestampBefore = previousValue.timestamp;
 
   if (isPlaying == false && timestampNow !== 0) {
-  admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-    name: 'Lounge Bot',
-    profilePicUrl: '/images/LoungeLogo.png',
-    text: `Video paused`,
-    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
+      name: 'Lounge Bot',
+      profilePicUrl: '/images/LoungeLogo.png',
+      text: `Video paused`,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
   }
-// only want to record instances when the timestamp changes outside the sync window
-   if (Math.abs(timestampNow - timestampBefore) > 5){
+  // only want to record instances when the timestamp changes outside the sync window
+  if (Math.abs(timestampNow - timestampBefore) > 5) {
     let minutes = 0;
     let seconds = 0;
     let hours = 0;
@@ -83,8 +90,9 @@ exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVid
     if (seconds < 10) {
       seconds = '0' + seconds;
     }
-    const formattedTime =  result + minutes + ':' + Math.trunc(seconds);
-    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
+    const formattedTime = result + minutes + ':' + Math.trunc(seconds);
+    admin.firestore().collection('rooms').doc(roomID)
+    .collection('messages').add({
       name: 'Lounge Bot',
       profilePicUrl: '/images/LoungeLogo.png',
       text: `Video timestamp moved to ${formattedTime}`,
@@ -93,8 +101,10 @@ exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVid
   }
 });
 
-// notifies chat when a new video is added to the queue 
-exports.addToQueue = functions.firestore.document('rooms/{roomId}/queue/{queueId}').onCreate((snap, context) => {
+// notifies chat when a new video is added to the queue
+exports.addToQueue = functions.firestore
+.document('rooms/{roomId}/queue/{queueId}').onCreate((snap, context) => {
+
   const roomID = context.params.roomId;
   const deletedVideo = snap.data();
   const videoTitle = deletedVideo.title;

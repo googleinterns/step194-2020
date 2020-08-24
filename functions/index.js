@@ -77,9 +77,9 @@ exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVid
     minutes = '0' + minutes;
     }
     if (seconds < 10) {
-    seconds = '0' + Math.trunc(seconds);
+    seconds = '0' + seconds;
     }
-  const formattedTime =  result + minutes + ':' + seconds;
+  const formattedTime =  result + minutes + ':' + Math.trunc(seconds);
   admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',

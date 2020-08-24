@@ -22,6 +22,10 @@ const SLOW_UPDATE_FACTOR = 0.85;
 const FAST_UPDATE_FACTOR = 0.7;
 const thumbnail = document.getElementById('thumbnailDisplay');
 thumbnail.style.display = 'none';
+const errorTag = document.getElementById('playerErrorContainer');
+errorTag.style.display = 'none';
+const skipVoteTag = document.getElementById('skipContainer');
+
 
 const firestore = firebase.firestore(); // eslint-disable-line no-undef
 
@@ -77,6 +81,7 @@ function getCurrentVideo() {
   });
 }
 
+let errorMessage = '';
 function getFirstVidFromQueue() {
   if (nextVidID === '') {
     console.log('add videos to the queue!');
@@ -89,7 +94,9 @@ function getFirstVidFromQueue() {
     addOneViewer();
     stopUpdating = false;
     setTimeout(function() {
-      updateVidPlaying(firstVid);
+      if (errorMessage === '') {
+        updateVidPlaying(firstVid);
+      }
       queueDataRef.doc(firstVidDocId).delete();
     }, 1000);
   }
@@ -102,8 +109,42 @@ function onYouTubeIframeAPIReady() { // eslint-disable-line no-unused-vars
       'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange,
       'onPlaybackRateChange': onPlayerPlaybackRateChange,
+      'onError': onPlayerError,
     },
   });
+}
+
+function onPlayerError(event) {
+  resetPlaybackInfo();
+  errorTag.style.display = 'block';
+  skipVoteTag.style.display = 'none';
+  const error = event.data;
+  switch (error) {
+    case 2: // request contains invalid parameter value
+      errorMessage = 'Video ID incorrect';
+      break;
+    case 5: // Any error related to the HTML5 player
+      errorMessage = 'HTML 5 player issue';
+      break;
+    case 100: // The requested video was not found
+      errorMessage = 'video not found (removed or private)';
+      break;
+    case 101: // // Requested video owner blocks embeds
+      errorMessage = 'video owner blocks embed';
+      break;
+    case 150: // "It's just a 101 error in disguise"
+      errorMessage = 'video owner blocks embed';
+  }
+  console.log(errorMessage);
+  setTimeout(function() {
+    errorMessage = '';
+    stopUpdating = true;
+    switchDisplay();
+    errorTag.style.display = 'none';
+    skipVoteTag.style.display = 'block';
+    removeOneViewer();
+    getCurrentVideo();
+  }, 4000); // give users time to read player error
 }
 
 let catchingUp; // Does this vid need to catch up to Firestore?
@@ -167,8 +208,8 @@ function updateVidPlaying(currentVid) {
 
 function removeOneViewer() {
   vidDataRef.update({
-    numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
-        FieldValue.increment(-1),
+    numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
+        .FieldValue.increment(-1),
   }).then(function() {
     console.log('removed one viewer');
   });
@@ -176,8 +217,8 @@ function removeOneViewer() {
 
 function addOneViewer() {
   vidDataRef.update({
-    numPeopleWatching: firebase.firestore. // eslint-disable-line no-undef
-        FieldValue.increment(1),
+    numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
+        .FieldValue.increment(1),
   }).then(function() {
     console.log('added one viewer');
   });
@@ -207,24 +248,25 @@ function waitForOthers(vidData) {
   }
 }
 
-// return true if player time is within 5 seconds of Firestore time
+// return true if player timestamp is within 5 realtime
+// seconds of firestore
 function timesInRange(firestoreVidTime) {
-  return Math.abs(player.getCurrentTime() - firestoreVidTime) <
+  return Math.abs(player.getCurrentTime() - firestoreVidTime) <=
       SYNC_WINDOW * player.getPlaybackRate();
 }
 
 // return true if player state is different than Firestore state
 function differentStates(firestoreVidIsPlaying) {
-  if (player.getPlayerState() != 1) { // player paused
-    if (firestoreVidIsPlaying) { // Firestore playing
-      return true;
+  if (isVideoPlaying()) {
+    if (firestoreVidIsPlaying) {
+      return false;
     }
-    return false;
-  }
-  if (!firestoreVidIsPlaying) {
     return true;
   }
-  return false;
+  if (!firestoreVidIsPlaying) {
+    return false;
+  }
+  return true;
 }
 
 // Return true if player is not paused
@@ -285,12 +327,14 @@ function onPlayerStateChange() {
   if (!stopUpdating) {
     switch (player.getPlayerState()) {
       case 1: // Playing
-        if (!videoUpdating && !catchingUp) updateInfo('play');
+        if (!videoUpdating && !catchingUp) {
+          updateInfo('play');
+        }
         alignWithFirestore();
         break;
       case 2: // paused
         if (!videoUpdating && !catchingUp) {
-          pauseTimeout = setTimeout(updateInfo, 100, 'pause');
+          pauseTimeout = setTimeout(updateInfo, 250, 'pause');
         }
         setPauseInterval();
         break;
@@ -380,6 +424,8 @@ function getRealtimeUpdates() {
 
 window.onbeforeunload = function() {
   clearTimeouts();
-  if (!vidOver && thumbnail.style.display === 'none') removeOneViewer();
+  if (!vidOver && thumbnail.style.display === 'none') {
+    removeOneViewer();
+  }
   return 'end of viewing';
 };

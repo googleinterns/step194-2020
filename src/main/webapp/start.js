@@ -30,6 +30,11 @@ async function startRoom() {
   }
 }
 
+/**
+ * Gathers information on each room contained in firestore, then deletes rooms
+ * if they have no guests inside and the room has existed for more than 30
+ * minutes
+ */
 async function deleteRooms() {
   await db.collection('rooms').get() // eslint-disable-line no-undef
       .then(function(querySnapshot) {
@@ -38,7 +43,7 @@ async function deleteRooms() {
           console.log('doc: ' + doc.id);
           let docTime = 0;
           db.collection('rooms') // eslint-disable-line no-undef
-              .doc('i291JRSktIHOoZgjStIL')
+              .doc(doc.id)
               .get()
               .then((snapshot) => {
                 docTime = snapshot.data().created.seconds;
@@ -68,6 +73,10 @@ async function deleteRooms() {
       });
 }
 
+/**
+ * Gets the queue associated with the given room and deletes each video
+ * @param doc the document reference for a room
+ */
 async function deleteQueue(doc) {
   await db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id).collection('queue').get()
@@ -79,6 +88,10 @@ async function deleteQueue(doc) {
       });
 }
 
+/**
+ * Gets the messages associated with a room and deletes al of their content
+ * @param doc the document reference for a room
+ */
 async function deleteMessages(doc) {
   await db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id).collection('messages').get()
@@ -90,6 +103,10 @@ async function deleteMessages(doc) {
       });
 }
 
+/**
+ * Gets the playback information for a room and deletes the iframe's info
+ * @param doc the document reference for a room
+ */
 async function deleteCurrentVideo(doc) {
   await db.collection('rooms') // eslint-disable-line no-undef
       .doc(doc.id)

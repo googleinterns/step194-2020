@@ -207,7 +207,6 @@ function updateVidPlaying(currentVid) {
 }
 
 function removeOneViewer() {
-  console.log('tried to remove');
   vidDataRef.update({
     numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
         .FieldValue.increment(-1),

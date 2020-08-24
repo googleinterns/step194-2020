@@ -207,6 +207,7 @@ function updateVidPlaying(currentVid) {
 }
 
 function removeOneViewer() {
+  console.log('tried to remove');
   vidDataRef.update({
     numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
         .FieldValue.increment(-1),
@@ -421,11 +422,3 @@ function getRealtimeUpdates() {
     }
   });
 }
-
-window.onbeforeunload = function() {
-  clearTimeouts();
-  if (!vidOver && thumbnail.style.display === 'none') {
-    removeOneViewer();
-  }
-  return 'end of viewing';
-};

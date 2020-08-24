@@ -43,26 +43,37 @@ exports.addLeaveMessages = functions.firestore.document('rooms/{roomId}/guests/{
 
 
 exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
-    const roomID = context.params.roomId;
-     console.log('video change state');
+  const roomID = context.params.roomId;
+  console.log('video change state');
+  // Get an object representing the document
+  const changeValue = change.after.data();
+
+  // access a particular field 
+  const isPlaying = changeValue.isPlaying;
+  const timestamp = changeValue.timestamp;
+
+  if (isPlaying == false && timestamp !== 0){
+  admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
+    name: 'Lounge Bot',
+    profilePicUrl: '/images/LoungeLogo.png',
+    text: `Video paused`,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+});
+
+exports.addToQueue = functions.firestore.document('rooms/{roomId}/queue/{queueId}').onCreate((snap, context) => {
+  const roomID = context.params.roomId;
+  console.log('video change state');
       // Get an object representing the document
-      const changeValue = change.after.data();
+  const deletedVideo = snap.data();
 
       // access a particular field 
-      const isPlaying = changeValue.isPlaying;
-        if (isPlaying == true) {
-            admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-            name: 'Lounge Bot',
-            profilePicUrl: '/images/LoungeLogo.png',
-            text: `Video is playing`,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            });
-        } else {
-           admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-            name: 'Lounge Bot',
-            profilePicUrl: '/images/LoungeLogo.png',
-            text: `Video is paused`,
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            }); 
-        }
+   const videoTitle = deletedVideo.title;
+   admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
+    name: 'Lounge Bot',
+    profilePicUrl: '/images/LoungeLogo.png',
+    text: `${videoTitle} was added to the queue`,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
+});

@@ -7,6 +7,7 @@ admin.initializeApp();
 
 // Adds a message that welcomes new users into the chat.
 exports.addWelcomeMessages = functions.firestore.document('rooms/{roomId}/guests/{guestId}').onCreate((snap, context) => {
+  const roomID = context.params.roomId;
   console.log('A new user signed in for the first time.');
   const newValue = snap.data();
 
@@ -14,7 +15,7 @@ exports.addWelcomeMessages = functions.firestore.document('rooms/{roomId}/guests
   console.log(userName);
 
   // Saves the new welcome message into the database
-  admin.firestore().collection('rooms').doc(roomId).collection('messages').add({
+  admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',
     text: `${userName} joined the room! Welcome!`,
@@ -24,13 +25,14 @@ exports.addWelcomeMessages = functions.firestore.document('rooms/{roomId}/guests
 });
 
 exports.addLeaveMessages = functions.firestore.document('rooms/{roomId}/guests/{guestId}').onDelete((snap, context) => {
+  const roomID = context.params.roomId;
   console.log('A user left the room');
   const deletedValue = snap.data();
 
   const userName = deletedValue.name;
 
   // Saves the leave message into the database
-  admin.firestore().doc('rooms/roomId/messages').add({
+  admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
     name: 'Lounge Bot',
     profilePicUrl: '/images/LoungeLogo.png',
     text: `${userName} left the room!`,
@@ -41,6 +43,7 @@ exports.addLeaveMessages = functions.firestore.document('rooms/{roomId}/guests/{
 
 
 exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
+    const roomID = context.params.roomId;
      console.log('video change state');
       // Get an object representing the document
       const changeValue = change.after.data();
@@ -48,14 +51,14 @@ exports.updatePlayBack = functions.firestore.document('rooms/{roomId}/CurrentVid
       // access a particular field 
       const isPlaying = changeValue.isPlaying;
         if (isPlaying == true) {
-            admin.firestore().document('rooms/{roomId}/messages').add({
+            admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
             name: 'Lounge Bot',
             profilePicUrl: '/images/LoungeLogo.png',
             text: `Video is playing`,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
             });
         } else {
-           admin.firestore().collection('rooms').doc(roomId).collection('messages').add({
+           admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
             name: 'Lounge Bot',
             profilePicUrl: '/images/LoungeLogo.png',
             text: `Video is paused`,

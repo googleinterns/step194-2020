@@ -39,7 +39,7 @@
 }
 #messages {
   margin-bottom: 10px;
-  height: 81vh;
+  height: 83vh;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -241,4 +241,11 @@
   font-weight: bold;
   width: calc(100% - 40px);
   padding: 15px 0 5px 10px;
+}
+
+
+@media (max-height:864px){
+  #messages {
+    height: 79vh;
+  }
 }

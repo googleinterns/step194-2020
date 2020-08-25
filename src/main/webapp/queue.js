@@ -297,7 +297,8 @@ document.getElementById('searchArea').addEventListener('keydown', function(e) {
 // when window closes or is refreshed
 window.addEventListener('beforeunload', function(e) {
   clearTimeouts(); // eslint-disable-line no-undef
-  if (!vidOver && thumbnail.style.display === 'none') { // eslint-disable-line no-undef
+  if (thumbnail.style.display === 'none' &&
+      !vidOver) { // eslint-disable-line no-undef
     removeOneViewer(); // eslint-disable-line no-undef
   }
   removeGuest(); // eslint-disable-line no-undef

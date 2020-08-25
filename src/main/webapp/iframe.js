@@ -421,11 +421,3 @@ function getRealtimeUpdates() {
     }
   });
 }
-
-window.onbeforeunload = function() {
-  clearTimeouts();
-  if (!vidOver && thumbnail.style.display === 'none') {
-    removeOneViewer();
-  }
-  return 'end of viewing';
-};

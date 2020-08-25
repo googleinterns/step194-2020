@@ -453,7 +453,6 @@ window.addEventListener('beforeunload', function(e) {
   if (!vidOver && thumbnail.style.display === 'none') {
     removeOneViewer();
   }
-  firebase.auth().signOut();
   removeGuest();
   firebase.auth().signOut();
   deleteAnonymousUser();

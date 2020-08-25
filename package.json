@@ -8,7 +8,8 @@
     "mocha": "^8.1.1"
   },
   "dependencies": {
-    "firebase": "^7.17.1"
+    "firebase": "^7.17.1",
+    "window": "^4.2.7"
   },
   "description": "This repository contains the capstone project for a pod of interns (step194-2020) in Google's Student Training in Engineering program.",
   "main": "index.js",

@@ -293,3 +293,17 @@ document.getElementById('searchArea').addEventListener('keydown', function(e) {
     getSearchQuery(document.getElementById('searchArea').value);
   }
 });
+
+// when window closes or is refreshed
+window.addEventListener('beforeunload', function(e) {
+  clearTimeouts();
+  if (!vidOver && thumbnail.style.display === 'none') {
+    removeOneViewer();
+  }
+  removeGuest();
+  deleteAnonymousUser();
+  firebase.auth().signOut();
+  anonymousSignInElement.disabled = false;
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
+}, false);

@@ -206,8 +206,8 @@ function updateVidPlaying(currentVid) {
   });
 }
 
-function removeOneViewer() {
-  vidDataRef.update({
+async function removeOneViewer() {
+  await vidDataRef.update({
     numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
         .FieldValue.increment(-1),
   }).then(function() {

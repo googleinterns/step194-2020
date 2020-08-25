@@ -301,11 +301,11 @@ function loadGuests() {
 }
 
 //removes user's guest document from firestore 
-function removeGuest() {
+async function removeGuest() {
   const uid = firebase.auth().currentUser.uid;
   const viewer = firebase.firestore().collection('rooms')
       .doc(roomParam).collection('guests').doc(uid);
-  viewer.delete();
+  await viewer.delete();
 }
 
 // Enables or disables the submit button depending on
@@ -319,9 +319,9 @@ function toggleButton() {
 }
 
 // deletes anonymous user at sign out
-function deleteAnonymousUser() {
+async function deleteAnonymousUser() {
   const user = firebase.auth().currentUser;
-  user.delete().catch(function(error) {
+  await user.delete().catch(function(error) {
     console.error('Error deleting guest', error);
   });
 }
@@ -432,8 +432,8 @@ const guestListElement = document.getElementById('guests');
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   removeGuest();
-  firebase.auth().signOut();
   deleteAnonymousUser();
+  firebase.auth().signOut();
   anonymousSignInElement.disabled = false;
   document.getElementById('mySidebar').style.width = '0';
   document.getElementById('main').style.marginRight = '0';
@@ -446,20 +446,6 @@ anonymousSignInElement.addEventListener('click', function(e) {
   document.getElementById('mySidebar').style.width = '25%';
   document.getElementById('main').style.marginRight = '25%';
 });
-
-// when window closes or is refreshed
-window.addEventListener('beforeunload', function(e) {
-  clearTimeouts();
-  if (!vidOver && thumbnail.style.display === 'none') {
-    removeOneViewer();
-  }
-  removeGuest();
-  firebase.auth().signOut();
-  deleteAnonymousUser();
-  anonymousSignInElement.disabled = false;
-  document.getElementById('mySidebar').style.width = '0';
-  document.getElementById('main').style.marginRight = '0';
-}, false);
 
 document.querySelector("dialog").addEventListener("keydown",function(e){
   const charCode = e.charCode || e.keyCode || e.which;

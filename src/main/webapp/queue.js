@@ -293,3 +293,18 @@ document.getElementById('searchArea').addEventListener('keydown', function(e) {
     getSearchQuery(document.getElementById('searchArea').value);
   }
 });
+
+// when window closes or is refreshed
+window.addEventListener('beforeunload', function(e) {
+  clearTimeouts(); // eslint-disable-line no-undef
+  if (thumbnail.style.display === 'none' && // eslint-disable-line no-undef
+      !vidOver) { // eslint-disable-line no-undef
+    removeOneViewer(); // eslint-disable-line no-undef
+  }
+  removeGuest(); // eslint-disable-line no-undef
+  deleteAnonymousUser(); // eslint-disable-line no-undef
+  firebase.auth().signOut(); // eslint-disable-line no-undef
+  anonymousSignInElement.disabled = false; // eslint-disable-line no-undef
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
+}, false);

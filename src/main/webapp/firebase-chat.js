@@ -358,6 +358,11 @@ anonymousSignInElement.addEventListener('click', function(e) {
 
 // when window closes or is refreshed
 window.addEventListener('beforeunload', function(e) {
+  clearTimeouts();
+  if (!vidOver && thumbnail.style.display === 'none') {
+    removeOneViewer();
+  }
+  firebase.auth().signOut();
   removeGuest();
   firebase.auth().signOut();
   deleteAnonymousUser();

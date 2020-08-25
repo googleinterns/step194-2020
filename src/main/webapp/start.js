@@ -5,8 +5,8 @@ let startButtonCount = 0;
 async function startRoom() {
   if (startButtonCount < 1) {
     await db.collection('rooms').add({ // eslint-disable-line no-undef
-      duration: '0',
-      elapsedTime: '0',
+      created: firebase // eslint-disable-line no-undef
+          .firestore.Timestamp.fromDate(new Date()),
     })
         .then(function(docRef) {
           db.collection('rooms').doc(docRef.id) // eslint-disable-line no-undef

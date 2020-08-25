@@ -432,8 +432,8 @@ const guestListElement = document.getElementById('guests');
 messageFormElement.addEventListener('submit', onMessageFormSubmit);
 signOutButtonElement.addEventListener('click', function() {
   removeGuest();
-  firebase.auth().signOut();
   deleteAnonymousUser();
+  firebase.auth().signOut();
   anonymousSignInElement.disabled = false;
   document.getElementById('mySidebar').style.width = '0';
   document.getElementById('main').style.marginRight = '0';

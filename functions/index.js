@@ -62,7 +62,8 @@ exports.updatePlayBack = functions.firestore
   const previousVideoState = previousValue.isPlaying;
   const timestampNow = changeValue.timestamp;
   const timestampBefore = previousValue.timestamp;
-  const videoSpeed = previousValue.videoSpeed;
+  const previousSpeed = previousValue.videoSpeed;
+  const videoSpeed = changeValue.videoSpeed;
 
 
   if (isPlaying == false && timestampNow !== 0) {
@@ -86,8 +87,9 @@ exports.updatePlayBack = functions.firestore
   
   /**  records instances when the timestamp changes outside the sync window */
   /** higher videospeeds cause the timestamp to be jumpy and messages to
-    print irregularly so timestamp changes occuring at different speeds are ignored */
-  if (Math.abs(timestampNow - timestampBefore) > 5 && videoSpeed == 1) {
+    print irregularly so timestamp changes occuring at higher speeds are ignored */
+  if (Math.abs(timestampNow - timestampBefore) > 5 && videoSpeed <= 1 
+  && previousSpeed == videoSpeed) {
     let minutes = 0;
     let seconds = 0;
     let hours = 0;

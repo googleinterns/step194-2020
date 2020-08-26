@@ -43,9 +43,12 @@ exports.addLeaveMessages = functions.firestore
   console.log('Leave message written to database.');
 });
 
-// on update of the video playback data the chat is notified
-// when the video is paused and when the timestamp of the video is moved
-exports.updatePlayBack = functions.firestore
+/** On update of the video playback data the chat sent notifications.
+    users are aware when the video is paused only if the previous 
+    state was playing to prevent repeated print statements. 
+    Also when the timestamp of the video is moved outside the sync
+    window */
+exports.updatePlayBack = functions.firestore 
 .document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
 
   const roomID = context.params.roomId;
@@ -71,7 +74,8 @@ exports.updatePlayBack = functions.firestore
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
   }
-  // notifies user if video is playing after prevously being paused 
+  /** notifies user if video is playing after prevously being paused 
+      except at beginning of video */
   if (previousVideoState == false && timestampNow > 1) {
     admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
       name: 'Lounge Bot',
@@ -80,7 +84,10 @@ exports.updatePlayBack = functions.firestore
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
   }
-  // only want to record instances when the timestamp changes outside the sync window
+  
+  /**  records instances when the timestamp changes outside the sync window */
+  /** higher videospeeds cause the timestamp to be jumpy and messages to
+    print irregularly so timestamp changes at different speeds are ignored */
   if (Math.abs(timestampNow - timestampBefore) > 5 && videoSpeed == 1) {
     let minutes = 0;
     let seconds = 0;

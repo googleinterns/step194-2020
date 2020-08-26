@@ -72,7 +72,7 @@ exports.updatePlayBack = functions.firestore
     });
   }
   // notifies user if video is playing after prevously being paused 
-  if (previousVideoState == false && timestampNow !== 0) {
+  if (previousVideoState == false && timestampNow > 1) {
     admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
       name: 'Lounge Bot',
       profilePicUrl: '/images/LoungeLogo.png',

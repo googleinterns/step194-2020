@@ -44,8 +44,7 @@ exports.addLeaveMessages = functions.firestore
 });
 
 /** On update of the video playback data the chat sent notifications.
-    users are aware when the video is paused only if the previous 
-    state was playing to prevent repeated print statements. 
+    Users are aware when the video is paused and played
     Also when the timestamp of the video is moved outside the sync
     window */
 exports.updatePlayBack = functions.firestore 
@@ -75,7 +74,7 @@ exports.updatePlayBack = functions.firestore
     });
   }
   /** notifies user if video is playing after prevously being paused 
-      except at beginning of video */
+      except at beginning of video to prevent repeated messages */
   if (previousVideoState == false && timestampNow > 1) {
     admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
       name: 'Lounge Bot',
@@ -87,7 +86,7 @@ exports.updatePlayBack = functions.firestore
   
   /**  records instances when the timestamp changes outside the sync window */
   /** higher videospeeds cause the timestamp to be jumpy and messages to
-    print irregularly so timestamp changes at different speeds are ignored */
+    print irregularly so timestamp changes occuring at different speeds are ignored */
   if (Math.abs(timestampNow - timestampBefore) > 5 && videoSpeed == 1) {
     let minutes = 0;
     let seconds = 0;

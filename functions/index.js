@@ -60,6 +60,8 @@ exports.updatePlayBack = functions.firestore
   const previousVideoState = previousValue.isPlaying;
   const timestampNow = changeValue.timestamp;
   const timestampBefore = previousValue.timestamp;
+  const videoSpeed = previousValue.videoSpeed;
+
 
   if (isPlaying == false && timestampNow !== 0) {
     admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
@@ -79,7 +81,7 @@ exports.updatePlayBack = functions.firestore
     });
   }
   // only want to record instances when the timestamp changes outside the sync window
-  if (Math.abs(timestampNow - timestampBefore) > 5) {
+  if (Math.abs(timestampNow - timestampBefore) > 5 && videoSpeed == 1) {
     let minutes = 0;
     let seconds = 0;
     let hours = 0;

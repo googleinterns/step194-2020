@@ -43,13 +43,25 @@ exports.addLeaveMessages = functions.firestore
   console.log('Leave message written to database.');
 });
 
-// on update of the video playback data the chat is notified
-// when the video is paused and when the timestamp of the video is moved
-exports.updatePlayBack = functions.firestore
+/** On update of the video playback data the chat sent notifications.
+    Users are aware when the video is paused and played
+    Also when the timestamp of the video is moved outside the sync
+    window */
+exports.updatePlayBack = functions.firestore 
 .document('rooms/{roomId}/CurrentVideo/{PlaybackData}').onUpdate((change, context) => {
 
   const roomID = context.params.roomId;
   console.log('video change state');
+
+  function BotMessage(BotText) {
+    admin.firestore().collection('rooms').doc(roomID)
+    .collection('messages').add({
+      name: 'Lounge Bot',
+      profilePicUrl: '/images/LoungeLogo.png',
+      text: BotText,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
 
   // Get an object representing the document
   const previousValue = change.before.data();
@@ -60,26 +72,24 @@ exports.updatePlayBack = functions.firestore
   const previousVideoState = previousValue.isPlaying;
   const timestampNow = changeValue.timestamp;
   const timestampBefore = previousValue.timestamp;
+  const previousSpeed = previousValue.videoSpeed;
+  const videoSpeed = changeValue.videoSpeed;
+
 
   if (isPlaying == false && timestampNow !== 0) {
-    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-      name: 'Lounge Bot',
-      profilePicUrl: '/images/LoungeLogo.png',
-      text: `Video paused`,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    BotMessage(`Video paused`);
   }
-  // notifies user if video is playing after prevously being paused 
-  if (previousVideoState == false && timestampNow !== 0) {
-    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-      name: 'Lounge Bot',
-      profilePicUrl: '/images/LoungeLogo.png',
-      text: `Video is playing`,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
+  /** notifies user if video is playing after prevously being paused 
+      except at beginning of video to prevent repeated messages */
+  if (previousVideoState == false && timestampNow > 1) {
+    BotMessage(`Video is playing`);
   }
-  // only want to record instances when the timestamp changes outside the sync window
-  if (Math.abs(timestampNow - timestampBefore) > 5) {
+  
+  /**  records instances when the timestamp changes outside the sync window */
+  /** higher videospeeds cause the timestamp to be jumpy and messages to
+    print irregularly so timestamp changes occuring at higher speeds are ignored */
+  if (Math.abs(timestampNow - timestampBefore) > 5 && videoSpeed <= 1 
+  && previousSpeed == videoSpeed) {
     let minutes = 0;
     let seconds = 0;
     let hours = 0;
@@ -97,13 +107,7 @@ exports.updatePlayBack = functions.firestore
       seconds = '0' + seconds;
     }
     const formattedTime = result + minutes + ':' + Math.trunc(seconds);
-    admin.firestore().collection('rooms').doc(roomID)
-    .collection('messages').add({
-      name: 'Lounge Bot',
-      profilePicUrl: '/images/LoungeLogo.png',
-      text: `Video timestamp moved to ${formattedTime}`,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    BotMessage(`Video timestamp moved to ${formattedTime}`);
   }
 });
 

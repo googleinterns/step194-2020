@@ -201,12 +201,14 @@ function resetPlaybackInfo() {
   });
 }
 
+
 // updates firestore to contain current video playing
 function updateVidPlaying(currentVid) {
   vidDataRef.update({
     videoId: currentVid,
   });
 }
+
 
 // decrements numPeopleWatching by one
 async function removeOneViewer() {
@@ -320,6 +322,7 @@ let bufferTimeout; // Finds when user's video has fallen behind
 let stopUpdating = false; // makes code ignore ended videos
 let vidOver = false; // limits checks to start next video
 
+
 // sets timeouts to 0
 function clearTimeouts() {
   clearTimeout(pauseTimeout);
@@ -374,6 +377,7 @@ function onPlayerPlaybackRateChange() {
     updateInfo('Change Speed');
   }
 }
+
 
 // Realigns user with lobby if they're too far behind the lobby
 function catchUserUp() {

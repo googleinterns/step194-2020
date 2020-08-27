@@ -53,6 +53,16 @@ exports.updatePlayBack = functions.firestore
   const roomID = context.params.roomId;
   console.log('video change state');
 
+  function BotMessage(BotText) {
+    admin.firestore().collection('rooms').doc(roomID)
+    .collection('messages').add({
+      name: 'Lounge Bot',
+      profilePicUrl: '/images/LoungeLogo.png',
+      text: BotText,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+
   // Get an object representing the document
   const previousValue = change.before.data();
   const changeValue = change.after.data();
@@ -67,22 +77,12 @@ exports.updatePlayBack = functions.firestore
 
 
   if (isPlaying == false && timestampNow !== 0) {
-    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-      name: 'Lounge Bot',
-      profilePicUrl: '/images/LoungeLogo.png',
-      text: `Video paused`,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    BotMessage(`Video paused`);
   }
   /** notifies user if video is playing after prevously being paused 
       except at beginning of video to prevent repeated messages */
   if (previousVideoState == false && timestampNow > 1) {
-    admin.firestore().collection('rooms').doc(roomID).collection('messages').add({
-      name: 'Lounge Bot',
-      profilePicUrl: '/images/LoungeLogo.png',
-      text: `Video is playing`,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    BotMessage(`Video is playing`);
   }
   
   /**  records instances when the timestamp changes outside the sync window */
@@ -107,13 +107,7 @@ exports.updatePlayBack = functions.firestore
       seconds = '0' + seconds;
     }
     const formattedTime = result + minutes + ':' + Math.trunc(seconds);
-    admin.firestore().collection('rooms').doc(roomID)
-    .collection('messages').add({
-      name: 'Lounge Bot',
-      profilePicUrl: '/images/LoungeLogo.png',
-      text: `Video timestamp moved to ${formattedTime}`,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    BotMessage(`Video timestamp moved to ${formattedTime}`);
   }
 });
 

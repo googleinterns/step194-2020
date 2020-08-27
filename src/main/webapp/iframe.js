@@ -186,6 +186,7 @@ function switchDisplay() {
   }
 }
 
+// sets playback info to base values
 function resetPlaybackInfo() {
   vidDataRef.update({
     isPlaying: true,
@@ -200,14 +201,18 @@ function resetPlaybackInfo() {
   });
 }
 
+
+// updates firestore to contain current video playing
 function updateVidPlaying(currentVid) {
   vidDataRef.update({
     videoId: currentVid,
   });
 }
 
-function removeOneViewer() {
-  vidDataRef.update({
+
+// decrements numPeopleWatching by one
+async function removeOneViewer() {
+  await vidDataRef.update({
     numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
         .FieldValue.increment(-1),
   }).then(function() {
@@ -215,6 +220,7 @@ function removeOneViewer() {
   });
 }
 
+// increment numPeopleWatching by one
 function addOneViewer() {
   vidDataRef.update({
     numPeopleWatching: firebase.firestore // eslint-disable-line no-undef
@@ -225,6 +231,7 @@ function addOneViewer() {
 }
 
 let justJoined = true;
+// retrieves playback information from firestore
 function alignWithFirestore() {
   if (justJoined) {
     justJoined = false;
@@ -315,6 +322,8 @@ let bufferTimeout; // Finds when user's video has fallen behind
 let stopUpdating = false; // makes code ignore ended videos
 let vidOver = false; // limits checks to start next video
 
+
+// sets timeouts to 0
 function clearTimeouts() {
   clearTimeout(pauseTimeout);
   clearTimeout(bufferTimeout);
@@ -322,6 +331,7 @@ function clearTimeouts() {
   clearInterval(pauseInterval);
 }
 
+// Updates firestore and lobby when player state changes
 function onPlayerStateChange() {
   clearTimeouts();
   if (!stopUpdating) {
@@ -361,12 +371,15 @@ function onPlayerStateChange() {
   }
 }
 
+// Changes player speed if video isn't changing and user isn't behind lobby
 function onPlayerPlaybackRateChange() {
   if (!videoUpdating && !catchingUp) {
     updateInfo('Change Speed');
   }
 }
 
+
+// Realigns user with lobby if they're too far behind the lobby
 function catchUserUp() {
   vidDataRef.get().then(function(doc) {
     if (doc && doc.exists) {
@@ -386,6 +399,7 @@ function catchUserUp() {
   });
 }
 
+// checks snapshot of playback data for updates and reassigns variables
 function getRealtimeUpdates() {
   vidDataRef.onSnapshot(function(doc) {
     clearTimeout(autoUpdate);
@@ -421,11 +435,3 @@ function getRealtimeUpdates() {
     }
   });
 }
-
-window.onbeforeunload = function() {
-  clearTimeouts();
-  if (!vidOver && thumbnail.style.display === 'none') {
-    removeOneViewer();
-  }
-  return 'end of viewing';
-};

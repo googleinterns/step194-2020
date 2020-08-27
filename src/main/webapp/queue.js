@@ -1,4 +1,3 @@
-db = firebase.firestore(); // eslint-disable-line no-undef
 const queryValue = window.location.search;
 const urlParameters = new URLSearchParams(queryValue);
 const roomParameters = urlParameters.get('room_id');
@@ -63,8 +62,8 @@ function updateShareTab() {
       '<span id="shareImg" class="material-icons">content_copy</span>' +
       '</button>' +
       '</div>' +
-      '<input id="loungeLink" value="https://www.youtube-lounge.appspot.com/' +
-      'lounge.html?room_id='+ roomParameters +'" type="text" readonly</input>';
+      '<input id="loungeLink" value="' + window.location.hostname +
+      '/lounge.html?room_id='+ roomParameters +'" type="text" readonly</input>';
 }
 
 /* exported voteToSkip */
@@ -158,7 +157,6 @@ async function getVideoData(id) {
           document.getElementById('linkError').style.display = 'none';
           document.getElementById('videoError').style.display = 'block';
         }
-        console.log(video);
       });
   getRoomQueue(roomParameters);
 }
@@ -176,7 +174,6 @@ async function getSearchQuery(query) {
   await fetch('/keywordSearch?query=' + query)
       .then((response) => response.json())
       .then((videos) => {
-        console.log(videos);
         const items = videos.items;
         document.getElementById('searchContainer').innerHTML = '';
         for (let i = 0; i < items.length; i++) {
@@ -296,3 +293,18 @@ document.getElementById('searchArea').addEventListener('keydown', function(e) {
     getSearchQuery(document.getElementById('searchArea').value);
   }
 });
+
+// when window closes or is refreshed
+window.addEventListener('beforeunload', function(e) {
+  clearTimeouts(); // eslint-disable-line no-undef
+  if (thumbnail.style.display === 'none' && // eslint-disable-line no-undef
+      !vidOver) { // eslint-disable-line no-undef
+    removeOneViewer(); // eslint-disable-line no-undef
+  }
+  removeGuest(); // eslint-disable-line no-undef
+  deleteAnonymousUser(); // eslint-disable-line no-undef
+  firebase.auth().signOut(); // eslint-disable-line no-undef
+  anonymousSignInElement.disabled = false; // eslint-disable-line no-undef
+  document.getElementById('mySidebar').style.width = '0';
+  document.getElementById('main').style.marginRight = '0';
+}, false);

@@ -28,9 +28,11 @@ public class KeywordSearch extends HttpServlet {
     try {
       youtubeService = YoutubeService.getService();
     } catch (Exception e) {
+      response.getWriter().println(gson.toJson(e));
       e.printStackTrace();
     }
     if (youtubeService == null) {
+      response.getWriter().println(gson.toJson("youtube service: null"));
       return;
     }
     // Define and execute the API request

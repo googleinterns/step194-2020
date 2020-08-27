@@ -95,10 +95,11 @@
 .queueVideo {
     display: flex;
     flex-direction: row;
-    /* padding-top: 1%; */
     margin: 1.5%;
     padding: 1%;
-    max-height: 150px;
+    height: auto;
+    overflow: scroll;
+    max-height: 225px;
     background: #414141;
     border-radius: 3pt;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
@@ -106,7 +107,6 @@
 
 .videoThumbnail {
     height: 120px;
-    /* width: 160px; */
     width: auto;
     padding: 0.1%;
     margin-right: 2%;

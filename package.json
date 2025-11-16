@@ -2,10 +2,10 @@
   "name": "step194-2020",
   "version": "0.0.1",
   "devDependencies": {
-    "eslint": "^7.3.1",
+    "eslint": "^9.39.1",
     "eslint-config-google": "^0.14.0",
     "firebase-functions-test": "^0.2.1",
-    "mocha": "^8.1.1"
+    "mocha": "^11.7.5"
   },
   "dependencies": {
     "firebase": "^7.17.1",
